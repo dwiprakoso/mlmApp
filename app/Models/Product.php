@@ -16,6 +16,17 @@ class Product extends Model
         'is_active',
     ];
 
+    // Cast attributes to appropriate types
+    protected $casts = [
+        'is_active' => 'boolean',
+        'price' => 'decimal:2',
+    ];
+
+    // Default values
+    protected $attributes = [
+        'is_active' => true,
+    ];
+
     public function deposits()
     {
         return $this->hasMany(Deposit::class);

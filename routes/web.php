@@ -37,6 +37,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Product Routes
     Route::prefix('product')->name('product.')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
+        Route::post('/', [ProductController::class, 'store'])->name('store');
+        Route::put('/{product}', [ProductController::class, 'update'])->name('update');
+        Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
     });
     // Report Routes
     Route::prefix('report')->name('report.')->group(function () {
