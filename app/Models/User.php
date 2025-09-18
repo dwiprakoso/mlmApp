@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'status',
     ];
 
     /**
@@ -44,5 +45,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get status badge color
+     */
+    public function getStatusBadgeColorAttribute()
+    {
+        return match ($this->status) {
+            'active' => 'success',
+            'inactive' => 'warning',
+            'suspended' => 'danger',
+            default => 'secondary'
+        };
     }
 }

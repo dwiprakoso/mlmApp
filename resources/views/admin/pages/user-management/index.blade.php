@@ -27,37 +27,42 @@
                         <!--begin::Item-->
                         <li class="breadcrumb-item text-muted">User Management</li>
                         <!--end::Item-->
-                        <!--begin::Item-->
-                        <li class="breadcrumb-item">
-                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
-                        </li>
-                        <!--end::Item-->
-                        <!--begin::Item-->
-                        <li class="breadcrumb-item text-muted">Users</li>
-                        <!--end::Item-->
                     </ul>
                     <!--end::Breadcrumb-->
                 </div>
                 <!--end::Page title-->
-                <!--begin::Actions-->
-                <div class="d-flex align-items-center gap-2 gap-lg-3">
-                    <a href="#"
-                        class="btn btn-flex btn-outline btn-color-gray-700 btn-active-color-primary bg-body h-40px fs-7 fw-bold"
-                        data-bs-toggle="modal" data-bs-target="#kt_modal_view_users">Add Member</a>
-                    <a href="#" class="btn btn-flex btn-primary h-40px fs-7 fw-bold" data-bs-toggle="modal"
-                        data-bs-target="#kt_modal_create_campaign">New Campaign</a>
-                </div>
-                <!--end::Actions-->
             </div>
             <!--end::Toolbar wrapper-->
         </div>
         <!--end::Toolbar container-->
     </div>
     <!--end::Toolbar-->
+
     <!--begin::Content-->
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <!--begin::Content container-->
         <div id="kt_app_content_container" class="app-container container-xxl">
+
+            {{-- Success Message --}}
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            {{-- Error Messages --}}
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <!--begin::Card-->
             <div class="card">
                 <!--begin::Card header-->
@@ -77,67 +82,6 @@
                     <div class="card-toolbar">
                         <!--begin::Toolbar-->
                         <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                            <!--begin::Filter-->
-                            <button type="button" class="btn btn-light-primary me-3" data-kt-menu-trigger="click"
-                                data-kt-menu-placement="bottom-end">
-                                <i class="ki-outline ki-filter fs-2"></i>Filter</button>
-                            <!--begin::Menu 1-->
-                            <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true">
-                                <!--begin::Header-->
-                                <div class="px-7 py-5">
-                                    <div class="fs-5 text-gray-900 fw-bold">Filter Options</div>
-                                </div>
-                                <!--end::Header-->
-                                <!--begin::Separator-->
-                                <div class="separator border-gray-200"></div>
-                                <!--end::Separator-->
-                                <!--begin::Content-->
-                                <div class="px-7 py-5" data-kt-user-table-filter="form">
-                                    <!--begin::Input group-->
-                                    <div class="mb-10">
-                                        <label class="form-label fs-6 fw-semibold">Role:</label>
-                                        <select class="form-select form-select-solid fw-bold" data-kt-select2="true"
-                                            data-placeholder="Select option" data-allow-clear="true"
-                                            data-kt-user-table-filter="role" data-hide-search="true">
-                                            <option></option>
-                                            <option value="Administrator">Administrator</option>
-                                            <option value="Analyst">Analyst</option>
-                                            <option value="Developer">Developer</option>
-                                            <option value="Support">Support</option>
-                                            <option value="Trial">Trial</option>
-                                        </select>
-                                    </div>
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
-                                    <div class="mb-10">
-                                        <label class="form-label fs-6 fw-semibold">Two Step Verification:</label>
-                                        <select class="form-select form-select-solid fw-bold" data-kt-select2="true"
-                                            data-placeholder="Select option" data-allow-clear="true"
-                                            data-kt-user-table-filter="two-step" data-hide-search="true">
-                                            <option></option>
-                                            <option value="Enabled">Enabled</option>
-                                        </select>
-                                    </div>
-                                    <!--end::Input group-->
-                                    <!--begin::Actions-->
-                                    <div class="d-flex justify-content-end">
-                                        <button type="reset"
-                                            class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6"
-                                            data-kt-menu-dismiss="true" data-kt-user-table-filter="reset">Reset</button>
-                                        <button type="submit" class="btn btn-primary fw-semibold px-6"
-                                            data-kt-menu-dismiss="true" data-kt-user-table-filter="filter">Apply</button>
-                                    </div>
-                                    <!--end::Actions-->
-                                </div>
-                                <!--end::Content-->
-                            </div>
-                            <!--end::Menu 1-->
-                            <!--end::Filter-->
-                            <!--begin::Export-->
-                            <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal"
-                                data-bs-target="#kt_modal_export_users">
-                                <i class="ki-outline ki-exit-up fs-2"></i>Export</button>
-                            <!--end::Export-->
                             <!--begin::Add user-->
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#kt_modal_add_user">
@@ -145,359 +89,6 @@
                             <!--end::Add user-->
                         </div>
                         <!--end::Toolbar-->
-                        <!--begin::Group actions-->
-                        <div class="d-flex justify-content-end align-items-center d-none"
-                            data-kt-user-table-toolbar="selected">
-                            <div class="fw-bold me-5">
-                                <span class="me-2" data-kt-user-table-select="selected_count"></span>Selected
-                            </div>
-                            <button type="button" class="btn btn-danger"
-                                data-kt-user-table-select="delete_selected">Delete Selected</button>
-                        </div>
-                        <!--end::Group actions-->
-                        <!--begin::Modal - Adjust Balance-->
-                        <div class="modal fade" id="kt_modal_export_users" tabindex="-1" aria-hidden="true">
-                            <!--begin::Modal dialog-->
-                            <div class="modal-dialog modal-dialog-centered mw-650px">
-                                <!--begin::Modal content-->
-                                <div class="modal-content">
-                                    <!--begin::Modal header-->
-                                    <div class="modal-header">
-                                        <!--begin::Modal title-->
-                                        <h2 class="fw-bold">Export Users</h2>
-                                        <!--end::Modal title-->
-                                        <!--begin::Close-->
-                                        <div class="btn btn-icon btn-sm btn-active-icon-primary"
-                                            data-kt-users-modal-action="close">
-                                            <i class="ki-outline ki-cross fs-1"></i>
-                                        </div>
-                                        <!--end::Close-->
-                                    </div>
-                                    <!--end::Modal header-->
-                                    <!--begin::Modal body-->
-                                    <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
-                                        <!--begin::Form-->
-                                        <form id="kt_modal_export_users_form" class="form" action="#">
-                                            <!--begin::Input group-->
-                                            <div class="fv-row mb-10">
-                                                <!--begin::Label-->
-                                                <label class="fs-6 fw-semibold form-label mb-2">Select Roles:</label>
-                                                <!--end::Label-->
-                                                <!--begin::Input-->
-                                                <select name="role" data-control="select2"
-                                                    data-placeholder="Select a role" data-hide-search="true"
-                                                    class="form-select form-select-solid fw-bold">
-                                                    <option></option>
-                                                    <option value="Administrator">Administrator</option>
-                                                    <option value="Analyst">Analyst</option>
-                                                    <option value="Developer">Developer</option>
-                                                    <option value="Support">Support</option>
-                                                    <option value="Trial">Trial</option>
-                                                </select>
-                                                <!--end::Input-->
-                                            </div>
-                                            <!--end::Input group-->
-                                            <!--begin::Input group-->
-                                            <div class="fv-row mb-10">
-                                                <!--begin::Label-->
-                                                <label class="required fs-6 fw-semibold form-label mb-2">Select Export
-                                                    Format:</label>
-                                                <!--end::Label-->
-                                                <!--begin::Input-->
-                                                <select name="format" data-control="select2"
-                                                    data-placeholder="Select a format" data-hide-search="true"
-                                                    class="form-select form-select-solid fw-bold">
-                                                    <option></option>
-                                                    <option value="excel">Excel</option>
-                                                    <option value="pdf">PDF</option>
-                                                    <option value="cvs">CVS</option>
-                                                    <option value="zip">ZIP</option>
-                                                </select>
-                                                <!--end::Input-->
-                                            </div>
-                                            <!--end::Input group-->
-                                            <!--begin::Actions-->
-                                            <div class="text-center">
-                                                <button type="reset" class="btn btn-light me-3"
-                                                    data-kt-users-modal-action="cancel">Discard</button>
-                                                <button type="submit" class="btn btn-primary"
-                                                    data-kt-users-modal-action="submit">
-                                                    <span class="indicator-label">Submit</span>
-                                                    <span class="indicator-progress">Please wait...
-                                                        <span
-                                                            class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-                                                </button>
-                                            </div>
-                                            <!--end::Actions-->
-                                        </form>
-                                        <!--end::Form-->
-                                    </div>
-                                    <!--end::Modal body-->
-                                </div>
-                                <!--end::Modal content-->
-                            </div>
-                            <!--end::Modal dialog-->
-                        </div>
-                        <!--end::Modal - New Card-->
-                        <!--begin::Modal - Add task-->
-                        <div class="modal fade" id="kt_modal_add_user" tabindex="-1" aria-hidden="true">
-                            <!--begin::Modal dialog-->
-                            <div class="modal-dialog modal-dialog-centered mw-650px">
-                                <!--begin::Modal content-->
-                                <div class="modal-content">
-                                    <!--begin::Modal header-->
-                                    <div class="modal-header" id="kt_modal_add_user_header">
-                                        <!--begin::Modal title-->
-                                        <h2 class="fw-bold">Add User</h2>
-                                        <!--end::Modal title-->
-                                        <!--begin::Close-->
-                                        <div class="btn btn-icon btn-sm btn-active-icon-primary"
-                                            data-kt-users-modal-action="close">
-                                            <i class="ki-outline ki-cross fs-1"></i>
-                                        </div>
-                                        <!--end::Close-->
-                                    </div>
-                                    <!--end::Modal header-->
-                                    <!--begin::Modal body-->
-                                    <div class="modal-body px-5 my-7">
-                                        <!--begin::Form-->
-                                        <form id="kt_modal_add_user_form" class="form" action="#">
-                                            <!--begin::Scroll-->
-                                            <div class="d-flex flex-column scroll-y px-5 px-lg-10"
-                                                id="kt_modal_add_user_scroll" data-kt-scroll="true"
-                                                data-kt-scroll-activate="true" data-kt-scroll-max-height="auto"
-                                                data-kt-scroll-dependencies="#kt_modal_add_user_header"
-                                                data-kt-scroll-wrappers="#kt_modal_add_user_scroll"
-                                                data-kt-scroll-offset="300px">
-                                                <!--begin::Input group-->
-                                                <div class="fv-row mb-7">
-                                                    <!--begin::Label-->
-                                                    <label class="d-block fw-semibold fs-6 mb-5">Avatar</label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Image placeholder-->
-                                                    <style>
-                                                        .image-input-placeholder {
-                                                            background-image: url('assets/media/svg/files/blank-image.svg');
-                                                        }
-
-                                                        [data-bs-theme="dark"] .image-input-placeholder {
-                                                            background-image: url('assets/media/svg/files/blank-image-dark.svg');
-                                                        }
-                                                    </style>
-                                                    <!--end::Image placeholder-->
-                                                    <!--begin::Image input-->
-                                                    <div class="image-input image-input-outline image-input-placeholder"
-                                                        data-kt-image-input="true">
-                                                        <!--begin::Preview existing avatar-->
-                                                        <div class="image-input-wrapper w-125px h-125px"
-                                                            style="background-image: url(assets/media/avatars/300-6.jpg);">
-                                                        </div>
-                                                        <!--end::Preview existing avatar-->
-                                                        <!--begin::Label-->
-                                                        <label
-                                                            class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                            data-kt-image-input-action="change" data-bs-toggle="tooltip"
-                                                            title="Change avatar">
-                                                            <i class="ki-outline ki-pencil fs-7"></i>
-                                                            <!--begin::Inputs-->
-                                                            <input type="file" name="avatar"
-                                                                accept=".png, .jpg, .jpeg" />
-                                                            <input type="hidden" name="avatar_remove" />
-                                                            <!--end::Inputs-->
-                                                        </label>
-                                                        <!--end::Label-->
-                                                        <!--begin::Cancel-->
-                                                        <span
-                                                            class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                            data-kt-image-input-action="cancel" data-bs-toggle="tooltip"
-                                                            title="Cancel avatar">
-                                                            <i class="ki-outline ki-cross fs-2"></i>
-                                                        </span>
-                                                        <!--end::Cancel-->
-                                                        <!--begin::Remove-->
-                                                        <span
-                                                            class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                            data-kt-image-input-action="remove" data-bs-toggle="tooltip"
-                                                            title="Remove avatar">
-                                                            <i class="ki-outline ki-cross fs-2"></i>
-                                                        </span>
-                                                        <!--end::Remove-->
-                                                    </div>
-                                                    <!--end::Image input-->
-                                                    <!--begin::Hint-->
-                                                    <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
-                                                    <!--end::Hint-->
-                                                </div>
-                                                <!--end::Input group-->
-                                                <!--begin::Input group-->
-                                                <div class="fv-row mb-7">
-                                                    <!--begin::Label-->
-                                                    <label class="required fw-semibold fs-6 mb-2">Full Name</label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Input-->
-                                                    <input type="text" name="user_name"
-                                                        class="form-control form-control-solid mb-3 mb-lg-0"
-                                                        placeholder="Full name" value="Emma Smith" />
-                                                    <!--end::Input-->
-                                                </div>
-                                                <!--end::Input group-->
-                                                <!--begin::Input group-->
-                                                <div class="fv-row mb-7">
-                                                    <!--begin::Label-->
-                                                    <label class="required fw-semibold fs-6 mb-2">Email</label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Input-->
-                                                    <input type="email" name="user_email"
-                                                        class="form-control form-control-solid mb-3 mb-lg-0"
-                                                        placeholder="example@domain.com" value="smith@kpmg.com" />
-                                                    <!--end::Input-->
-                                                </div>
-                                                <!--end::Input group-->
-                                                <!--begin::Input group-->
-                                                <div class="mb-5">
-                                                    <!--begin::Label-->
-                                                    <label class="required fw-semibold fs-6 mb-5">Role</label>
-                                                    <!--end::Label-->
-                                                    <!--begin::Roles-->
-                                                    <!--begin::Input row-->
-                                                    <div class="d-flex fv-row">
-                                                        <!--begin::Radio-->
-                                                        <div class="form-check form-check-custom form-check-solid">
-                                                            <!--begin::Input-->
-                                                            <input class="form-check-input me-3" name="user_role"
-                                                                type="radio" value="0"
-                                                                id="kt_modal_update_role_option_0" checked='checked' />
-                                                            <!--end::Input-->
-                                                            <!--begin::Label-->
-                                                            <label class="form-check-label"
-                                                                for="kt_modal_update_role_option_0">
-                                                                <div class="fw-bold text-gray-800">Administrator</div>
-                                                                <div class="text-gray-600">Best for business owners and
-                                                                    company administrators</div>
-                                                            </label>
-                                                            <!--end::Label-->
-                                                        </div>
-                                                        <!--end::Radio-->
-                                                    </div>
-                                                    <!--end::Input row-->
-                                                    <div class='separator separator-dashed my-5'></div>
-                                                    <!--begin::Input row-->
-                                                    <div class="d-flex fv-row">
-                                                        <!--begin::Radio-->
-                                                        <div class="form-check form-check-custom form-check-solid">
-                                                            <!--begin::Input-->
-                                                            <input class="form-check-input me-3" name="user_role"
-                                                                type="radio" value="1"
-                                                                id="kt_modal_update_role_option_1" />
-                                                            <!--end::Input-->
-                                                            <!--begin::Label-->
-                                                            <label class="form-check-label"
-                                                                for="kt_modal_update_role_option_1">
-                                                                <div class="fw-bold text-gray-800">Developer</div>
-                                                                <div class="text-gray-600">Best for developers or people
-                                                                    primarily using the API</div>
-                                                            </label>
-                                                            <!--end::Label-->
-                                                        </div>
-                                                        <!--end::Radio-->
-                                                    </div>
-                                                    <!--end::Input row-->
-                                                    <div class='separator separator-dashed my-5'></div>
-                                                    <!--begin::Input row-->
-                                                    <div class="d-flex fv-row">
-                                                        <!--begin::Radio-->
-                                                        <div class="form-check form-check-custom form-check-solid">
-                                                            <!--begin::Input-->
-                                                            <input class="form-check-input me-3" name="user_role"
-                                                                type="radio" value="2"
-                                                                id="kt_modal_update_role_option_2" />
-                                                            <!--end::Input-->
-                                                            <!--begin::Label-->
-                                                            <label class="form-check-label"
-                                                                for="kt_modal_update_role_option_2">
-                                                                <div class="fw-bold text-gray-800">Analyst</div>
-                                                                <div class="text-gray-600">Best for people who need full
-                                                                    access to analytics data, but don't need to update
-                                                                    business settings</div>
-                                                            </label>
-                                                            <!--end::Label-->
-                                                        </div>
-                                                        <!--end::Radio-->
-                                                    </div>
-                                                    <!--end::Input row-->
-                                                    <div class='separator separator-dashed my-5'></div>
-                                                    <!--begin::Input row-->
-                                                    <div class="d-flex fv-row">
-                                                        <!--begin::Radio-->
-                                                        <div class="form-check form-check-custom form-check-solid">
-                                                            <!--begin::Input-->
-                                                            <input class="form-check-input me-3" name="user_role"
-                                                                type="radio" value="3"
-                                                                id="kt_modal_update_role_option_3" />
-                                                            <!--end::Input-->
-                                                            <!--begin::Label-->
-                                                            <label class="form-check-label"
-                                                                for="kt_modal_update_role_option_3">
-                                                                <div class="fw-bold text-gray-800">Support</div>
-                                                                <div class="text-gray-600">Best for employees who regularly
-                                                                    refund payments and respond to disputes</div>
-                                                            </label>
-                                                            <!--end::Label-->
-                                                        </div>
-                                                        <!--end::Radio-->
-                                                    </div>
-                                                    <!--end::Input row-->
-                                                    <div class='separator separator-dashed my-5'></div>
-                                                    <!--begin::Input row-->
-                                                    <div class="d-flex fv-row">
-                                                        <!--begin::Radio-->
-                                                        <div class="form-check form-check-custom form-check-solid">
-                                                            <!--begin::Input-->
-                                                            <input class="form-check-input me-3" name="user_role"
-                                                                type="radio" value="4"
-                                                                id="kt_modal_update_role_option_4" />
-                                                            <!--end::Input-->
-                                                            <!--begin::Label-->
-                                                            <label class="form-check-label"
-                                                                for="kt_modal_update_role_option_4">
-                                                                <div class="fw-bold text-gray-800">Trial</div>
-                                                                <div class="text-gray-600">Best for people who need to
-                                                                    preview content data, but don't need to make any updates
-                                                                </div>
-                                                            </label>
-                                                            <!--end::Label-->
-                                                        </div>
-                                                        <!--end::Radio-->
-                                                    </div>
-                                                    <!--end::Input row-->
-                                                    <!--end::Roles-->
-                                                </div>
-                                                <!--end::Input group-->
-                                            </div>
-                                            <!--end::Scroll-->
-                                            <!--begin::Actions-->
-                                            <div class="text-center pt-10">
-                                                <button type="reset" class="btn btn-light me-3"
-                                                    data-kt-users-modal-action="cancel">Discard</button>
-                                                <button type="submit" class="btn btn-primary"
-                                                    data-kt-users-modal-action="submit">
-                                                    <span class="indicator-label">Submit</span>
-                                                    <span class="indicator-progress">Please wait...
-                                                        <span
-                                                            class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-                                                </button>
-                                            </div>
-                                            <!--end::Actions-->
-                                        </form>
-                                        <!--end::Form-->
-                                    </div>
-                                    <!--end::Modal body-->
-                                </div>
-                                <!--end::Modal content-->
-                            </div>
-                            <!--end::Modal dialog-->
-                        </div>
-                        <!--end::Modal - Add task-->
                     </div>
                     <!--end::Card toolbar-->
                 </div>
@@ -508,1146 +99,67 @@
                     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_users">
                         <thead>
                             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                <th class="w-10px pe-2">
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
-                                        <input class="form-check-input" type="checkbox" data-kt-check="true"
-                                            data-kt-check-target="#kt_table_users .form-check-input" value="1" />
-                                    </div>
-                                </th>
                                 <th class="min-w-125px">User</th>
-                                <th class="min-w-125px">Role</th>
-                                <th class="min-w-125px">Last login</th>
-                                <th class="min-w-125px">Two-step</th>
+                                <th class="min-w-125px">Status</th>
                                 <th class="min-w-125px">Joined Date</th>
                                 <th class="text-end min-w-100px">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-600 fw-semibold">
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-6.jpg" alt="Emma Smith"
-                                                    class="w-100" />
+                            @foreach ($users as $user)
+                                <tr>
+                                    <td class="d-flex align-items-center">
+                                        <!--begin:: Avatar -->
+                                        <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
+                                            <div class="symbol-label fs-3 bg-light-primary text-primary">
+                                                {{ strtoupper(substr($user->name, 0, 1)) }}
                                             </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Emma Smith</a>
-                                        <span>smith@kpmg.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Administrator</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">Yesterday</div>
-                                </td>
-                                <td></td>
-                                <td>05 May 2024, 8:43 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
                                         </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
+                                        <!--end::Avatar-->
+                                        <!--begin::User details-->
+                                        <div class="d-flex flex-column">
+                                            <a href="#"
+                                                class="text-gray-800 text-hover-primary mb-1">{{ $user->name }}</a>
+                                            <span>{{ $user->email }}</span>
                                         </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label fs-3 bg-light-danger text-danger">M</div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Melody Macy</a>
-                                        <span>melody@altbox.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Analyst</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">20 mins ago</div>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success fw-bold">Enabled</div>
-                                </td>
-                                <td>10 Mar 2024, 5:30 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
+                                        <!--begin::User details-->
+                                    </td>
+                                    <td>
+                                        <div class="badge badge-light-{{ $user->status_badge_color }} fw-bold">
+                                            {{ ucfirst($user->status) }}
                                         </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-1.jpg" alt="Max Smith"
-                                                    class="w-100" />
+                                    </td>
+                                    <td>{{ $user->created_at->format('d M Y, g:i a') }}</td>
+                                    <td class="text-end">
+                                        <a href="#"
+                                            class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
+                                            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
+                                            <i class="ki-outline ki-down fs-5 ms-1"></i></a>
+                                        <!--begin::Menu-->
+                                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
+                                            data-kt-menu="true">
+                                            <!--begin::Menu item-->
+                                            <div class="menu-item px-3">
+                                                <a href="#" class="menu-link px-3" data-bs-toggle="modal"
+                                                    data-bs-target="#kt_modal_edit_user" data-user-id="{{ $user->id }}"
+                                                    data-user-name="{{ $user->name }}"
+                                                    data-user-email="{{ $user->email }}"
+                                                    data-user-status="{{ $user->status }}">Edit</a>
                                             </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Max Smith</a>
-                                        <span>max@kt.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Developer</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">3 days ago</div>
-                                </td>
-                                <td></td>
-                                <td>25 Oct 2024, 10:30 am</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-5.jpg" alt="Sean Bean"
-                                                    class="w-100" />
+                                            <!--end::Menu item-->
+                                            <!--begin::Menu item-->
+                                            <div class="menu-item px-3">
+                                                <a href="#" class="menu-link px-3 text-danger" data-bs-toggle="modal"
+                                                    data-bs-target="#kt_modal_delete_user"
+                                                    data-user-id="{{ $user->id }}"
+                                                    data-user-name="{{ $user->name }}">Delete</a>
                                             </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Sean Bean</a>
-                                        <span>sean@dellito.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Support</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">5 hours ago</div>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success fw-bold">Enabled</div>
-                                </td>
-                                <td>25 Oct 2024, 6:05 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
+                                            <!--end::Menu item-->
                                         </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-25.jpg" alt="Brian Cox"
-                                                    class="w-100" />
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Brian Cox</a>
-                                        <span>brian@exchange.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Developer</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">2 days ago</div>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success fw-bold">Enabled</div>
-                                </td>
-                                <td>25 Jul 2024, 11:30 am</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label fs-3 bg-light-warning text-warning">C</div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Mikaela Collins</a>
-                                        <span>mik@pex.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Administrator</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">5 days ago</div>
-                                </td>
-                                <td></td>
-                                <td>05 May 2024, 6:43 am</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-9.jpg" alt="Francis Mitcham"
-                                                    class="w-100" />
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Francis Mitcham</a>
-                                        <span>f.mit@kpmg.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Trial</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">3 weeks ago</div>
-                                </td>
-                                <td></td>
-                                <td>20 Jun 2024, 9:23 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label fs-3 bg-light-danger text-danger">O</div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Olivia Wild</a>
-                                        <span>olivia@corpmail.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Administrator</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">Yesterday</div>
-                                </td>
-                                <td></td>
-                                <td>20 Jun 2024, 2:40 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label fs-3 bg-light-primary text-primary">N</div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Neil Owen</a>
-                                        <span>owen.neil@gmail.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Analyst</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">20 mins ago</div>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success fw-bold">Enabled</div>
-                                </td>
-                                <td>21 Feb 2024, 6:43 am</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-23.jpg" alt="Dan Wilson"
-                                                    class="w-100" />
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Dan Wilson</a>
-                                        <span>dam@consilting.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Developer</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">3 days ago</div>
-                                </td>
-                                <td></td>
-                                <td>20 Dec 2024, 11:30 am</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label fs-3 bg-light-danger text-danger">E</div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Emma Bold</a>
-                                        <span>emma@intenso.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Support</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">5 hours ago</div>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success fw-bold">Enabled</div>
-                                </td>
-                                <td>20 Dec 2024, 10:30 am</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-12.jpg" alt="Ana Crown"
-                                                    class="w-100" />
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Ana Crown</a>
-                                        <span>ana.cf@limtel.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Developer</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">2 days ago</div>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success fw-bold">Enabled</div>
-                                </td>
-                                <td>22 Sep 2024, 11:05 am</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label fs-3 bg-light-info text-info">A</div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Robert Doe</a>
-                                        <span>robert@benko.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Administrator</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">5 days ago</div>
-                                </td>
-                                <td></td>
-                                <td>05 May 2024, 9:23 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-13.jpg" alt="John Miller"
-                                                    class="w-100" />
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">John Miller</a>
-                                        <span>miller@mapple.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Trial</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">3 weeks ago</div>
-                                </td>
-                                <td></td>
-                                <td>20 Jun 2024, 2:40 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label fs-3 bg-light-success text-success">L</div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Lucy Kunic</a>
-                                        <span>lucy.m@fentech.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Administrator</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">Yesterday</div>
-                                </td>
-                                <td></td>
-                                <td>10 Nov 2024, 8:43 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label fs-3 bg-light-danger text-danger">M</div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Melody Macy</a>
-                                        <span>melody@altbox.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Analyst</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">20 mins ago</div>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success fw-bold">Enabled</div>
-                                </td>
-                                <td>19 Aug 2024, 10:30 am</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-1.jpg" alt="Max Smith"
-                                                    class="w-100" />
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Max Smith</a>
-                                        <span>max@kt.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Developer</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">3 days ago</div>
-                                </td>
-                                <td></td>
-                                <td>22 Sep 2024, 5:30 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-5.jpg" alt="Sean Bean"
-                                                    class="w-100" />
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Sean Bean</a>
-                                        <span>sean@dellito.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Support</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">5 hours ago</div>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success fw-bold">Enabled</div>
-                                </td>
-                                <td>25 Jul 2024, 8:43 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-25.jpg" alt="Brian Cox"
-                                                    class="w-100" />
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Brian Cox</a>
-                                        <span>brian@exchange.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Developer</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">2 days ago</div>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success fw-bold">Enabled</div>
-                                </td>
-                                <td>19 Aug 2024, 2:40 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label fs-3 bg-light-warning text-warning">C</div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Mikaela Collins</a>
-                                        <span>mik@pex.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Administrator</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">5 days ago</div>
-                                </td>
-                                <td></td>
-                                <td>15 Apr 2024, 5:20 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="1" />
-                                    </div>
-                                </td>
-                                <td class="d-flex align-items-center">
-                                    <!--begin:: Avatar -->
-                                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                        <a href="apps/user-management/users/view.html">
-                                            <div class="symbol-label">
-                                                <img src="assets/media/avatars/300-9.jpg" alt="Francis Mitcham"
-                                                    class="w-100" />
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::User details-->
-                                    <div class="d-flex flex-column">
-                                        <a href="apps/user-management/users/view.html"
-                                            class="text-gray-800 text-hover-primary mb-1">Francis Mitcham</a>
-                                        <span>f.mit@kpmg.com</span>
-                                    </div>
-                                    <!--begin::User details-->
-                                </td>
-                                <td>Trial</td>
-                                <td>
-                                    <div class="badge badge-light fw-bold">3 weeks ago</div>
-                                </td>
-                                <td></td>
-                                <td>24 Jun 2024, 6:05 pm</td>
-                                <td class="text-end">
-                                    <a href="#"
-                                        class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                        <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                    <!--begin::Menu-->
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                        data-kt-menu="true">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="apps/user-management/users/view.html" class="menu-link px-3">Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3"
-                                                data-kt-users-table-filter="delete_row">Delete</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                    <!--end::Menu-->
-                                </td>
-                            </tr>
+                                        <!--end::Menu-->
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                     <!--end::Table-->
@@ -1659,4 +171,198 @@
         <!--end::Content container-->
     </div>
     <!--end::Content-->
+
+    {{-- Add User Modal --}}
+    <div class="modal fade" id="kt_modal_add_user" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-650px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="fw-bold">Add User</h2>
+                    <button type="button" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="ki-outline ki-cross fs-1"></i>
+                    </button>
+                </div>
+                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                    <form action="{{ route('admin.user-management.store') }}" method="POST"
+                        id="kt_modal_add_user_form">
+                        @csrf
+                        <div class="d-flex flex-column scroll-y me-n7 pe-7">
+                            {{-- Name --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Full Name</label>
+                                <input type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Full name" value="{{ old('name') }}" required />
+                            </div>
+                            {{-- Email --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Email</label>
+                                <input type="email" name="email" class="form-control form-control-solid mb-3 mb-lg-0"
+                                    placeholder="example@domain.com" value="{{ old('email') }}" required />
+                            </div>
+                            {{-- Password --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Password</label>
+                                <input type="password" name="password"
+                                    class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Password"
+                                    required />
+                            </div>
+                            {{-- Status --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Status</label>
+                                <select name="status" class="form-select form-select-solid fw-bold" required>
+                                    <option value="">Select status</option>
+                                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active
+                                    </option>
+                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive
+                                    </option>
+                                    <option value="suspended" {{ old('status') == 'suspended' ? 'selected' : '' }}>
+                                        Suspended</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="text-center pt-15">
+                            <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal"
+                                aria-label="Close">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <span class="indicator-label">Submit</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Edit User Modal --}}
+    <div class="modal fade" id="kt_modal_edit_user" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-650px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="fw-bold">Edit User</h2>
+                    <button type="button" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="ki-outline ki-cross fs-1"></i>
+                    </button>
+                </div>
+                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                    <form action="" method="POST" id="kt_modal_edit_user_form">
+                        @csrf
+                        @method('PUT')
+                        <div class="d-flex flex-column scroll-y me-n7 pe-7">
+                            {{-- Name --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Full Name</label>
+                                <input type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Full name" id="edit_name" required />
+                            </div>
+                            {{-- Email --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Email</label>
+                                <input type="email" name="email" class="form-control form-control-solid mb-3 mb-lg-0"
+                                    placeholder="example@domain.com" id="edit_email" required />
+                            </div>
+                            {{-- Password --}}
+                            <div class="fv-row mb-7">
+                                <label class="fw-semibold fs-6 mb-2">Password</label>
+                                <input type="password" name="password"
+                                    class="form-control form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Leave blank to keep current password" />
+                                <div class="form-text">Leave blank if you don't want to change the password</div>
+                            </div>
+                            {{-- Status --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Status</label>
+                                <select name="status" class="form-select form-select-solid fw-bold" id="edit_status"
+                                    required>
+                                    <option value="">Select status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="suspended">Suspended</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="text-center pt-15">
+                            <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal"
+                                aria-label="Close">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <span class="indicator-label">Update</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Delete User Modal --}}
+    <div class="modal fade" id="kt_modal_delete_user" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-550px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="fw-bold">Delete User</h2>
+                    <button type="button" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="ki-outline ki-cross fs-1"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="ki-outline ki-trash text-danger fs-3x mb-5"></i>
+                        <p class="fs-6 text-gray-600 mb-5">Are you sure you want to delete <strong
+                                id="delete_user_name"></strong>?</p>
+                        <p class="fs-7 text-muted">This action cannot be undone.</p>
+                    </div>
+                    <form action="" method="POST" id="kt_modal_delete_user_form">
+                        @csrf
+                        @method('DELETE')
+                        <div class="text-center pt-5">
+                            <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+        <script>
+            // Edit User Modal
+            document.addEventListener('DOMContentLoaded', function() {
+                const editModal = document.getElementById('kt_modal_edit_user');
+                editModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const userId = button.getAttribute('data-user-id');
+                    const userName = button.getAttribute('data-user-name');
+                    const userEmail = button.getAttribute('data-user-email');
+                    const userStatus = button.getAttribute('data-user-status');
+
+                    // Update form action
+                    const form = document.getElementById('kt_modal_edit_user_form');
+                    form.action = `{{ route('admin.user-management.index') }}/${userId}`;
+
+                    // Fill form fields
+                    document.getElementById('edit_name').value = userName;
+                    document.getElementById('edit_email').value = userEmail;
+                    document.getElementById('edit_status').value = userStatus;
+                });
+
+                // Delete User Modal
+                const deleteModal = document.getElementById('kt_modal_delete_user');
+                deleteModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const userId = button.getAttribute('data-user-id');
+                    const userName = button.getAttribute('data-user-name');
+
+                    // Update form action
+                    const form = document.getElementById('kt_modal_delete_user_form');
+                    form.action = `{{ route('admin.user-management.index') }}/${userId}`;
+
+                    // Update user name in modal
+                    document.getElementById('delete_user_name').textContent = userName;
+                });
+            });
+        </script>
+    @endpush
 @endsection
