@@ -61,6 +61,23 @@
                                 <!--end:Menu item-->
                                 <!--begin:Menu item-->
                                 <div class="menu-item">
+                                    <a class="menu-link {{ request()->routeIs('admin.product*') ? 'active' : '' }}"
+                                        href="{{ route('admin.product.index') }}">
+                                        <span class="menu-icon">
+                                            <i class="ki-duotone ki-parcel fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                                <span class="path4"></span>
+                                                <span class="path5"></span>
+                                            </i>
+                                        </span>
+                                        <span class="menu-title">Product</span>
+                                    </a>
+                                </div>
+                                <!--end:Menu item-->
+                                <!--begin:Menu item-->
+                                <div class="menu-item">
                                     <a class="menu-link {{ request()->routeIs('admin.deposit*') ? 'active' : '' }}"
                                         href="{{ route('admin.deposit.index') }}">
                                         <span class="menu-icon">
@@ -90,23 +107,6 @@
                                             </i>
                                         </span>
                                         <span class="menu-title">Withdraw</span>
-                                    </a>
-                                </div>
-                                <!--end:Menu item-->
-                                <!--begin:Menu item-->
-                                <div class="menu-item">
-                                    <a class="menu-link {{ request()->routeIs('admin.product*') ? 'active' : '' }}"
-                                        href="{{ route('admin.product.index') }}">
-                                        <span class="menu-icon">
-                                            <i class="ki-duotone ki-parcel fs-2">
-                                                <span class="path1"></span>
-                                                <span class="path2"></span>
-                                                <span class="path3"></span>
-                                                <span class="path4"></span>
-                                                <span class="path5"></span>
-                                            </i>
-                                        </span>
-                                        <span class="menu-title">Product</span>
                                     </a>
                                 </div>
                                 <!--end:Menu item-->

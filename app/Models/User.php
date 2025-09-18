@@ -59,4 +59,8 @@ class User extends Authenticatable
             default => 'secondary'
         };
     }
+    public function deposits()
+    {
+        return $this->hasMany(Deposit::class);
+    }
 }

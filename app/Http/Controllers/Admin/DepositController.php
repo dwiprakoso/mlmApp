@@ -11,4 +11,8 @@ class DepositController extends Controller
     {
         return view('admin.pages.deposit.index');
     }
+    public function edit()
+    {
+        return view('admin.pages.deposit.detail');
+    }
 }

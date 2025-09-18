@@ -28,6 +28,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Deposit Routes
     Route::prefix('deposit')->name('deposit.')->group(function () {
         Route::get('/', [DepositController::class, 'index'])->name('index');
+        Route::get('/detail', [DepositController::class, 'edit'])->name('edit');
     });
     // Withdraw Routes
     Route::prefix('withdraw')->name('withdraw.')->group(function () {
