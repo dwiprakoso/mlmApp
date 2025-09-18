@@ -58,6 +58,18 @@
                                 </div>
                                 <!--end:Menu item-->
                                 <!--begin:Menu item-->
+                                <div class="menu-item">
+                                    <!--begin:Menu link-->
+                                    <a class="menu-link" href="{{ route('admin.deposit.index') }}">
+                                        <span class="menu-icon">
+                                            <i class="ki-outline ki-element-11 fs-2"></i>
+                                        </span>
+                                        <span class="menu-title">Deposit</span>
+                                    </a>
+                                    <!--end:Menu link-->
+                                </div>
+                                <!--end:Menu item-->
+                                <!--begin:Menu item-->
                                 <div class="menu-item pt-5">
                                     <!--begin:Menu content-->
                                     <div class="menu-content">

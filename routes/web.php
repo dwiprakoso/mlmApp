@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Guest\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DepositController;
 use App\Http\Controllers\Admin\UserManagementController;
 
 Route::get('/', [AuthController::class, 'index'])->name('guest.index');
@@ -15,6 +16,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // User Management Routes
     Route::prefix('user-management')->name('user-management.')->group(function () {
         Route::get('/', [UserManagementController::class, 'index'])->name('index');
+    });
+    // Deposit Routes
+    Route::prefix('deposit')->name('deposit.')->group(function () {
+        Route::get('/', [DepositController::class, 'index'])->name('index');
     });
 }); 
 
