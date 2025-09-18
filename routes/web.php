@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Guest\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserManagementController;
 
 Route::get('/', [AuthController::class, 'index'])->name('guest.index');
 
@@ -10,6 +11,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard Routes
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('index');
+    });
+    // User Management Routes
+    Route::prefix('user-management')->name('user-management.')->group(function () {
+        Route::get('/', [UserManagementController::class, 'index'])->name('index');
     });
 }); 
 
