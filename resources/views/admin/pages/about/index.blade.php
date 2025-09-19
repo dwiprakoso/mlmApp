@@ -16,7 +16,7 @@
                     <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0">
                         <!--begin::Item-->
                         <li class="breadcrumb-item text-muted">
-                            <a href="index.html" class="text-muted text-hover-primary">Home</a>
+                            <a href="{{ route('admin.dashboard.index') }}" class="text-muted text-hover-primary">Home</a>
                         </li>
                         <!--end::Item-->
                         <!--begin::Item-->
@@ -25,8 +25,7 @@
                         </li>
                         <!--end::Item-->
                         <!--begin::Item-->
-                        <li class="breadcrumb-item text-muted">About
-                            App</li>
+                        <li class="breadcrumb-item text-muted">About App</li>
                         <!--end::Item-->
                     </ul>
                     <!--end::Breadcrumb-->
@@ -38,10 +37,31 @@
         <!--end::Toolbar container-->
     </div>
     <!--end::Toolbar-->
+
     <!--begin::Content-->
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <!--begin::Content container-->
         <div id="kt_app_content_container" class="app-container container-xxl">
+
+            <!-- Success/Error Messages -->
+            @if (session('success'))
+                <div class="alert alert-success d-flex align-items-center p-5 mb-10">
+                    <i class="ki-outline ki-shield-tick fs-2hx text-success me-4"></i>
+                    <div class="d-flex flex-column">
+                        <span>{{ session('success') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger d-flex align-items-center p-5 mb-10">
+                    <i class="ki-outline ki-information-5 fs-2hx text-danger me-4"></i>
+                    <div class="d-flex flex-column">
+                        <span>{{ session('error') }}</span>
+                    </div>
+                </div>
+            @endif
+
             <!--begin::Card-->
             <div class="card">
                 <!--begin::Card header-->
@@ -51,8 +71,11 @@
                     <!--end::Card title-->
                 </div>
                 <!--end::Card header-->
+
                 <!--begin::Form-->
-                <form id="kt_project_settings_form" class="form">
+                <form id="kt_project_settings_form" class="form" method="POST" action="{{ route('admin.about.update') }}"
+                    enctype="multipart/form-data">
+                    @csrf
                     <!--begin::Card body-->
                     <div class="card-body p-9">
                         <!--begin::Row-->
@@ -69,7 +92,7 @@
                                     style="background-image: url('assets/media/svg/avatars/blank.svg')">
                                     <!--begin::Preview existing avatar-->
                                     <div class="image-input-wrapper w-125px h-125px bgi-position-center"
-                                        style="background-size: 75%; background-image: url('assets/media/svg/brand-logos/volicity-9.svg')">
+                                        style="background-size: 75%; background-image: url('{{ $configs['app_logo'] ?? 'assets/media/svg/brand-logos/volicity-9.svg' }}')">
                                     </div>
                                     <!--end::Preview existing avatar-->
                                     <!--begin::Label-->
@@ -102,10 +125,14 @@
                                 <!--begin::Hint-->
                                 <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
                                 <!--end::Hint-->
+                                @error('avatar')
+                                    <div class="text-danger fs-7">{{ $message }}</div>
+                                @enderror
                             </div>
                             <!--end::Col-->
                         </div>
                         <!--end::Row-->
+
                         <!--begin::Row-->
                         <div class="row mb-8">
                             <!--begin::Col-->
@@ -115,32 +142,45 @@
                             <!--end::Col-->
                             <!--begin::Col-->
                             <div class="col-xl-9 fv-row">
-                                <input type="text" class="form-control form-control-solid" name="name"
-                                    value="9 Degree Award" />
+                                <input type="text"
+                                    class="form-control form-control-solid @error('name') is-invalid @enderror"
+                                    name="name" value="{{ old('name', $configs['app_name']) }}" />
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                         <!--end::Row-->
+
                         <!--begin::Row-->
                         <div class="row mb-8">
                             <!--begin::Col-->
                             <div class="col-xl-3">
-                                <div class="fs-6 fw-semibold mt-2 mb-3">Project Description</div>
+                                <div class="fs-6 fw-semibold mt-2 mb-3">App Description</div>
                             </div>
                             <!--end::Col-->
                             <!--begin::Col-->
                             <div class="col-xl-9 fv-row">
-                                <textarea name="description" class="form-control form-control-solid h-100px">Organize your thoughts with an outline. Here’s the outlining strategy I use. I promise it works like a charm. Not only will it make writing your blog post easier, it’ll help you make your message</textarea>
+                                <textarea name="description" class="form-control form-control-solid h-100px @error('description') is-invalid @enderror">{{ old('description', $configs['app_description']) }}</textarea>
+                                @error('description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <!--begin::Col-->
                         </div>
                         <!--end::Row-->
                     </div>
                     <!--end::Card body-->
+
                     <!--begin::Card footer-->
                     <div class="card-footer d-flex justify-content-end py-6 px-9">
                         <button type="reset" class="btn btn-light btn-active-light-primary me-2">Discard</button>
-                        <button type="submit" class="btn btn-primary" id="kt_project_settings_submit">Save
-                            Changes</button>
+                        <button type="submit" class="btn btn-primary" id="kt_project_settings_submit">
+                            <span class="indicator-label">Save Changes</span>
+                            <span class="indicator-progress">Please wait...
+                                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
                     </div>
                     <!--end::Card footer-->
                 </form>

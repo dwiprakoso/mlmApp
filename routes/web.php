@@ -52,5 +52,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // About Routes
     Route::prefix('about')->name('about.')->group(function () {
         Route::get('/', [AboutController::class, 'index'])->name('index');
+        Route::post('/update', [AboutController::class, 'update'])->name('update');
     });
 });
