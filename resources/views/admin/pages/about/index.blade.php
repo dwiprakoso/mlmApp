@@ -9,8 +9,8 @@
                 <!--begin::Page title-->
                 <div class="page-title d-flex flex-column justify-content-center gap-1 me-3">
                     <!--begin::Title-->
-                    <h1 class="page-heading d-flex flex-column justify-content-center text-gray-900 fw-bold fs-3 m-0">Project
-                        Settings</h1>
+                    <h1 class="page-heading d-flex flex-column justify-content-center text-gray-900 fw-bold fs-3 m-0">About
+                        App</h1>
                     <!--end::Title-->
                     <!--begin::Breadcrumb-->
                     <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0">
@@ -25,21 +25,13 @@
                         </li>
                         <!--end::Item-->
                         <!--begin::Item-->
-                        <li class="breadcrumb-item text-muted">Projects</li>
+                        <li class="breadcrumb-item text-muted">About
+                            App</li>
                         <!--end::Item-->
                     </ul>
                     <!--end::Breadcrumb-->
                 </div>
                 <!--end::Page title-->
-                <!--begin::Actions-->
-                <div class="d-flex align-items-center gap-2 gap-lg-3">
-                    <a href="#"
-                        class="btn btn-flex btn-outline btn-color-gray-700 btn-active-color-primary bg-body h-40px fs-7 fw-bold"
-                        data-bs-toggle="modal" data-bs-target="#kt_modal_view_users">Add Member</a>
-                    <a href="#" class="btn btn-flex btn-primary h-40px fs-7 fw-bold" data-bs-toggle="modal"
-                        data-bs-target="#kt_modal_create_campaign">New Campaign</a>
-                </div>
-                <!--end::Actions-->
             </div>
             <!--end::Toolbar wrapper-->
         </div>
@@ -55,7 +47,7 @@
                 <!--begin::Card header-->
                 <div class="card-header">
                     <!--begin::Card title-->
-                    <div class="card-title fs-3 fw-bold">Project Settings</div>
+                    <div class="card-title fs-3 fw-bold">App Settings</div>
                     <!--end::Card title-->
                 </div>
                 <!--end::Card header-->
@@ -67,7 +59,7 @@
                         <div class="row mb-5">
                             <!--begin::Col-->
                             <div class="col-xl-3">
-                                <div class="fs-6 fw-semibold mt-2 mb-3">Project Logo</div>
+                                <div class="fs-6 fw-semibold mt-2 mb-3">App Logo</div>
                             </div>
                             <!--end::Col-->
                             <!--begin::Col-->
@@ -118,27 +110,13 @@
                         <div class="row mb-8">
                             <!--begin::Col-->
                             <div class="col-xl-3">
-                                <div class="fs-6 fw-semibold mt-2 mb-3">Project Name</div>
+                                <div class="fs-6 fw-semibold mt-2 mb-3">App Name</div>
                             </div>
                             <!--end::Col-->
                             <!--begin::Col-->
                             <div class="col-xl-9 fv-row">
                                 <input type="text" class="form-control form-control-solid" name="name"
                                     value="9 Degree Award" />
-                            </div>
-                        </div>
-                        <!--end::Row-->
-                        <!--begin::Row-->
-                        <div class="row mb-8">
-                            <!--begin::Col-->
-                            <div class="col-xl-3">
-                                <div class="fs-6 fw-semibold mt-2 mb-3">Project Type</div>
-                            </div>
-                            <!--end::Col-->
-                            <!--begin::Col-->
-                            <div class="col-xl-9 fv-row">
-                                <input type="text" class="form-control form-control-solid" name="type"
-                                    value="Client Relationship" />
                             </div>
                         </div>
                         <!--end::Row-->
@@ -154,67 +132,6 @@
                                 <textarea name="description" class="form-control form-control-solid h-100px">Organize your thoughts with an outline. Here’s the outlining strategy I use. I promise it works like a charm. Not only will it make writing your blog post easier, it’ll help you make your message</textarea>
                             </div>
                             <!--begin::Col-->
-                        </div>
-                        <!--end::Row-->
-                        <!--begin::Row-->
-                        <div class="row mb-8">
-                            <!--begin::Col-->
-                            <div class="col-xl-3">
-                                <div class="fs-6 fw-semibold mt-2 mb-3">Due Date</div>
-                            </div>
-                            <!--end::Col-->
-                            <!--begin::Col-->
-                            <div class="col-xl-9 fv-row">
-                                <div class="position-relative d-flex align-items-center">
-                                    <i class="ki-outline ki-calendar-8 position-absolute ms-4 mb-1 fs-2"></i>
-                                    <input class="form-control form-control-solid ps-12" name="date"
-                                        placeholder="Pick a date" id="kt_datepicker_1" />
-                                </div>
-                            </div>
-                            <!--begin::Col-->
-                        </div>
-                        <!--end::Row-->
-                        <!--begin::Row-->
-                        <div class="row mb-8">
-                            <!--begin::Col-->
-                            <div class="col-xl-3">
-                                <div class="fs-6 fw-semibold mt-2 mb-3">Notifications</div>
-                            </div>
-                            <!--end::Col-->
-                            <!--begin::Col-->
-                            <div class="col-xl-9">
-                                <div class="d-flex fw-semibold h-100">
-                                    <div class="form-check form-check-custom form-check-solid me-9">
-                                        <input class="form-check-input" type="checkbox" value="" id="email" />
-                                        <label class="form-check-label ms-3" for="email">Email</label>
-                                    </div>
-                                    <div class="form-check form-check-custom form-check-solid">
-                                        <input class="form-check-input" type="checkbox" value="" id="phone"
-                                            checked="checked" />
-                                        <label class="form-check-label ms-3" for="phone">Phone</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--end::Col-->
-                        </div>
-                        <!--end::Row-->
-                        <!--begin::Row-->
-                        <div class="row">
-                            <!--begin::Col-->
-                            <div class="col-xl-3">
-                                <div class="fs-6 fw-semibold mt-2 mb-3">Status</div>
-                            </div>
-                            <!--end::Col-->
-                            <!--begin::Col-->
-                            <div class="col-xl-9">
-                                <div class="form-check form-switch form-check-custom form-check-solid">
-                                    <input class="form-check-input" type="checkbox" value="" id="status"
-                                        name="status" checked="checked" />
-                                    <label class="form-check-label fw-semibold text-gray-500 ms-3"
-                                        for="status">Active</label>
-                                </div>
-                            </div>
-                            <!--end::Col-->
                         </div>
                         <!--end::Row-->
                     </div>
