@@ -11,7 +11,8 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\WithdrawController;
 
-Route::get('/', [AuthController::class, 'index'])->name('guest.index');
+Route::get('/', [AuthController::class, 'signIn'])->name('guest.sign-in');
+Route::get('/sign-up', [AuthController::class, 'signUp'])->name('guest.sign-up');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard Routes
