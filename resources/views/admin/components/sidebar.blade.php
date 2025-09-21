@@ -327,10 +327,17 @@
                                 </div>
                                 <!--end::Menu item-->
                                 <!--begin::Menu item-->
+                                <!--begin::Menu item-->
                                 <div class="menu-item px-5">
-                                    <a href="authentication/layouts/corporate/sign-in.html"
-                                        class="menu-link px-5">Sign Out</a>
+                                    <form method="POST" action="{{ route('logout') }}" class="m-0">
+                                        @csrf
+                                        <button type="submit" class="menu-link px-5"
+                                            style="border: none; background: none; width: 100%; text-align: left; color: inherit; font-weight: inherit; font-size: inherit;">
+                                            Sign Out
+                                        </button>
+                                    </form>
                                 </div>
+                                <!--end::Menu item-->
                                 <!--end::Menu item-->
                             </div>
                             <!--end::User account menu-->
