@@ -40,7 +40,10 @@ Route::middleware('auth')->group(function () {
         // Deposit Routes
         Route::prefix('deposit')->name('deposit.')->group(function () {
             Route::get('/', [DepositController::class, 'index'])->name('index');
-            Route::get('/detail', [DepositController::class, 'edit'])->name('edit');
+            Route::get('/detail/{id}', [DepositController::class, 'edit'])->name('edit');
+            Route::post('/store', [DepositController::class, 'store'])->name('store');
+            Route::post('/confirm/{id}', [DepositController::class, 'confirm'])->name('confirm');
+            Route::post('/reject/{id}', [DepositController::class, 'reject'])->name('reject');
         });
         // Withdraw Routes
         Route::prefix('withdraw')->name('withdraw.')->group(function () {

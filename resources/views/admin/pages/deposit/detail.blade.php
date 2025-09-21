@@ -16,7 +16,7 @@
                     <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0">
                         <!--begin::Item-->
                         <li class="breadcrumb-item text-muted">
-                            <a href="index.html" class="text-muted text-hover-primary">Home</a>
+                            <a href="{{ route('admin.deposit.index') }}" class="text-muted text-hover-primary">Home</a>
                         </li>
                         <!--end::Item-->
                         <!--begin::Item-->
@@ -25,7 +25,9 @@
                         </li>
                         <!--end::Item-->
                         <!--begin::Item-->
-                        <li class="breadcrumb-item text-muted">Deposits</li>
+                        <li class="breadcrumb-item text-muted">
+                            <a href="{{ route('admin.deposit.index') }}" class="text-muted text-hover-primary">Deposits</a>
+                        </li>
                         <!--end::Item-->
                         <!--begin::Item-->
                         <li class="breadcrumb-item">
@@ -45,6 +47,28 @@
         <!--end::Toolbar container-->
     </div>
     <!--end::Toolbar-->
+
+    <!-- Alert Messages -->
+    @if (session('success'))
+        <div class="alert alert-success d-flex align-items-center p-5 mb-10">
+            <i class="ki-outline ki-shield-tick fs-2hx text-success me-4"></i>
+            <div class="d-flex flex-column">
+                <h4 class="mb-1 text-success">Success</h4>
+                <span>{{ session('success') }}</span>
+            </div>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger d-flex align-items-center p-5 mb-10">
+            <i class="ki-outline ki-shield-cross fs-2hx text-danger me-4"></i>
+            <div class="d-flex flex-column">
+                <h4 class="mb-1 text-danger">Error</h4>
+                <span>{{ session('error') }}</span>
+            </div>
+        </div>
+    @endif
+
     <!--begin::Content-->
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <!--begin::Content container-->
@@ -60,82 +84,52 @@
                             <!--begin::Section-->
                             <div class="mb-0">
                                 <!--begin::Title-->
-                                <h5 class="mb-4">Products:</h5>
+                                <h5 class="mb-4">Proof of Payment:</h5>
                                 <!--end::Title-->
-                                <!--begin::Product table-->
-                                <div class="table-responsive">
-                                    <!--begin::Table-->
-                                    <table class="table align-middle table-row-dashed fs-6 gy-4 mb-0">
-                                        <!--begin::Table head-->
-                                        <thead>
-                                            <!--begin::Table row-->
-                                            <tr
-                                                class="border-bottom border-gray-200 text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                                                <th class="min-w-150px">Product</th>
-                                                <th class="min-w-125px">Subscription ID</th>
-                                                <th class="min-w-125px">Qty</th>
-                                                <th class="min-w-125px">Total</th>
-                                            </tr>
-                                            <!--end::Table row-->
-                                        </thead>
-                                        <!--end::Table head-->
-                                        <!--begin::Table body-->
-                                        <tbody class="fw-semibold text-gray-800">
-                                            <tr>
-                                                <td>
-                                                    <label class="w-150px">Basic Bundle</label>
-                                                    <div class="fw-normal text-gray-600">Basic yearly bundle</div>
-                                                </td>
-                                                <td>
-                                                    <span class="badge badge-light-danger">sub_4567_8765</span>
-                                                </td>
-                                                <td>1</td>
-                                                <td>$149.99 / Year</td>
-                                            </tr>
-                                        </tbody>
-                                        <!--end::Table body-->
-                                    </table>
-                                    <!--end::Table-->
-                                </div>
-                                <!--end::Product table-->
+
+                                @if ($deposit->proof_url)
+                                    <!--begin::Image-->
+                                    <div class="mb-7">
+                                        <img src="{{ asset($deposit->proof_url) }}" alt="Proof of Payment" class="mw-100"
+                                            style="max-height: 400px;">
+                                    </div>
+                                    <!--end::Image-->
+                                @else
+                                    <div class="alert alert-light-info d-flex align-items-center p-5">
+                                        <i class="ki-outline ki-information-5 fs-2hx text-info me-4"></i>
+                                        <div class="d-flex flex-column">
+                                            <span>Tidak ada bukti pembayaran (Deposit dibuat manual oleh admin)</span>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!--begin::Action buttons-->
+                                @if ($deposit->status == 'waiting_confirmation')
+                                    <div class="d-flex gap-3 mt-5">
+                                        <form action="{{ route('admin.deposit.confirm', $deposit->id) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success"
+                                                onclick="return confirm('Apakah Anda yakin ingin mengkonfirmasi deposit ini?')">
+                                                <i class="ki-outline ki-check fs-2"></i>
+                                                Konfirmasi Pembayaran
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('admin.deposit.reject', $deposit->id) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger"
+                                                onclick="return confirm('Apakah Anda yakin ingin menolak deposit ini?')">
+                                                <i class="ki-outline ki-cross fs-2"></i>
+                                                Tolak Pembayaran
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                                <!--end::Action buttons-->
                             </div>
                             <!--end::Section-->
-                        </div>
-                        <!--end::Card body-->
-                    </div>
-                    <!--end::Card-->
-                    <!--begin::Card-->
-                    <div class="card card-flush pt-3 mb-5 mb-xl-10">
-                        <!--begin::Card header-->
-                        <div class="card-header">
-                            <!--begin::Card title-->
-                            <div class="card-title">
-                                <h2>Recent Events</h2>
-                            </div>
-                            <!--end::Card title-->
-                        </div>
-                        <!--end::Card header-->
-                        <!--begin::Card body-->
-                        <div class="card-body pt-0">
-                            <!--begin::Table wrapper-->
-                            <div class="table-responsive">
-                                <!--begin::Table-->
-                                <table class="table align-middle table-row-dashed fs-6 text-gray-600 fw-semibold gy-5"
-                                    id="kt_table_customers_events">
-                                    <tbody>
-                                        <tr>
-                                            <td class="min-w-400px">Invoice
-                                                <a href="#"
-                                                    class="fw-bold text-gray-800 text-hover-primary me-1">4476-8786</a>is
-                                                <span class="badge badge-light-info">In Progress</span>
-                                            </td>
-                                            <td class="pe-0 text-gray-600 text-end min-w-200px">25 Jul 2024, 10:10 pm</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <!--end::Table-->
-                            </div>
-                            <!--end::Table wrapper-->
                         </div>
                         <!--end::Card body-->
                     </div>
@@ -153,7 +147,7 @@
                         <div class="card-header">
                             <!--begin::Card title-->
                             <div class="card-title">
-                                <h2>Summary</h2>
+                                <h2>Deposit Summary</h2>
                             </div>
                             <!--end::Card title-->
                         </div>
@@ -166,19 +160,20 @@
                                 <div class="d-flex align-items-center">
                                     <!--begin::Avatar-->
                                     <div class="symbol symbol-60px symbol-circle me-3">
-                                        <img alt="Pic" src="assets/media/avatars/300-5.jpg" />
+                                        <div class="symbol-label bg-light-primary text-primary fw-bold">
+                                            {{ strtoupper(substr($deposit->user->name, 0, 2)) }}
+                                        </div>
                                     </div>
                                     <!--end::Avatar-->
                                     <!--begin::Info-->
                                     <div class="d-flex flex-column">
                                         <!--begin::Name-->
-                                        <a href="#" class="fs-4 fw-bold text-gray-900 text-hover-primary me-2">Sean
-                                            Bean</a>
-                                        <!--end::Name-->
-                                        <!--begin::Email-->
                                         <a href="#"
-                                            class="fw-semibold text-gray-600 text-hover-primary">sean@dellito.com</a>
-                                        <!--end::Email-->
+                                            class="fs-4 fw-bold text-gray-900 text-hover-primary me-2">{{ $deposit->user->name }}</a>
+                                        <!--end::Name-->
+                                        <!--begin::Phone-->
+                                        <span class="fw-semibold text-gray-600">{{ $deposit->user->phone }}</span>
+                                        <!--end::Phone-->
                                     </div>
                                     <!--end::Info-->
                                 </div>
@@ -191,39 +186,23 @@
                             <!--begin::Section-->
                             <div class="mb-7">
                                 <!--begin::Title-->
-                                <h5 class="mb-4">Product details</h5>
-                                <!--end::Title-->
-                                <!--begin::Details-->
-                                <div class="mb-0">
-                                    <!--begin::Plan-->
-                                    <span class="badge badge-light-info me-2">Basic Bundle</span>
-                                    <!--end::Plan-->
-                                    <!--begin::Price-->
-                                    <span class="fw-semibold text-gray-600">$149.99 / Year</span>
-                                    <!--end::Price-->
-                                </div>
-                                <!--end::Details-->
-                            </div>
-                            <!--end::Section-->
-                            <!--begin::Seperator-->
-                            <div class="separator separator-dashed mb-7"></div>
-                            <!--end::Seperator-->
-                            <!--begin::Section-->
-                            <div class="mb-10">
-                                <!--begin::Title-->
                                 <h5 class="mb-4">Payment Details</h5>
                                 <!--end::Title-->
                                 <!--begin::Details-->
                                 <div class="mb-0">
-                                    <!--begin::Card info-->
-                                    <div class="fw-semibold text-gray-600 d-flex align-items-center">Mastercard
-                                        <img src="assets/media/svg/card-logos/mastercard.svg" class="w-35px ms-2"
-                                            alt="" />
+                                    <!--begin::Amount-->
+                                    <div class="fw-bold text-gray-600 d-flex justify-content-between mb-3">
+                                        <span>Amount:</span>
+                                        <span class="text-gray-800">Rp
+                                            {{ number_format($deposit->amount, 0, ',', '.') }}</span>
                                     </div>
-                                    <!--end::Card info-->
-                                    <!--begin::Card expiry-->
-                                    <div class="fw-semibold text-gray-600">Expires Dec 2024</div>
-                                    <!--end::Card expiry-->
+                                    <!--end::Amount-->
+                                    <!--begin::Method-->
+                                    <div class="fw-semibold text-gray-600 d-flex justify-content-between mb-3">
+                                        <span>Method:</span>
+                                        <span class="text-gray-800">{{ $deposit->method }}</span>
+                                    </div>
+                                    <!--end::Method-->
                                 </div>
                                 <!--end::Details-->
                             </div>
@@ -239,39 +218,59 @@
                                 <!--begin::Details-->
                                 <table class="table fs-6 fw-semibold gs-0 gy-2 gx-2">
                                     <!--begin::Row-->
-                                    <tr class="">
-                                        <td class="text-gray-500">Subscription ID:</td>
-                                        <td class="text-gray-800">sub_4567_8765</td>
+                                    <tr>
+                                        <td class="text-gray-500">Deposit ID:</td>
+                                        <td class="text-gray-800">#{{ $deposit->id }}</td>
                                     </tr>
                                     <!--end::Row-->
                                     <!--begin::Row-->
-                                    <tr class="">
-                                        <td class="text-gray-500">Started:</td>
-                                        <td class="text-gray-800">15 Apr 2021</td>
+                                    <tr>
+                                        <td class="text-gray-500">Created:</td>
+                                        <td class="text-gray-800">{{ $deposit->created_at->format('d M Y, H:i') }}</td>
                                     </tr>
                                     <!--end::Row-->
                                     <!--begin::Row-->
-                                    <tr class="">
+                                    <tr>
                                         <td class="text-gray-500">Status:</td>
                                         <td>
-                                            <span class="badge badge-light-success">Active</span>
+                                            @if ($deposit->status == 'confirmed')
+                                                <span class="badge badge-light-success">Confirmed</span>
+                                            @elseif($deposit->status == 'waiting_confirmation')
+                                                <span class="badge badge-light-warning">Waiting Confirmation</span>
+                                            @elseif($deposit->status == 'rejected')
+                                                <span class="badge badge-light-danger">Rejected</span>
+                                            @else
+                                                <span class="badge badge-light-secondary">{{ $deposit->status }}</span>
+                                            @endif
                                         </td>
                                     </tr>
                                     <!--end::Row-->
-                                    <!--begin::Row-->
-                                    <tr class="">
-                                        <td class="text-gray-500">Next Invoice:</td>
-                                        <td class="text-gray-800">15 Apr 2022</td>
-                                    </tr>
-                                    <!--end::Row-->
+                                    @if ($deposit->approved_by)
+                                        <!--begin::Row-->
+                                        <tr>
+                                            <td class="text-gray-500">Processed by:</td>
+                                            <td class="text-gray-800">Admin</td>
+                                        </tr>
+                                        <!--end::Row-->
+                                        <!--begin::Row-->
+                                        <tr>
+                                            <td class="text-gray-500">Processed at:</td>
+                                            <td class="text-gray-800">
+                                                {{ $deposit->approved_at ? $deposit->approved_at->format('d M Y, H:i') : '-' }}
+                                            </td>
+                                        </tr>
+                                        <!--end::Row-->
+                                    @endif
                                 </table>
                                 <!--end::Details-->
                             </div>
                             <!--end::Section-->
                             <!--begin::Actions-->
                             <div class="mb-0">
-                                <a href="apps/subscriptions/add.html" class="btn btn-primary"
-                                    id="kt_subscriptions_create_button">Edit Subscription</a>
+                                <a href="{{ route('admin.deposit.index') }}" class="btn btn-light w-100">
+                                    <i class="ki-outline ki-arrow-left fs-2"></i>
+                                    Kembali ke List Deposit
+                                </a>
                             </div>
                             <!--end::Actions-->
                         </div>
