@@ -13,12 +13,13 @@
 
 <body>
     <div class="mobile-container">
+        <div class="hero-card">
+            @include('member.components.header')
 
-
-        @yield('content')
-    </div>
-    @include('member.components.bottombar')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+            @yield('content')
+        </div>
+        @include('member.components.bottombar')
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

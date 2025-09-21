@@ -1,24 +1,15 @@
 @extends('member.layouts.app')
 @section('content')
+
+
     <!-- Hero -->
     <div class="hero-card">
-        <div class="d-flex align-items-center mb-3">
-            <div class="me-2">
-                <img src="https://via.placeholder.com/40" class="rounded-circle" alt="User">
-            </div>
-            <div>
-                <small class="text-muted">Selamat datang kembali</small>
-                <h5 class="mb-0 text-white">Solusi pintar untuk uang pintar.</h5>
-            </div>
-            <div class="ms-auto d-flex gap-2">
-                <i class="bi bi-shield-fill-check text-gold"></i>
-                <i class="bi bi-house-door-fill text-gold"></i>
-                <i class="bi bi-bell-fill position-relative text-gold">
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">2</span>
-                </i>
-            </div>
+        <!-- Tagline -->
+        <div class="mb-3">
+            <h5 class="mb-0 text-white">Solusi pintar untuk uang pintar.</h5>
         </div>
 
+        <!-- Balance Card -->
         <div class="balance-card">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div>
