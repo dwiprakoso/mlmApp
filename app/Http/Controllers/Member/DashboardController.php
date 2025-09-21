@@ -9,6 +9,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('member.layouts.app');
+        return view('member.pages.dasboard.index');
     }
 }
