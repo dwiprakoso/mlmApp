@@ -69,6 +69,9 @@ Route::prefix('member')->name('member.')->group(function () {
     // Deposit Routes
     Route::prefix('deposit')->name('deposit.')->group(function () {
         Route::get('/', [MemberDepositController::class, 'index'])->name('index');
+        Route::post('/', [MemberDepositController::class, 'store'])->name('store');
+        Route::get('/payment/{id}', [MemberDepositController::class, 'payment'])->name('payment');
+        Route::post('/payment/{id}/upload-proof', [MemberDepositController::class, 'uploadProof'])->name('upload-proof');
         Route::get('/log', [MemberDepositController::class, 'log'])->name('log');
     });
     // Withdraw Routes

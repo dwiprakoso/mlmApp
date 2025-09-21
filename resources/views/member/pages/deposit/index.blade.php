@@ -14,128 +14,148 @@
     </div>
 
     <!-- Main Content Card -->
-    <div class="card-dark p-3">
-        <!-- Jumlah Deposit -->
-        <div class="mb-4">
-            <h6 class="text-white mb-3">Jumlah Deposit</h6>
-            <div class="form-group">
-                <input type="text" class="form-control form-control-dark" placeholder="Jumlah Deposit"
-                    id="depositAmount">
-            </div>
-        </div>
+    <form action="{{ route('member.deposit.store') }}" method="POST" id="depositForm">
+        @csrf
+        <div class="card-dark p-3">
+            <!-- Error Messages -->
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-        <!-- Amount Selection Grid -->
-        <div class="amount-grid mb-4">
-            <div class="row g-2">
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="220000">
-                        Rp 220K
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="480000">
-                        Rp 480K
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="100000">
-                        Rp 100K
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="50000">
-                        Rp 50K
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="200000">
-                        Rp 200K
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="775000">
-                        Rp 775K
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="1200000">
-                        Rp 1200K
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="2800000">
-                        Rp 2800K
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="5000000">
-                        Rp 5000K
-                    </button>
-                </div>
-                <div class="col-4">
-                    <button class="btn btn-outline-gold w-100 amount-btn" data-amount="50000000">
-                        Rp 50000K
-                    </button>
+            <!-- Jumlah Deposit -->
+            <div class="mb-4">
+                <h6 class="text-white mb-3">Jumlah Deposit</h6>
+                <div class="form-group">
+                    <input type="text" class="form-control form-control-dark" placeholder="Jumlah Deposit"
+                        id="depositAmount" name="amount" required>
+                    <input type="hidden" id="rawAmount" name="raw_amount">
                 </div>
             </div>
-        </div>
 
-        <!-- Saluran Deposit -->
-        <div class="mb-4">
-            <h6 class="text-white mb-3">Saluran Deposit</h6>
-
-            <!-- Payment Method 1 - Selected -->
-            <div class="payment-method selected mb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-white mb-1">Wallet & QRIS & E-Bank</h6>
-                        <small class="text-muted">
-                            Rentang Jumlah: <span class="text-gold">IDR</span> 50 K - <span class="text-gold">IDR</span>
-                            50,000 K
-                        </small>
+            <!-- Amount Selection Grid -->
+            <div class="amount-grid mb-4">
+                <div class="row g-2">
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="220000">
+                            Rp 220K
+                        </button>
                     </div>
-                    <div class="payment-check">
-                        <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="480000">
+                            Rp 480K
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="100000">
+                            Rp 100K
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="50000">
+                            Rp 50K
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="200000">
+                            Rp 200K
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="775000">
+                            Rp 775K
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="1200000">
+                            Rp 1200K
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="2800000">
+                            Rp 2800K
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="5000000">
+                            Rp 5000K
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="50000000">
+                            Rp 50000K
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Payment Method 2 -->
-            <div class="payment-method mb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-white mb-1">Wallet & QRIS & E-Bank</h6>
-                        <small class="text-muted">
-                            Rentang Jumlah: <span class="text-gold">IDR</span> 50 K - <span class="text-gold">IDR</span>
-                            50,000 K
-                        </small>
+            <!-- Saluran Deposit -->
+            <div class="mb-4">
+                <h6 class="text-white mb-3">Saluran Deposit</h6>
+
+                <!-- Payment Method 1 - Selected -->
+                <div class="payment-method selected mb-2" data-method="wallet_qris">
+                    <input type="radio" name="method" value="wallet_qris" checked style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white mb-1">Wallet & QRIS & E-Bank</h6>
+                            <small class="text-muted">
+                                Rentang Jumlah: <span class="text-gold">IDR</span> 50 K - <span class="text-gold">IDR</span>
+                                50,000 K
+                            </small>
+                        </div>
+                        <div class="payment-check">
+                            <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                        </div>
                     </div>
-                    <div class="payment-radio">
-                        <div class="radio-circle"></div>
+                </div>
+
+                <!-- Payment Method 2 -->
+                <div class="payment-method mb-2" data-method="bank_transfer">
+                    <input type="radio" name="method" value="bank_transfer" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white mb-1">Bank Transfer</h6>
+                            <small class="text-muted">
+                                Rentang Jumlah: <span class="text-gold">IDR</span> 50 K - <span class="text-gold">IDR</span>
+                                50,000 K
+                            </small>
+                        </div>
+                        <div class="payment-radio">
+                            <div class="radio-circle"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Konfirmasi Button -->
-        <div class="mt-4" style="padding-bottom: 100px;">
-            <button class="btn btn-gold w-100 btn-lg">
-                Konfirmasi
-            </button>
+            <!-- Konfirmasi Button -->
+            <div class="mt-4" style="padding-bottom: 100px;">
+                <button type="submit" class="btn btn-gold w-100 btn-lg">
+                    Konfirmasi
+                </button>
+            </div>
         </div>
-    </div>
+    </form>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const amountButtons = document.querySelectorAll('.amount-btn');
             const depositInput = document.getElementById('depositAmount');
+            const rawAmountInput = document.getElementById('rawAmount');
             const paymentMethods = document.querySelectorAll('.payment-method');
+            const form = document.getElementById('depositForm');
 
             // Handle amount button clicks
             amountButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const amount = this.dataset.amount;
                     depositInput.value = new Intl.NumberFormat('id-ID').format(amount);
+                    rawAmountInput.value = amount;
 
                     // Remove active class from all buttons
                     amountButtons.forEach(btn => btn.classList.remove('btn-gold'));
@@ -151,10 +171,14 @@
             paymentMethods.forEach(method => {
                 method.addEventListener('click', function() {
                     // Remove selected class from all methods
-                    paymentMethods.forEach(m => m.classList.remove('selected'));
+                    paymentMethods.forEach(m => {
+                        m.classList.remove('selected');
+                        m.querySelector('input[type="radio"]').checked = false;
+                    });
 
                     // Add selected class to clicked method
                     this.classList.add('selected');
+                    this.querySelector('input[type="radio"]').checked = true;
                 });
             });
 
@@ -163,7 +187,32 @@
                 let value = this.value.replace(/[^0-9]/g, '');
                 if (value) {
                     this.value = new Intl.NumberFormat('id-ID').format(value);
+                    rawAmountInput.value = value;
+                } else {
+                    rawAmountInput.value = '';
                 }
+            });
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                // Set the amount value to raw number for submission
+                const rawValue = rawAmountInput.value || depositInput.value.replace(/[^0-9]/g, '');
+
+                if (!rawValue || rawValue < 50000 || rawValue > 50000000) {
+                    e.preventDefault();
+                    alert('Jumlah deposit harus antara Rp 50.000 - Rp 50.000.000');
+                    return;
+                }
+
+                // Create a hidden input with the raw amount
+                const hiddenAmount = document.createElement('input');
+                hiddenAmount.type = 'hidden';
+                hiddenAmount.name = 'amount';
+                hiddenAmount.value = rawValue;
+                this.appendChild(hiddenAmount);
+
+                // Remove the formatted input from form data
+                depositInput.removeAttribute('name');
             });
         });
     </script>
