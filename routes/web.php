@@ -14,6 +14,7 @@ use App\Http\Controllers\Member\DashboardController as MemberDashboardController
 use App\Http\Controllers\Member\DepositController as MemberDepositController;
 use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
+use App\Http\Controllers\Member\DompetController as MemberDompetController;
 
 Route::get('/', [AuthController::class, 'signIn'])->name('guest.sign-in');
 Route::get('/sign-up', [AuthController::class, 'signUp'])->name('guest.sign-up');
@@ -78,5 +79,9 @@ Route::prefix('member')->name('member.')->group(function () {
     // Invest Routes
     Route::prefix('invest')->name('invest.')->group(function () {
         Route::get('/', [MemberInvestController::class, 'index'])->name('index');
+    });
+    // Dompet Routes
+    Route::prefix('dompet')->name('dompet.')->group(function () {
+        Route::get('/', [MemberDompetController::class, 'index'])->name('index');
     });
 });

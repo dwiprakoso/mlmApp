@@ -511,3 +511,89 @@ body {
             font-size: 12px;
             padding: 6px 12px;
         }
+        .balance-card {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, var(--card-dark) 0%, var(--secondary-dark) 100%);
+            padding: 20px;
+            border-radius: 0 0 20px 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .card-dark {
+            background-color: var(--card-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-dark:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(218, 165, 32, 0.1);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #20c997, #28a745);
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            border: none;
+            color: #000;
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #fd7e14, #ffc107);
+            color: #000;
+            transform: translateY(-1px);
+        }
+
+        .content-section {
+            padding: 20px;
+            padding-bottom: 0;
+        }
+
+        .circle-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-size: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .circle-icon:hover {
+            transform: scale(1.05);
+        }
+
+        small {
+            font-size: 12px;
+        }
+
+        .text-gold {
+            color: var(--gold-color) !important;
+        }
+
+        .bg-gold {
+            background-color: var(--gold-color) !important;
+        }

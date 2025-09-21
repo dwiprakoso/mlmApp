@@ -12,7 +12,7 @@
         <i class="bi bi-gift-fill d-block fs-5"></i>
         <span>Bonus</span>
     </a>
-    <a href="#" class="nav-item">
+    <a href="{{ route('member.dompet.index') }}" class="nav-item">
         <i class="bi bi-wallet-fill d-block fs-5"></i>
         <span>Dompetku</span>
     </a>
