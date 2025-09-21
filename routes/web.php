@@ -83,6 +83,7 @@ Route::middleware('auth')->group(function () {
         // Withdraw Routes
         Route::prefix('withdraw')->name('withdraw.')->group(function () {
             Route::get('/', [MemberWithdrawController::class, 'index'])->name('index');
+            Route::post('/store', [MemberWithdrawController::class, 'store'])->name('store');
             Route::get('/log', [MemberWithdrawController::class, 'log'])->name('log');
         });
         // Invest Routes

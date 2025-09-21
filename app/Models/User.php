@@ -55,4 +55,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(Wallet::class)->where('is_primary', true);
     }
+    public function withdrawals()
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
 }
