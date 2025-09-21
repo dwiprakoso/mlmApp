@@ -20,14 +20,17 @@ class ProductController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
+                'duration' => 'required|integer|min:1',
                 'price' => 'required|numeric|min:0',
+                'is_active' => 'required|boolean',
             ]);
 
             Product::create([
                 'name' => $request->name,
                 'description' => $request->description,
+                'duration' => $request->duration,
                 'price' => $request->price,
-                'is_active' => $request->has('is_active') ? 1 : 0, // Explicitly convert to 1 or 0
+                'is_active' => $request->is_active == '1' ? 1 : 0,
             ]);
 
             return redirect()->route('admin.product.index')->with('success', 'Product created successfully!');
@@ -42,14 +45,17 @@ class ProductController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
+                'duration' => 'required|integer|min:1',
                 'price' => 'required|numeric|min:0',
+                'is_active' => 'required|boolean',
             ]);
 
             $product->update([
                 'name' => $request->name,
                 'description' => $request->description,
+                'duration' => $request->duration,
                 'price' => $request->price,
-                'is_active' => $request->has('is_active') ? 1 : 0, // Explicitly convert to 1 or 0
+                'is_active' => $request->is_active == '1' ? 1 : 0,
             ]);
 
             return redirect()->route('admin.product.index')->with('success', 'Product updated successfully!');

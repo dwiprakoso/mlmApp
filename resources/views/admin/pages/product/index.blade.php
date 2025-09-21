@@ -111,6 +111,7 @@
                         <thead>
                             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                                 <th class="min-w-200px">Product</th>
+                                <th class="min-w-100px">Duration</th>
                                 <th class="min-w-125px">Price</th>
                                 <th class="min-w-125px">Status</th>
                                 <th class="text-end min-w-100px">Actions</th>
@@ -128,6 +129,10 @@
                                                 class="text-muted">{{ Str::limit($product->description, 60) ?? 'No description' }}</span>
                                         </div>
                                         <!--end::Product details-->
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-light-info fw-bold">{{ $product->duration ?? 'N/A' }}
+                                            days</span>
                                     </td>
                                     <td>
                                         <span class="fw-bold">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
@@ -154,6 +159,7 @@
                                                     data-product-id="{{ $product->id }}"
                                                     data-product-name="{{ $product->name }}"
                                                     data-product-description="{{ $product->description }}"
+                                                    data-product-duration="{{ $product->duration }}"
                                                     data-product-price="{{ $product->price }}"
                                                     data-product-status="{{ $product->is_active ? '1' : '0' }}">Edit</a>
                                             </div>
@@ -172,7 +178,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center py-5">
+                                    <td colspan="5" class="text-center py-5">
                                         <span class="text-muted">No products found</span>
                                     </td>
                                 </tr>
@@ -215,6 +221,13 @@
                                 <label class="fw-semibold fs-6 mb-2">Description</label>
                                 <textarea name="description" class="form-control form-control-solid" rows="4"
                                     placeholder="Enter product description">{{ old('description') }}</textarea>
+                            </div>
+                            {{-- Duration --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Duration (Days)</label>
+                                <input type="number" name="duration" class="form-control form-control-solid"
+                                    min="1" placeholder="Enter duration in days" value="{{ old('duration') }}"
+                                    required />
                             </div>
                             {{-- Price --}}
                             <div class="fv-row mb-7">
@@ -277,6 +290,12 @@
                                 <label class="fw-semibold fs-6 mb-2">Description</label>
                                 <textarea name="description" class="form-control form-control-solid" rows="4"
                                     placeholder="Enter product description" id="edit_description"></textarea>
+                            </div>
+                            {{-- Duration --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Duration (Days)</label>
+                                <input type="number" name="duration" class="form-control form-control-solid"
+                                    min="1" placeholder="Enter duration in days" id="edit_duration" required />
                             </div>
                             {{-- Price --}}
                             <div class="fv-row mb-7">
@@ -352,6 +371,7 @@
                     const productId = button.getAttribute('data-product-id');
                     const productName = button.getAttribute('data-product-name');
                     const productDescription = button.getAttribute('data-product-description');
+                    const productDuration = button.getAttribute('data-product-duration');
                     const productPrice = button.getAttribute('data-product-price');
                     const productStatus = button.getAttribute('data-product-status');
 
@@ -362,6 +382,7 @@
                     // Fill form fields
                     document.getElementById('edit_name').value = productName;
                     document.getElementById('edit_description').value = productDescription || '';
+                    document.getElementById('edit_duration').value = productDuration || '';
                     document.getElementById('edit_price').value = productPrice;
                     document.getElementById('edit_status').value = productStatus;
                 });
