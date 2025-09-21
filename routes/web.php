@@ -66,5 +66,6 @@ Route::prefix('member')->name('member.')->group(function () {
     // Deposit Routes
     Route::prefix('deposit')->name('deposit.')->group(function () {
         Route::get('/', [MemberDepositController::class, 'index'])->name('index');
+        Route::get('/log', [MemberDepositController::class, 'log'])->name('log');
     });
 });

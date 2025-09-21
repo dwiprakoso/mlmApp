@@ -8,9 +8,9 @@
             </a>
             <h5 class="text-white mb-0">Deposit</h5>
         </div>
-        <div>
-            <small class="text-gold">Log</small>
-        </div>
+        <a href="{{ route('member.deposit.log') }}" class="text-gold text-decoration-none">
+            <small>Log</small>
+        </a>
     </div>
 
     <!-- Main Content Card -->

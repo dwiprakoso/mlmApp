@@ -366,3 +366,67 @@ body {
     font-size: 16px;
     font-weight: 600;
 }
+
+/* Deposit Log Styles */
+.deposit-log-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.log-item {
+    background-color: var(--card-dark);
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.log-item:first-child {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.log-item:last-child {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-bottom: none;
+}
+
+.log-item:hover {
+    background-color: rgba(218, 165, 32, 0.05);
+}
+
+.log-content {
+    padding: 16px 20px;
+}
+
+.log-item .text-muted {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.log-item .text-white {
+    font-size: 13px;
+    color: #fff;
+}
+
+.log-item .fw-bold {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.bg-warning {
+    background-color: var(--gold-color) !important;
+    color: #000 !important;
+}
+
+.bg-success {
+    background-color: #28a745 !important;
+    color: #fff !important;
+}

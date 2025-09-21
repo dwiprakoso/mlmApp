@@ -11,4 +11,8 @@ class DepositController extends Controller
     {
         return view('member.pages.deposit.index');
     }
+    public function log()
+    {
+        return view('member.pages.deposit.log');
+    }
 }
