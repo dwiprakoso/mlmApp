@@ -79,6 +79,7 @@ Route::prefix('member')->name('member.')->group(function () {
     // Invest Routes
     Route::prefix('invest')->name('invest.')->group(function () {
         Route::get('/', [MemberInvestController::class, 'index'])->name('index');
+        Route::get('/log', [MemberInvestController::class, 'log'])->name('log');
     });
     // Dompet Routes
     Route::prefix('dompet')->name('dompet.')->group(function () {

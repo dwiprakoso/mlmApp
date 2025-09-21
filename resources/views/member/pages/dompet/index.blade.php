@@ -41,7 +41,7 @@
                             style="width: 40px; height: 40px;">
                             <i class="bi bi-chat-left-text text-muted"></i>
                         </div>
-                        <a href="#" class="text-gold text-decoration-none">
+                        <a href="{{ route('member.invest.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
                         </a>
                     </div>
@@ -92,7 +92,7 @@
                             style="width: 40px; height: 40px;">
                             <i class="bi bi-calendar-event text-muted"></i>
                         </div>
-                        <a href="#" class="text-gold text-decoration-none">
+                        <a href="{{ route('member.withdraw.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
                         </a>
                     </div>
@@ -109,7 +109,7 @@
                             style="width: 40px; height: 40px;">
                             <i class="bi bi-arrow-down text-muted"></i>
                         </div>
-                        <a href="#" class="text-gold text-decoration-none">
+                        <a href="{{ route('member.deposit.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
                         </a>
                     </div>
@@ -126,7 +126,7 @@
                             style="width: 40px; height: 40px;">
                             <i class="bi bi-arrow-up text-muted"></i>
                         </div>
-                        <a href="#" class="text-gold text-decoration-none">
+                        <a href="{{ route('member.withdraw.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
                         </a>
                     </div>
@@ -167,50 +167,6 @@
                     <h6 class="text-gold mb-1">IDR 0</h6>
                     <small class="text-muted">Total komisi</small>
                 </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="row g-3 mt-3 mb-5" style="margin-bottom: 120px !important;">
-            <div class="col-3">
-                <a href="{{ route('member.invest.index') }}" class="text-decoration-none">
-                    <div class="text-center">
-                        <div class="bg-gold circle-icon mb-2">
-                            <i class="bi bi-gem text-dark"></i>
-                        </div>
-                        <small class="text-white">VIP</small>
-                    </div>
-                </a>
-            </div>
-            <div class="col-3">
-                <a href="{{ route('member.invest.index') }}" class="text-decoration-none">
-                    <div class="text-center">
-                        <div class="bg-gold circle-icon mb-2">
-                            <i class="bi bi-graph-up text-dark"></i>
-                        </div>
-                        <small class="text-white">Investasi</small>
-                    </div>
-                </a>
-            </div>
-            <div class="col-3">
-                <a href="{{ route('member.invest.index') }}" class="text-decoration-none">
-                    <div class="text-center">
-                        <div class="bg-gold circle-icon mb-2">
-                            <i class="bi bi-gift text-dark"></i>
-                        </div>
-                        <small class="text-white">Bonus</small>
-                    </div>
-                </a>
-            </div>
-            <div class="col-3">
-                <a href="{{ route('member.invest.index') }}" class="text-decoration-none">
-                    <div class="text-center">
-                        <div class="bg-gold circle-icon mb-2">
-                            <i class="bi bi-people text-dark"></i>
-                        </div>
-                        <small class="text-white">Referral</small>
-                    </div>
-                </a>
             </div>
         </div>
     </div>

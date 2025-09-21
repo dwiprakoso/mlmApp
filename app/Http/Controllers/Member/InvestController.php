@@ -11,4 +11,8 @@ class InvestController extends Controller
     {
         return view('member.pages.invest.index');
     }
+    public function log()
+    {
+        return view('member.pages.invest.log');
+    }
 }
