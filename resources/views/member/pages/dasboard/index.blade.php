@@ -26,7 +26,7 @@
                 <a href="{{ route('member.deposit.index') }}" class="btn btn-gold btn-sm flex-fill">
                     <i class="bi bi-arrow-down me-1"></i>Deposit
                 </a>
-                <a href="{{ route('member.deposit.index') }}" class="btn btn-outline-gold btn-sm flex-fill">
+                <a href="{{ route('member.withdraw.index') }}" class="btn btn-outline-gold btn-sm flex-fill">
                     <i class="bi bi-arrow-up me-1"></i>Penarikan
                 </a>
             </div>

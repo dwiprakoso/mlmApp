@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\WithdrawController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\DepositController as MemberDepositController;
+use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
 
 Route::get('/', [AuthController::class, 'signIn'])->name('guest.sign-in');
 Route::get('/sign-up', [AuthController::class, 'signUp'])->name('guest.sign-up');
@@ -67,5 +68,10 @@ Route::prefix('member')->name('member.')->group(function () {
     Route::prefix('deposit')->name('deposit.')->group(function () {
         Route::get('/', [MemberDepositController::class, 'index'])->name('index');
         Route::get('/log', [MemberDepositController::class, 'log'])->name('log');
+    });
+    // Withdraw Routes
+    Route::prefix('withdraw')->name('withdraw.')->group(function () {
+        Route::get('/', [MemberWithdrawController::class, 'index'])->name('index');
+        Route::get('/log', [MemberWithdrawController::class, 'log'])->name('log');
     });
 });

@@ -430,3 +430,50 @@ body {
     background-color: #28a745 !important;
     color: #fff !important;
 }
+
+/* Withdraw Page Styles */
+.bank-info {
+    padding: 8px 0;
+}
+
+.bank-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bank-icon i {
+    font-size: 20px;
+}
+
+.instructions-section {
+    margin-top: 20px;
+}
+
+.instruction-list {
+    background-color: transparent;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: flex-start;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.instruction-item .text-gold {
+    min-width: 20px;
+    flex-shrink: 0;
+}
+
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form-control:disabled {
+    background-color: var(--secondary-dark);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
