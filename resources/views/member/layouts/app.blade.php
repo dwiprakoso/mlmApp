@@ -13,11 +13,11 @@
 
 <body>
     <div class="mobile-container">
+
+
         @yield('content')
-
-        @include('member.components.bottombar')
     </div>
-
+    @include('member.components.bottombar')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
