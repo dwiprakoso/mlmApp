@@ -15,14 +15,14 @@
                 <div class="col-6">
                     <a href="{{ route('member.deposit.index') }}"
                         class="btn btn-success w-100 d-flex align-items-center justify-content-center">
-                        <i class="bi bi-download me-2"></i>
+                        <i class="bi bi-upload me-2"></i>
                         <span>Deposit</span>
                     </a>
                 </div>
                 <div class="col-6">
                     <a href="{{ route('member.withdraw.index') }}"
                         class="btn btn-warning w-100 d-flex align-items-center justify-content-center">
-                        <i class="bi bi-upload me-2"></i>
+                        <i class="bi bi-download me-2"></i>
                         <span>Penarikan</span>
                     </a>
                 </div>
@@ -39,7 +39,7 @@
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
                             style="width: 40px; height: 40px;">
-                            <i class="bi bi-chat-left-text text-muted"></i>
+                            <i class="bi bi-graph-up d-block fs-5"></i>
                         </div>
                         <a href="{{ route('member.invest.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
@@ -73,7 +73,7 @@
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
                             style="width: 40px; height: 40px;">
-                            <i class="bi bi-wallet text-muted"></i>
+                            <i class="bi bi-upload me-2"></i>
                         </div>
                         <a href="{{ route('member.deposit.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
@@ -90,7 +90,7 @@
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
                             style="width: 40px; height: 40px;">
-                            <i class="bi bi-calendar-event text-muted"></i>
+                            <i class="bi bi-download me-2"></i>
                         </div>
                         <a href="{{ route('member.withdraw.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
@@ -107,7 +107,7 @@
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
                             style="width: 40px; height: 40px;">
-                            <i class="bi bi-arrow-down text-muted"></i>
+                            <i class="bi bi-upload me-2"></i>
                         </div>
                         <a href="{{ route('member.deposit.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
@@ -124,7 +124,7 @@
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
                             style="width: 40px; height: 40px;">
-                            <i class="bi bi-arrow-up text-muted"></i>
+                            <i class="bi bi-download me-2"></i>
                         </div>
                         <a href="{{ route('member.withdraw.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
