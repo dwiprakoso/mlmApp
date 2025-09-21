@@ -50,7 +50,7 @@
                 </div>
             </div>
 
-            <!-- Bank Card -->
+            <!-- Bank Card - Update bagian ini di dashboard -->
             <div class="col-6">
                 <div class="card-dark p-3 h-100">
                     <div class="d-flex justify-content-between align-items-start mb-2">
@@ -58,12 +58,30 @@
                             style="width: 40px; height: 40px;">
                             <i class="bi bi-credit-card text-muted"></i>
                         </div>
-                        <a href="#" class="text-gold text-decoration-none">
+                        <a href="{{ route('member.dompet.detail') }}" class="text-gold text-decoration-none">
                             <small>Lihat info kartu →</small>
                         </a>
                     </div>
-                    <h6 class="text-white mb-1">0821***778</h6>
-                    <small class="text-muted">Kartu bank</small>
+                    @php
+                        $primaryWallet = auth()->user()->primaryWallet ?? auth()->user()->wallets()->first();
+                    @endphp
+
+                    @if ($primaryWallet)
+                        @if ($primaryWallet->wallet_type === 'bank')
+                            <h6 class="text-white mb-1">
+                                {{ substr($primaryWallet->bank_account, 0, 4) }}***{{ substr($primaryWallet->bank_account, -3) }}
+                            </h6>
+                            <small class="text-muted">{{ $primaryWallet->bank_name }}</small>
+                        @else
+                            <h6 class="text-white mb-1">
+                                {{ substr($primaryWallet->ewallet_number, 0, 4) }}***{{ substr($primaryWallet->ewallet_number, -3) }}
+                            </h6>
+                            <small class="text-muted">{{ $primaryWallet->ewallet_provider }}</small>
+                        @endif
+                    @else
+                        <h6 class="text-white mb-1">Belum ada wallet</h6>
+                        <small class="text-muted">Tambah wallet</small>
+                    @endif
                 </div>
             </div>
 

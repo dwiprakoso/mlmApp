@@ -93,6 +93,13 @@ Route::middleware('auth')->group(function () {
         // Dompet Routes
         Route::prefix('dompet')->name('dompet.')->group(function () {
             Route::get('/', [MemberDompetController::class, 'index'])->name('index');
+            Route::get('/detail', [MemberDompetController::class, 'detail'])->name('detail');
+            Route::get('/create', [MemberDompetController::class, 'create'])->name('create');
+            Route::post('/store', [MemberDompetController::class, 'store'])->name('store');
+            Route::get('/edit/{wallet}', [MemberDompetController::class, 'edit'])->name('edit');
+            Route::put('/update/{wallet}', [MemberDompetController::class, 'update'])->name('update');
+            Route::delete('/destroy/{wallet}', [MemberDompetController::class, 'destroy'])->name('destroy');
+            Route::patch('/set-primary/{wallet}', [MemberDompetController::class, 'setPrimary'])->name('setPrimary');
         });
     });
 });
