@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\WithdrawController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Member\DepositController as MemberDepositController;
 
 Route::get('/', [AuthController::class, 'signIn'])->name('guest.sign-in');
 Route::get('/sign-up', [AuthController::class, 'signUp'])->name('guest.sign-up');
@@ -61,5 +62,9 @@ Route::prefix('member')->name('member.')->group(function () {
     // Dashboard Routes
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [MemberDashboardController::class, 'index'])->name('index');
+    });
+    // Deposit Routes
+    Route::prefix('deposit')->name('deposit.')->group(function () {
+        Route::get('/', [MemberDepositController::class, 'index'])->name('index');
     });
 });

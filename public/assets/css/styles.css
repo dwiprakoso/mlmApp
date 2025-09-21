@@ -280,3 +280,89 @@ body {
 .activity-item small {
     font-size: 11px;
 }
+
+/* Deposit Page Styles */
+.form-control-dark {
+    background-color: var(--secondary-dark);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    border-radius: 8px;
+    padding: 12px 15px;
+}
+
+.form-control-dark:focus {
+    background-color: var(--secondary-dark);
+    border-color: var(--gold-color);
+    color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(218, 165, 32, 0.25);
+}
+
+.form-control-dark::placeholder {
+    color: var(--text-muted);
+}
+
+.amount-btn {
+    padding: 12px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.amount-btn:hover {
+    transform: translateY(-1px);
+}
+
+.payment-method {
+    background-color: var(--secondary-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-method:hover {
+    border-color: var(--gold-color);
+    background-color: rgba(218, 165, 32, 0.05);
+}
+
+.payment-method.selected {
+    border-color: var(--gold-color);
+    background-color: rgba(218, 165, 32, 0.1);
+}
+
+.payment-method.selected .payment-check {
+    display: block;
+}
+
+.payment-method:not(.selected) .payment-check {
+    display: none;
+}
+
+.payment-method:not(.selected) .payment-radio {
+    display: block;
+}
+
+.payment-method.selected .payment-radio {
+    display: none;
+}
+
+.radio-circle {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    background-color: transparent;
+}
+
+.payment-method h6 {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.btn-lg {
+    padding: 15px 20px;
+    font-size: 16px;
+    font-weight: 600;
+}

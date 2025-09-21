@@ -1,7 +1,5 @@
 @extends('member.layouts.app')
 @section('content')
-
-
     <!-- Hero -->
     <div class="hero-card">
         <!-- Tagline -->
@@ -25,12 +23,12 @@
                 </div>
             </div>
             <div class="d-flex gap-2 mt-3">
-                <button class="btn btn-gold btn-sm flex-fill">
+                <a href="{{ route('member.deposit.index') }}" class="btn btn-gold btn-sm flex-fill">
                     <i class="bi bi-arrow-down me-1"></i>Deposit
-                </button>
-                <button class="btn btn-outline-gold btn-sm flex-fill">
+                </a>
+                <a href="{{ route('member.deposit.index') }}" class="btn btn-outline-gold btn-sm flex-fill">
                     <i class="bi bi-arrow-up me-1"></i>Penarikan
-                </button>
+                </a>
             </div>
         </div>
     </div>
