@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\WithdrawController;
+use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 
 Route::get('/', [AuthController::class, 'signIn'])->name('guest.sign-in');
 Route::get('/sign-up', [AuthController::class, 'signUp'])->name('guest.sign-up');
@@ -54,5 +55,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('about')->name('about.')->group(function () {
         Route::get('/', [AboutController::class, 'index'])->name('index');
         Route::post('/update', [AboutController::class, 'update'])->name('update');
+    });
+});
+Route::prefix('member')->name('member.')->group(function () {
+    // Dashboard Routes
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::get('/', [MemberDashboardController::class, 'index'])->name('index');
     });
 });

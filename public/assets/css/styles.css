@@ -1,0 +1,230 @@
+/* Mobile-First Design with Metronic Dark Theme */
+:root {
+    --primary-dark: #1e1e2e;
+    --secondary-dark: #2a2d3a;
+    --card-dark: #181c32;
+    --gold-color: #DAA520;
+    --gold-hover: #b8941c;
+    --text-muted: #7e8299;
+    --border-color: #323248;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--primary-dark);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    color: #fff;
+}
+
+/* Mobile Container - Fixed Width for Consistency */
+.mobile-container {
+    width: 425px;
+    min-height: 100vh;
+    background-color: var(--primary-dark);
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Hero Section */
+.hero-card {
+    background: linear-gradient(135deg, var(--card-dark) 0%, var(--secondary-dark) 100%);
+    padding: 20px;
+    border-radius: 0 0 20px 20px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.balance-card {
+    background: linear-gradient(135deg, var(--secondary-dark), var(--card-dark));
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 15px;
+}
+
+/* Content Sections */
+.content-section {
+    padding: 20px;
+}
+
+/* Cards */
+.card-dark {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+/* Circle Icons */
+.circle-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px auto;
+    font-size: 24px;
+    transition: transform 0.2s ease;
+}
+
+.circle-icon:hover {
+    transform: scale(1.05);
+}
+
+/* Gold Theme Colors */
+.text-gold {
+    color: var(--gold-color) !important;
+}
+
+.bg-gold {
+    background-color: var(--gold-color) !important;
+}
+
+.btn-gold {
+    background-color: var(--gold-color);
+    border-color: var(--gold-color);
+    color: #000;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-gold:hover {
+    background-color: var(--gold-hover);
+    border-color: var(--gold-hover);
+    color: #000;
+    transform: translateY(-1px);
+}
+
+.btn-outline-gold {
+    background-color: transparent;
+    border-color: var(--gold-color);
+    color: var(--gold-color);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-gold:hover {
+    background-color: var(--gold-color);
+    border-color: var(--gold-color);
+    color: #000;
+    transform: translateY(-1px);
+}
+
+/* Text Colors */
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-white {
+    color: #fff !important;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 425px;
+    background: linear-gradient(135deg, var(--card-dark), var(--secondary-dark));
+    border-top: 1px solid var(--border-color);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0 20px 0;
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 11px;
+    text-align: center;
+    flex: 1;
+    transition: all 0.2s ease;
+    padding: 6px 2px;
+    border-radius: 4px;
+}
+
+.nav-item:hover {
+    color: var(--gold-color);
+    background-color: rgba(218, 165, 32, 0.06);
+}
+
+.nav-item.active {
+    color: var(--gold-color);
+    font-weight: 600;
+}
+
+.nav-item.active i {
+    color: var(--gold-color);
+}
+
+.nav-item span {
+    display: block;
+    margin-top: 2px;
+}
+
+/* Responsive Adjustments for Larger Screens */
+@media (min-width: 768px) {
+    body {
+        background: linear-gradient(135deg, #0f0f23 0%, var(--primary-dark) 100%);
+        padding: 20px 0;
+    }
+    
+    .mobile-container {
+        border-radius: 20px;
+        overflow: hidden;
+    }
+}
+
+/* Badge Styles */
+.badge {
+    font-size: 10px;
+    padding: 4px 6px;
+}
+
+/* Smooth Animations */
+.btn, .circle-icon, .nav-item {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Loading States */
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* Focus States for Accessibility */
+.btn:focus,
+.nav-item:focus {
+    outline: 2px solid var(--gold-color);
+    outline-offset: 2px;
+}
+
+/* Scrollbar Styling */
+.mobile-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.mobile-container::-webkit-scrollbar-track {
+    background: var(--primary-dark);
+}
+
+.mobile-container::-webkit-scrollbar-thumb {
+    background: var(--gold-color);
+    border-radius: 2px;
+}
+
+.mobile-container::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-hover);
+}
