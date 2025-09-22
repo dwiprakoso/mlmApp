@@ -9,6 +9,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('member.pages.dasboard.index');
+        $user = auth()->user();
+        $referralCode = $user->refferal_code;
+        $referralLink = route('guest.sign-up', ['ref' => $referralCode]);
+
+        return view('member.pages.dasboard.index', compact('user', 'referralCode', 'referralLink'));
     }
 }

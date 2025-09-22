@@ -67,20 +67,20 @@
 
             <div class="row text-center mb-3">
                 <div class="col-4">
-                    <div class="invitation-box">
+                    <div class="invitation-box" onclick="generateQR('{{ $referralLink }}')">
                         <i class="bi bi-qr-code fs-3 text-gold"></i>
                         <small class="text-muted d-block mt-2">Undang Kode QR</small>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="invitation-box">
+                    <div class="invitation-box" onclick="copyToClipboard('{{ $referralLink }}')">
                         <i class="bi bi-link-45deg fs-3 text-gold"></i>
                         <small class="text-muted d-block mt-2">Undang tautan</small>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="invitation-box">
-                        <h5 class="fw-bold mb-0 text-gold">ZKL9S</h5>
+                    <div class="invitation-box" onclick="copyToClipboard('{{ $referralCode }}')">
+                        <h5 class="fw-bold mb-0 text-gold">{{ $referralCode }}</h5>
                         <small class="text-muted d-block mt-2">Undang Kode</small>
                     </div>
                 </div>
@@ -88,6 +88,7 @@
             <button class="btn btn-gold w-100">Lihat tim saya</button>
         </div>
     </div>
+
 
     <!-- Pesanan saya yang valid -->
     <div class="content-section">
@@ -117,46 +118,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-4">
-                <div class="order-card">
-                    <small class="text-muted">IDR</small>
-                    <h6 class="text-success fw-bold mb-0">50,000.00</h6>
-                    <small class="text-muted">Jumlah Pesanan</small>
-                    <hr class="my-2 border-secondary">
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Periode Kembali</small>
-                        <small class="text-white">25 Hari</small>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Total pendapatan</small>
-                        <small class="text-white">IDR 437,500.00</small>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Hari Kerja</small>
-                        <small class="text-white">6 Hari</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="order-card">
-                    <small class="text-muted">IDR</small>
-                    <h6 class="text-success fw-bold mb-0">50,000.00</h6>
-                    <small class="text-muted">Jumlah Pesanan</small>
-                    <hr class="my-2 border-secondary">
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Periode Kembali</small>
-                        <small class="text-white">33 Hari</small>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Total pendapatan</small>
-                        <small class="text-white">IDR 544,500.00</small>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Hari Kerja</small>
-                        <small class="text-white">8 Hari</small>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -180,58 +141,20 @@
                     </div>
                 </div>
             </div>
-
-            <div class="activity-item">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-white mb-1">Deposit</h6>
-                        <small class="text-muted">2025-09-14 19:08:21</small>
-                    </div>
-                    <div class="text-end">
-                        <span class="text-success">IDR 50,000</span>
-                        <small class="text-muted d-block">IDR 250,000</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="activity-item">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-white mb-1">Investasi</h6>
-                        <small class="text-muted">2025-09-14 15:51:58</small>
-                    </div>
-                    <div class="text-end">
-                        <span class="text-danger">IDR -50,000</span>
-                        <small class="text-muted d-block">IDR 200,000</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="activity-item">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-white mb-1">Deposit</h6>
-                        <small class="text-muted">2025-09-14 15:48:03</small>
-                    </div>
-                    <div class="text-end">
-                        <span class="text-success">IDR 250,000</span>
-                        <small class="text-muted d-block">IDR 250,000</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="activity-item">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-white mb-1">Penarikan</h6>
-                        <small class="text-muted">2025-09-14 15:34:33</small>
-                    </div>
-                    <div class="text-end">
-                        <span class="text-danger">IDR -80,000</span>
-                        <small class="text-muted d-block">IDR 0</small>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Bisa pakai toast notification atau alert sederhana
+                alert('Disalin ke clipboard!');
+            });
+        }
+
+        function generateQR(url) {
+            // Buka QR generator di tab baru
+            window.open(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`,
+                '_blank');
+        }
+    </script>
 @endsection
