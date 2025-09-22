@@ -31,7 +31,7 @@
     </div>
 
     <!-- Dashboard Stats Grid -->
-    <div class="content-section">
+    <div class="content-section mb-5 pb-5">
         <div class="row g-3">
             <!-- Messages Card -->
             <div class="col-6">
