@@ -17,7 +17,7 @@ use App\Http\Controllers\Member\InvestController as MemberInvestController;
 use App\Http\Controllers\Member\DompetController as MemberDompetController;
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', [AuthController::class, 'signIn'])->name('guest.sign-in');
+    Route::get('/', [AuthController::class, 'signIn'])->name('login');
     Route::post('/sign-in', [AuthController::class, 'processSignIn'])->name('guest.process-sign-in');
     Route::get('/sign-up', [AuthController::class, 'signUp'])->name('guest.sign-up');
     Route::post('/sign-up', [AuthController::class, 'processSignUp'])->name('guest.process-sign-up');

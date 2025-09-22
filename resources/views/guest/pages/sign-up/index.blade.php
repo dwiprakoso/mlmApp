@@ -114,7 +114,7 @@
 
                         <!--begin::Sign in-->
                         <div class="text-gray-500 text-center fw-semibold fs-6">Sudah punya akun?
-                            <a href="{{ route('guest.sign-in') }}" class="link-primary fw-semibold">Sign in</a>
+                            <a href="{{ route('login') }}" class="link-primary fw-semibold">Sign in</a>
                         </div>
                         <!--end::Sign in-->
                     </form>
