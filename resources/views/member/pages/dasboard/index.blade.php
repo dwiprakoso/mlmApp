@@ -91,7 +91,7 @@
 
 
     <!-- Pesanan saya yang valid -->
-    <div class="content-section">
+    {{-- <div class="content-section">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="text-white mb-0">Pesanan saya yang valid</h6>
             <small class="text-gold">Lihat semua</small>
@@ -119,10 +119,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Kegiatan Terbaru -->
-    <div class="content-section" style="padding-bottom: 100px;">
+    {{-- <div class="content-section" style="padding-bottom: 100px;">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="text-white mb-0">Kegiatan Terbaru</h6>
             <small class="text-gold">Lihat semua</small>
@@ -142,7 +142,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <script>
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function() {
