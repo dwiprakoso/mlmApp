@@ -15,7 +15,7 @@
                         <i class="bi bi-wallet2 text-gold"></i>
                         <small class="text-muted">IDR</small>
                     </div>
-                    <h3 class="fw-bold text-gold mb-0">75,000</h3>
+                    <h3 class="fw-bold text-gold mb-0">{{ number_format($balance, 0, ',', '.') }}</h3>
                     <small class="text-muted">Saldo akun</small>
                 </div>
                 <div class="text-end">
