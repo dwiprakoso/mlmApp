@@ -14,6 +14,7 @@ class Product extends Model
         'description',
         'duration',
         'price',
+        'type',
         'is_active',
     ];
 
