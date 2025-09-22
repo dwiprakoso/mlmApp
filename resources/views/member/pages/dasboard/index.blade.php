@@ -18,9 +18,6 @@
                     <h3 class="fw-bold text-gold mb-0">{{ number_format($balance, 0, ',', '.') }}</h3>
                     <small class="text-muted">Saldo akun</small>
                 </div>
-                <div class="text-end">
-                    <small class="text-gold">Dompetku →</small>
-                </div>
             </div>
             <div class="d-flex gap-2 mt-3">
                 <a href="{{ route('member.deposit.index') }}" class="btn btn-gold btn-sm flex-fill">
