@@ -10,12 +10,28 @@
         </div>
     </div>
 
-    <!-- Info Banner -->
-    {{-- <div class="alert alert-info mb-3"
-        style="background-color: var(--secondary-dark); border: 1px solid var(--border-color); color: var(--text-muted);">
-        <small>Jagakeuangan - Indonesia Investments terlibat dengan regulator untuk membawa aset crypto ke arus
-            utama.</small>
-    </div> --}}
+    <!-- Alert Messages -->
+    @if (session('success'))
+        <div class="alert alert-success mb-3" style="background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger mb-3" style="background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger mb-3" style="background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <!-- Dynamic Tab Navigation -->
     <div class="mb-4">
@@ -85,9 +101,15 @@
                                     </div>
                                     <small class="text-white">ID: {{ $product->id }}</small>
                                 </div>
-                                <button class="btn btn-gold btn-sm px-3" onclick="investNow({{ $product->id }})">
-                                    <small>Investasi Sekarang</small>
-                                </button>
+                                @if ($product->is_active)
+                                    <button class="btn btn-gold btn-sm px-3" onclick="investNow({{ $product->id }})">
+                                        <small>Investasi Sekarang</small>
+                                    </button>
+                                @else
+                                    <button class="btn btn-secondary btn-sm px-3" disabled>
+                                        <small>Tidak Tersedia</small>
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     @endforeach
@@ -107,11 +129,49 @@
         @endif
     </div>
 
+    <!-- Quick Navigation -->
+    <div class="row g-2 mt-4">
+        <div class="col-6">
+            <a href="{{ route('member.invest.log') }}" class="btn btn-outline-gold w-100">
+                <i class="bi bi-clock-history me-2"></i>
+                <small>Riwayat Investasi</small>
+            </a>
+        </div>
+        <div class="col-6">
+            <a href="{{ route('member.dashboard.index') }}" class="btn btn-outline-gold w-100">
+                <i class="bi bi-house me-2"></i>
+                <small>Dashboard</small>
+            </a>
+        </div>
+    </div>
+
+    <!-- Hidden Form for Investment -->
+    <form id="investmentForm" method="POST" action="{{ route('member.invest.store') }}" style="display: none;">
+        @csrf
+        <input type="hidden" id="productIdInput" name="product_id">
+    </form>
+
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border-gold">
+                <div class="modal-body text-center p-4">
+                    <div class="spinner-border text-gold mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h6 class="text-white mb-0">Memproses Investasi...</h6>
+                    <small class="text-muted">Mohon tunggu sebentar</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
 
+            // Tab switching functionality
             tabButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const targetTab = this.dataset.tab;
@@ -135,15 +195,47 @@
                     document.getElementById(targetTab + '-tab').classList.add('active');
                 });
             });
+
+            // Auto dismiss alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 500);
+                }, 5000);
+            });
         });
 
         // Function to handle investment
         function investNow(productId) {
-            // Add your investment logic here
-            alert('Investing in product ID: ' + productId);
-            // You can redirect to investment form or open a modal
-            // window.location.href = `/member/invest/${productId}`;
+            // Show confirmation modal
+            if (confirm('Apakah Anda yakin ingin berinvestasi pada produk ini?')) {
+                // Show loading modal
+                const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+                loadingModal.show();
+
+                // Set product ID and submit form
+                document.getElementById('productIdInput').value = productId;
+
+                // Add a small delay to show loading modal
+                setTimeout(() => {
+                    document.getElementById('investmentForm').submit();
+                }, 500);
+            }
         }
+
+        // Handle form submission errors
+        document.getElementById('investmentForm').addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('.btn-gold');
+            if (submitBtn) {
+                submitBtn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-2" role="status"></span><small>Memproses...</small>';
+                submitBtn.disabled = true;
+            }
+        });
     </script>
 
     <style>
@@ -160,6 +252,92 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
+        }
+
+        .card-dark {
+            background-color: var(--secondary-dark, #2c2c2c);
+            border: 1px solid var(--border-color, #444);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .card-dark:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-gold {
+            background-color: var(--gold-color, #ffd700);
+            border-color: var(--gold-color, #ffd700);
+            color: #000;
+            font-weight: 500;
+        }
+
+        .btn-gold:hover {
+            background-color: var(--gold-hover, #e6c200);
+            border-color: var(--gold-hover, #e6c200);
+        }
+
+        .btn-outline-gold {
+            border-color: var(--gold-color, #ffd700);
+            color: var(--gold-color, #ffd700);
+        }
+
+        .btn-outline-gold:hover {
+            background-color: var(--gold-color, #ffd700);
+            color: #000;
+        }
+
+        .text-gold {
+            color: var(--gold-color, #ffd700) !important;
+        }
+
+        .bg-gold {
+            background-color: var(--gold-color, #ffd700) !important;
+        }
+
+        .border-gold {
+            border-color: var(--gold-color, #ffd700) !important;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+
+        .tab-btn {
+            position: relative;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn .badge {
+            font-size: 8px;
+            padding: 2px 4px;
+        }
+
+        @media (max-width: 768px) {
+            .col-4 {
+                margin-bottom: 0.25rem;
+            }
+
+            .tab-btn {
+                font-size: 0.875rem;
+                padding: 0.5rem;
+            }
+
+            .card-dark {
+                margin-bottom: 1rem;
+            }
         }
     </style>
 @endsection
