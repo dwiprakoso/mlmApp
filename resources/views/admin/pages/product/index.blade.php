@@ -111,6 +111,7 @@
                         <thead>
                             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                                 <th class="min-w-200px">Product</th>
+                                <th class="min-w-125px">Type</th>
                                 <th class="min-w-100px">Duration</th>
                                 <th class="min-w-125px">Price</th>
                                 <th class="min-w-125px">Status</th>
@@ -129,6 +130,25 @@
                                                 class="text-muted">{{ Str::limit($product->description, 60) ?? 'No description' }}</span>
                                         </div>
                                         <!--end::Product details-->
+                                    </td>
+                                    <td>
+                                        @switch($product->type)
+                                            @case('Rencana Lanjutan')
+                                                <span class="badge badge-light-primary fw-bold">{{ $product->type }}</span>
+                                            @break
+
+                                            @case('Pendapatan Stabil')
+                                                <span class="badge badge-light-warning fw-bold">{{ $product->type }}</span>
+                                            @break
+
+                                            @case('Keuntungan VIP')
+                                                <span class="badge badge-light-success fw-bold">{{ $product->type }}</span>
+                                            @break
+
+                                            @default
+                                                <span
+                                                    class="badge badge-light-secondary fw-bold">{{ $product->type ?? 'N/A' }}</span>
+                                        @endswitch
                                     </td>
                                     <td>
                                         <span class="badge badge-light-info fw-bold">{{ $product->duration ?? 'N/A' }}
@@ -161,13 +181,14 @@
                                                     data-product-description="{{ $product->description }}"
                                                     data-product-duration="{{ $product->duration }}"
                                                     data-product-price="{{ $product->price }}"
+                                                    data-product-type="{{ $product->type }}"
                                                     data-product-status="{{ $product->is_active ? '1' : '0' }}">Edit</a>
                                             </div>
                                             <!--end::Menu item-->
                                             <!--begin::Menu item-->
                                             <div class="menu-item px-3">
-                                                <a href="#" class="menu-link px-3 text-danger" data-bs-toggle="modal"
-                                                    data-bs-target="#kt_modal_delete_product"
+                                                <a href="#" class="menu-link px-3 text-danger"
+                                                    data-bs-toggle="modal" data-bs-target="#kt_modal_delete_product"
                                                     data-product-id="{{ $product->id }}"
                                                     data-product-name="{{ $product->name }}">Delete</a>
                                             </div>
@@ -176,232 +197,261 @@
                                         <!--end::Menu-->
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center py-5">
-                                        <span class="text-muted">No products found</span>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                    <!--end::Table-->
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <span class="text-muted">No products found</span>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        <!--end::Table-->
+                    </div>
+                    <!--end::Card body-->
                 </div>
-                <!--end::Card body-->
+                <!--end::Card-->
             </div>
-            <!--end::Card-->
+            <!--end::Content container-->
         </div>
-        <!--end::Content container-->
-    </div>
-    <!--end::Content-->
+        <!--end::Content-->
 
-    {{-- Add Product Modal --}}
-    <div class="modal fade" id="kt_modal_add_product" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered mw-650px">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="fw-bold">Add Product</h2>
-                    <button type="button" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"
-                        aria-label="Close">
-                        <i class="ki-outline ki-cross fs-1"></i>
-                    </button>
-                </div>
-                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
-                    <form action="{{ route('admin.product.store') }}" method="POST" id="kt_modal_add_product_form">
-                        @csrf
-                        <div class="d-flex flex-column scroll-y me-n7 pe-7">
-                            {{-- Product Name --}}
-                            <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">Product Name</label>
-                                <input type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0"
-                                    placeholder="Enter product name" value="{{ old('name') }}" required />
-                            </div>
-                            {{-- Description --}}
-                            <div class="fv-row mb-7">
-                                <label class="fw-semibold fs-6 mb-2">Description</label>
-                                <textarea name="description" class="form-control form-control-solid" rows="4"
-                                    placeholder="Enter product description">{{ old('description') }}</textarea>
-                            </div>
-                            {{-- Duration --}}
-                            <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">Duration (Days)</label>
-                                <input type="number" name="duration" class="form-control form-control-solid"
-                                    min="1" placeholder="Enter duration in days" value="{{ old('duration') }}"
-                                    required />
-                            </div>
-                            {{-- Price --}}
-                            <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">Price</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="number" name="price" class="form-control form-control-solid"
-                                        step="0.01" min="0" placeholder="0" value="{{ old('price') }}"
+        {{-- Add Product Modal --}}
+        <div class="modal fade" id="kt_modal_add_product" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mw-650px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="fw-bold">Add Product</h2>
+                        <button type="button" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"
+                            aria-label="Close">
+                            <i class="ki-outline ki-cross fs-1"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                        <form action="{{ route('admin.product.store') }}" method="POST" id="kt_modal_add_product_form">
+                            @csrf
+                            <div class="d-flex flex-column scroll-y me-n7 pe-7">
+                                {{-- Product Name --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Product Name</label>
+                                    <input type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0"
+                                        placeholder="Enter product name" value="{{ old('name') }}" required />
+                                </div>
+                                {{-- Description --}}
+                                <div class="fv-row mb-7">
+                                    <label class="fw-semibold fs-6 mb-2">Description</label>
+                                    <textarea name="description" class="form-control form-control-solid" rows="4"
+                                        placeholder="Enter product description">{{ old('description') }}</textarea>
+                                </div>
+                                {{-- Type --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Type</label>
+                                    <select name="type" class="form-select form-select-solid fw-bold" required>
+                                        <option value="">Select type</option>
+                                        <option value="Rencana Lanjutan"
+                                            {{ old('type') == 'Rencana Lanjutan' ? 'selected' : '' }}>
+                                            Rencana Lanjutan</option>
+                                        <option value="Pendapatan Stabil"
+                                            {{ old('type') == 'Pendapatan Stabil' ? 'selected' : '' }}>
+                                            Pendapatan Stabil</option>
+                                        <option value="Keuntungan VIP"
+                                            {{ old('type') == 'Keuntungan VIP' ? 'selected' : '' }}>
+                                            Keuntungan VIP</option>
+                                    </select>
+                                </div>
+                                {{-- Duration --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Duration (Days)</label>
+                                    <input type="number" name="duration" class="form-control form-control-solid"
+                                        min="1" placeholder="Enter duration in days" value="{{ old('duration') }}"
                                         required />
                                 </div>
-                            </div>
-                            {{-- Status --}}
-                            <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">Status</label>
-                                <select name="is_active" class="form-select form-select-solid fw-bold" required>
-                                    <option value="">Select status</option>
-                                    <option value="1" {{ old('is_active') == '1' ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Inactive
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="text-center pt-15">
-                            <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal"
-                                aria-label="Close">Cancel</button>
-                            <button type="submit" class="btn btn-primary">
-                                <span class="indicator-label">Submit</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Edit Product Modal --}}
-    <div class="modal fade" id="kt_modal_edit_product" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered mw-650px">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="fw-bold">Edit Product</h2>
-                    <button type="button" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"
-                        aria-label="Close">
-                        <i class="ki-outline ki-cross fs-1"></i>
-                    </button>
-                </div>
-                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
-                    <form action="" method="POST" id="kt_modal_edit_product_form">
-                        @csrf
-                        @method('PUT')
-                        <div class="d-flex flex-column scroll-y me-n7 pe-7">
-                            {{-- Product Name --}}
-                            <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">Product Name</label>
-                                <input type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0"
-                                    placeholder="Enter product name" id="edit_name" required />
-                            </div>
-                            {{-- Description --}}
-                            <div class="fv-row mb-7">
-                                <label class="fw-semibold fs-6 mb-2">Description</label>
-                                <textarea name="description" class="form-control form-control-solid" rows="4"
-                                    placeholder="Enter product description" id="edit_description"></textarea>
-                            </div>
-                            {{-- Duration --}}
-                            <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">Duration (Days)</label>
-                                <input type="number" name="duration" class="form-control form-control-solid"
-                                    min="1" placeholder="Enter duration in days" id="edit_duration" required />
-                            </div>
-                            {{-- Price --}}
-                            <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">Price</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="number" name="price" class="form-control form-control-solid"
-                                        step="0.01" min="0" id="edit_price" required />
+                                {{-- Price --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="number" name="price" class="form-control form-control-solid"
+                                            step="0.01" min="0" placeholder="0" value="{{ old('price') }}"
+                                            required />
+                                    </div>
+                                </div>
+                                {{-- Status --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Status</label>
+                                    <select name="is_active" class="form-select form-select-solid fw-bold" required>
+                                        <option value="">Select status</option>
+                                        <option value="1" {{ old('is_active') == '1' ? 'selected' : '' }}>Active</option>
+                                        <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Inactive
+                                        </option>
+                                    </select>
                                 </div>
                             </div>
-                            {{-- Status --}}
-                            <div class="fv-row mb-7">
-                                <label class="required fw-semibold fs-6 mb-2">Status</label>
-                                <select name="is_active" class="form-select form-select-solid fw-bold" id="edit_status"
-                                    required>
-                                    <option value="">Select status</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
+                            <div class="text-center pt-15">
+                                <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal"
+                                    aria-label="Close">Cancel</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="indicator-label">Submit</span>
+                                </button>
                             </div>
-                        </div>
-                        <div class="text-center pt-15">
-                            <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal"
-                                aria-label="Close">Cancel</button>
-                            <button type="submit" class="btn btn-primary">
-                                <span class="indicator-label">Update</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Delete Product Modal --}}
-    <div class="modal fade" id="kt_modal_delete_product" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered mw-550px">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="fw-bold">Delete Product</h2>
-                    <button type="button" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"
-                        aria-label="Close">
-                        <i class="ki-outline ki-cross fs-1"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="text-center">
-                        <i class="ki-outline ki-trash text-danger fs-3x mb-5"></i>
-                        <p class="fs-6 text-gray-600 mb-5">Are you sure you want to delete <strong
-                                id="delete_product_name"></strong>?</p>
-                        <p class="fs-7 text-muted">This action cannot be undone.</p>
+                        </form>
                     </div>
-                    <form action="" method="POST" id="kt_modal_delete_product_form">
-                        @csrf
-                        @method('DELETE')
-                        <div class="text-center pt-5">
-                            <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
-    </div>
 
-    @push('scripts')
-        <script>
-            // Edit Product Modal
-            document.addEventListener('DOMContentLoaded', function() {
-                const editModal = document.getElementById('kt_modal_edit_product');
-                editModal.addEventListener('show.bs.modal', function(event) {
-                    const button = event.relatedTarget;
-                    const productId = button.getAttribute('data-product-id');
-                    const productName = button.getAttribute('data-product-name');
-                    const productDescription = button.getAttribute('data-product-description');
-                    const productDuration = button.getAttribute('data-product-duration');
-                    const productPrice = button.getAttribute('data-product-price');
-                    const productStatus = button.getAttribute('data-product-status');
+        {{-- Edit Product Modal --}}
+        <div class="modal fade" id="kt_modal_edit_product" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mw-650px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="fw-bold">Edit Product</h2>
+                        <button type="button" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"
+                            aria-label="Close">
+                            <i class="ki-outline ki-cross fs-1"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                        <form action="" method="POST" id="kt_modal_edit_product_form">
+                            @csrf
+                            @method('PUT')
+                            <div class="d-flex flex-column scroll-y me-n7 pe-7">
+                                {{-- Product Name --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Product Name</label>
+                                    <input type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0"
+                                        placeholder="Enter product name" id="edit_name" required />
+                                </div>
+                                {{-- Description --}}
+                                <div class="fv-row mb-7">
+                                    <label class="fw-semibold fs-6 mb-2">Description</label>
+                                    <textarea name="description" class="form-control form-control-solid" rows="4"
+                                        placeholder="Enter product description" id="edit_description"></textarea>
+                                </div>
+                                {{-- Type --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Type</label>
+                                    <select name="type" class="form-select form-select-solid fw-bold" id="edit_type"
+                                        required>
+                                        <option value="">Select type</option>
+                                        <option value="Rencana Lanjutan">Rencana Lanjutan</option>
+                                        <option value="Pendapatan Stabil">Pendapatan Stabil</option>
+                                        <option value="Keuntungan VIP">Keuntungan VIP</option>
+                                    </select>
+                                </div>
+                                {{-- Duration --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Duration (Days)</label>
+                                    <input type="number" name="duration" class="form-control form-control-solid"
+                                        min="1" placeholder="Enter duration in days" id="edit_duration" required />
+                                </div>
+                                {{-- Price --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="number" name="price" class="form-control form-control-solid"
+                                            step="0.01" min="0" id="edit_price" required />
+                                    </div>
+                                </div>
+                                {{-- Status --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Status</label>
+                                    <select name="is_active" class="form-select form-select-solid fw-bold" id="edit_status"
+                                        required>
+                                        <option value="">Select status</option>
+                                        <option value="1">Active</option>
+                                        <option value="0">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="text-center pt-15">
+                                <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal"
+                                    aria-label="Close">Cancel</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="indicator-label">Update</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    // Update form action
-                    const form = document.getElementById('kt_modal_edit_product_form');
-                    form.action = `{{ route('admin.product.index') }}/${productId}`;
+        {{-- Delete Product Modal --}}
+        <div class="modal fade" id="kt_modal_delete_product" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mw-550px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="fw-bold">Delete Product</h2>
+                        <button type="button" class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal"
+                            aria-label="Close">
+                            <i class="ki-outline ki-cross fs-1"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <i class="ki-outline ki-trash text-danger fs-3x mb-5"></i>
+                            <p class="fs-6 text-gray-600 mb-5">Are you sure you want to delete <strong
+                                    id="delete_product_name"></strong>?</p>
+                            <p class="fs-7 text-muted">This action cannot be undone.</p>
+                        </div>
+                        <form action="" method="POST" id="kt_modal_delete_product_form">
+                            @csrf
+                            @method('DELETE')
+                            <div class="text-center pt-5">
+                                <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    // Fill form fields
-                    document.getElementById('edit_name').value = productName;
-                    document.getElementById('edit_description').value = productDescription || '';
-                    document.getElementById('edit_duration').value = productDuration || '';
-                    document.getElementById('edit_price').value = productPrice;
-                    document.getElementById('edit_status').value = productStatus;
+        @push('scripts')
+            <script>
+                // Edit Product Modal
+                document.addEventListener('DOMContentLoaded', function() {
+                    const editModal = document.getElementById('kt_modal_edit_product');
+                    editModal.addEventListener('show.bs.modal', function(event) {
+                        const button = event.relatedTarget;
+                        const productId = button.getAttribute('data-product-id');
+                        const productName = button.getAttribute('data-product-name');
+                        const productDescription = button.getAttribute('data-product-description');
+                        const productDuration = button.getAttribute('data-product-duration');
+                        const productPrice = button.getAttribute('data-product-price');
+                        const productType = button.getAttribute('data-product-type');
+                        const productStatus = button.getAttribute('data-product-status');
+
+                        // Update form action
+                        const form = document.getElementById('kt_modal_edit_product_form');
+                        form.action = `{{ route('admin.product.index') }}/${productId}`;
+
+                        // Fill form fields
+                        document.getElementById('edit_name').value = productName;
+                        document.getElementById('edit_description').value = productDescription || '';
+                        document.getElementById('edit_duration').value = productDuration || '';
+                        document.getElementById('edit_price').value = productPrice;
+                        document.getElementById('edit_type').value = productType || '';
+                        document.getElementById('edit_status').value = productStatus;
+                    });
+
+                    // Delete Product Modal
+                    const deleteModal = document.getElementById('kt_modal_delete_product');
+                    deleteModal.addEventListener('show.bs.modal', function(event) {
+                        const button = event.relatedTarget;
+                        const productId = button.getAttribute('data-product-id');
+                        const productName = button.getAttribute('data-product-name');
+
+                        // Update form action
+                        const form = document.getElementById('kt_modal_delete_product_form');
+                        form.action = `{{ route('admin.product.index') }}/${productId}`;
+
+                        // Update product name in modal
+                        document.getElementById('delete_product_name').textContent = productName;
+                    });
                 });
-
-                // Delete Product Modal
-                const deleteModal = document.getElementById('kt_modal_delete_product');
-                deleteModal.addEventListener('show.bs.modal', function(event) {
-                    const button = event.relatedTarget;
-                    const productId = button.getAttribute('data-product-id');
-                    const productName = button.getAttribute('data-product-name');
-
-                    // Update form action
-                    const form = document.getElementById('kt_modal_delete_product_form');
-                    form.action = `{{ route('admin.product.index') }}/${productId}`;
-
-                    // Update product name in modal
-                    document.getElementById('delete_product_name').textContent = productName;
-                });
-            });
-        </script>
-    @endpush
-@endsection
+            </script>
+        @endpush
+    @endsection

@@ -22,6 +22,7 @@ class ProductController extends Controller
                 'description' => 'nullable|string',
                 'duration' => 'required|integer|min:1',
                 'price' => 'required|numeric|min:0',
+                'type' => 'required|string|in:Rencana Lanjutan,Pendapatan Stabil,Keuntungan VIP',
                 'is_active' => 'required|boolean',
             ]);
 
@@ -30,6 +31,7 @@ class ProductController extends Controller
                 'description' => $request->description,
                 'duration' => $request->duration,
                 'price' => $request->price,
+                'type' => $request->type,
                 'is_active' => $request->is_active == '1' ? 1 : 0,
             ]);
 
@@ -47,6 +49,7 @@ class ProductController extends Controller
                 'description' => 'nullable|string',
                 'duration' => 'required|integer|min:1',
                 'price' => 'required|numeric|min:0',
+                'type' => 'required|string|in:Rencana Lanjutan,Pendapatan Stabil,Keuntungan VIP',
                 'is_active' => 'required|boolean',
             ]);
 
@@ -55,6 +58,7 @@ class ProductController extends Controller
                 'description' => $request->description,
                 'duration' => $request->duration,
                 'price' => $request->price,
+                'type' => $request->type,
                 'is_active' => $request->is_active == '1' ? 1 : 0,
             ]);
 
