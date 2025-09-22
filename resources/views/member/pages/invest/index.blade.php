@@ -11,11 +11,11 @@
     </div>
 
     <!-- Info Banner -->
-    <div class="alert alert-info mb-3"
+    {{-- <div class="alert alert-info mb-3"
         style="background-color: var(--secondary-dark); border: 1px solid var(--border-color); color: var(--text-muted);">
         <small>Jagakeuangan - Indonesia Investments terlibat dengan regulator untuk membawa aset crypto ke arus
             utama.</small>
-    </div>
+    </div> --}}
 
     <!-- Dynamic Tab Navigation -->
     <div class="mb-4">
