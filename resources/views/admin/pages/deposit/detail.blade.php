@@ -87,13 +87,11 @@
                                 <h5 class="mb-4">Proof of Payment:</h5>
                                 <!--end::Title-->
 
-                                @if ($deposit->proof_url)
-                                    <!--begin::Image-->
+                                @if ($deposit->payment_proof)
                                     <div class="mb-7">
-                                        <img src="{{ asset($deposit->proof_url) }}" alt="Proof of Payment" class="mw-100"
-                                            style="max-height: 400px;">
+                                        <img src="{{ Storage::url($deposit->payment_proof) }}" alt="Proof of Payment"
+                                            class="mw-100" style="max-height: 400px;">
                                     </div>
-                                    <!--end::Image-->
                                 @else
                                     <div class="alert alert-light-info d-flex align-items-center p-5">
                                         <i class="ki-outline ki-information-5 fs-2hx text-info me-4"></i>
@@ -102,9 +100,8 @@
                                         </div>
                                     </div>
                                 @endif
-
                                 <!--begin::Action buttons-->
-                                @if ($deposit->status == 'waiting_confirmation')
+                                @if (in_array($deposit->status, ['pending', 'waiting_confirmation']))
                                     <div class="d-flex gap-3 mt-5">
                                         <form action="{{ route('admin.deposit.confirm', $deposit->id) }}" method="POST"
                                             class="d-inline">
@@ -200,7 +197,7 @@
                                     <!--begin::Method-->
                                     <div class="fw-semibold text-gray-600 d-flex justify-content-between mb-3">
                                         <span>Method:</span>
-                                        <span class="text-gray-800">{{ $deposit->method }}</span>
+                                        <span class="text-gray-800">{{ $deposit->payment_method }}</span>
                                     </div>
                                     <!--end::Method-->
                                 </div>
@@ -220,7 +217,7 @@
                                     <!--begin::Row-->
                                     <tr>
                                         <td class="text-gray-500">Deposit ID:</td>
-                                        <td class="text-gray-800">#{{ $deposit->id }}</td>
+                                        <td class="text-gray-800">#{{ $deposit->reference }}</td>
                                     </tr>
                                     <!--end::Row-->
                                     <!--begin::Row-->
@@ -233,12 +230,13 @@
                                     <tr>
                                         <td class="text-gray-500">Status:</td>
                                         <td>
-                                            @if ($deposit->status == 'confirmed')
-                                                <span class="badge badge-light-success">Confirmed</span>
-                                            @elseif($deposit->status == 'waiting_confirmation')
-                                                <span class="badge badge-light-warning">Waiting Confirmation</span>
-                                            @elseif($deposit->status == 'rejected')
-                                                <span class="badge badge-light-danger">Rejected</span>
+                                            @if ($deposit->status == 'success')
+                                                <span class="badge badge-light-success">Success</span>
+                                            @elseif(in_array($deposit->status, ['pending', 'waiting_confirmation']))
+                                                <span
+                                                    class="badge badge-light-warning">{{ ucfirst(str_replace('_', ' ', $deposit->status)) }}</span>
+                                            @elseif($deposit->status == 'failed')
+                                                <span class="badge badge-light-danger">Failed</span>
                                             @else
                                                 <span class="badge badge-light-secondary">{{ $deposit->status }}</span>
                                             @endif

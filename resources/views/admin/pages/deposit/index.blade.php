@@ -229,15 +229,15 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="text-gray-800 text-hover-primary mb-1">{{ $deposit->method }}
+                                        <div class="text-gray-800 text-hover-primary mb-1">{{ $deposit->payment_method }}
                                         </div>
                                     </td>
                                     <td>
-                                        @if ($deposit->status == 'confirmed')
+                                        @if ($deposit->status == 'success')
                                             <span class="badge badge-light-success">Confirmed</span>
-                                        @elseif($deposit->status == 'waiting_confirmation')
+                                        @elseif($deposit->status == 'waiting_confirmation' || $deposit->status == 'pending')
                                             <span class="badge badge-light-warning">Waiting</span>
-                                        @elseif($deposit->status == 'rejected')
+                                        @elseif($deposit->status == 'failed')
                                             <span class="badge badge-light-danger">Rejected</span>
                                         @else
                                             <span class="badge badge-light-secondary">{{ $deposit->status }}</span>
