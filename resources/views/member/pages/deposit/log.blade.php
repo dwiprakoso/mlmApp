@@ -57,16 +57,6 @@
                         <i class="bi bi-credit-card me-1"></i>
                         {{ ucfirst(str_replace('_', ' ', $deposit->method)) }}
                     </small>
-
-                    @if ($deposit->approved_at && $deposit->approvedBy)
-                        <div class="mt-1">
-                            <small class="text-success">
-                                <i class="bi bi-person-check me-1"></i>
-                                Disetujui oleh {{ $deposit->approvedBy->name }} pada
-                                {{ $deposit->approved_at->format('d M Y, H:i') }}
-                            </small>
-                        </div>
-                    @endif
                 </div>
                 <div class="col-4 text-end">
                     @if ($deposit->status == 'pending')
