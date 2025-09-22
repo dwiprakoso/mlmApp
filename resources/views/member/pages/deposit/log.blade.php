@@ -23,25 +23,25 @@
         <div class="card-dark p-3 mb-3">
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <div>
-                    <h6 class="text-white mb-1">{{ $deposit->code }}</h6>
+                    <h6 class="text-white mb-1">{{ $deposit->reference }}</h6>
                     <small class="text-muted">{{ $deposit->created_at->format('d M Y, H:i') }}</small>
                 </div>
                 <div class="text-end">
                     <div
                         class="badge 
                         @if ($deposit->status == 'pending') bg-warning text-dark
-                        @elseif($deposit->status == 'waiting_approval') bg-info
-                        @elseif($deposit->status == 'approved') bg-success
-                        @elseif($deposit->status == 'rejected') bg-danger
+                        @elseif($deposit->status == 'waiting_confirmation') bg-info
+                        @elseif($deposit->status == 'success') bg-success
+                        @elseif($deposit->status == 'failed') bg-danger
                         @else bg-secondary @endif
                     ">
                         @if ($deposit->status == 'pending')
                             Menunggu Pembayaran
-                        @elseif($deposit->status == 'waiting_approval')
+                        @elseif($deposit->status == 'waiting_confirmation')
                             Menunggu Verifikasi
-                        @elseif($deposit->status == 'approved')
+                        @elseif($deposit->status == 'success')
                             Berhasil
-                        @elseif($deposit->status == 'rejected')
+                        @elseif($deposit->status == 'failed')
                             Ditolak
                         @else
                             {{ ucfirst($deposit->status) }}
@@ -55,7 +55,7 @@
                     <p class="text-gold mb-1 fw-bold fs-5">Rp {{ number_format($deposit->amount, 0, ',', '.') }}</p>
                     <small class="text-muted">
                         <i class="bi bi-credit-card me-1"></i>
-                        {{ ucfirst(str_replace('_', ' ', $deposit->method)) }}
+                        {{ ucfirst(str_replace('_', ' ', $deposit->payment_method)) }}
                     </small>
                 </div>
                 <div class="col-4 text-end">
@@ -64,7 +64,7 @@
                             <i class="bi bi-arrow-right me-1"></i>
                             Bayar
                         </a>
-                    @elseif($deposit->proof_url)
+                    @elseif($deposit->payment_proof)
                         <button class="btn btn-outline-gold btn-sm" data-bs-toggle="modal"
                             data-bs-target="#proofModal{{ $deposit->id }}">
                             <i class="bi bi-image me-1"></i>
@@ -79,32 +79,44 @@
                 <div class="progress" style="height: 4px;">
                     <div class="progress-bar 
                         @if ($deposit->status == 'pending') bg-warning
-                        @elseif($deposit->status == 'waiting_approval') bg-info
-                        @elseif($deposit->status == 'approved') bg-success
-                        @elseif($deposit->status == 'rejected') bg-danger @endif
+                        @elseif($deposit->status == 'waiting_confirmation') bg-info
+                        @elseif($deposit->status == 'success') bg-success
+                        @elseif($deposit->status == 'failed') bg-danger @endif
                         "
                         style="width: 
                         @if ($deposit->status == 'pending') 25%
-                        @elseif($deposit->status == 'waiting_approval') 75%
-                        @elseif($deposit->status == 'approved') 100%
-                        @elseif($deposit->status == 'rejected') 100% @endif
+                        @elseif($deposit->status == 'waiting_confirmation') 75%
+                        @elseif($deposit->status == 'success') 100%
+                        @elseif($deposit->status == 'failed') 100% @endif
                     ">
                     </div>
                 </div>
             </div>
+
+            <!-- Additional Info -->
+            @if ($deposit->status == 'failed' || $deposit->approved_by)
+                <div class="mt-2">
+                    @if ($deposit->approved_by)
+                        <small class="text-muted">
+                            <i class="bi bi-person-check me-1"></i>
+                            Diverifikasi oleh Admin
+                        </small>
+                    @endif
+                </div>
+            @endif
         </div>
 
         <!-- Proof Modal -->
-        @if ($deposit->proof_url)
+        @if ($deposit->payment_proof)
             <div class="modal fade" id="proofModal{{ $deposit->id }}" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content bg-dark">
                         <div class="modal-header border-secondary">
-                            <h5 class="modal-title text-white">Bukti Pembayaran - {{ $deposit->code }}</h5>
+                            <h5 class="modal-title text-white">Bukti Pembayaran - {{ $deposit->reference }}</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body text-center">
-                            <img src="{{ asset('storage/' . $deposit->proof_url) }}" class="img-fluid rounded"
+                            <img src="{{ asset('storage/' . $deposit->payment_proof) }}" class="img-fluid rounded"
                                 alt="Bukti Pembayaran">
                             <div class="mt-2">
                                 <small class="text-muted">Upload pada:

@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
-use App\Models\Deposit;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class DepositController extends Controller
 {
@@ -19,29 +18,41 @@ class DepositController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:50000|max:50000000',
-            'method' => 'required|string'
+            'payment_method' => 'required|string'
         ]);
 
-        // Create deposit record
-        $deposit = Deposit::create([
+        // Generate reference dengan format DEP-6 digit random
+        $reference = 'DEP-' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Pastikan reference unik
+        while (Transaction::where('reference', $reference)->exists()) {
+            $reference = 'DEP-' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT);
+        }
+
+        // Buat transaksi deposit
+        $transaction = Transaction::create([
             'user_id' => Auth::id(),
+            'product_id' => null,
+            'reference' => $reference,
             'amount' => $request->amount,
-            'method' => $request->method,
-            'status' => 'pending'
+            'type' => 'deposit',
+            'status' => 'pending',
+            'payment_method' => $request->payment_method,
+            'payment_proof' => null,
+            'approved_by' => null,
         ]);
 
-        // Redirect to payment page
-        return redirect()->route('member.deposit.payment', $deposit->id);
+        return redirect()->route('member.deposit.payment', $transaction->id)
+            ->with('success', 'Deposit berhasil dibuat dengan kode: ' . $reference);
     }
 
     public function payment($id)
     {
-        $deposit = Deposit::where('id', $id)
+        $deposit = Transaction::where('id', $id)
             ->where('user_id', Auth::id())
-            ->where('status', 'pending')
+            ->where('type', 'deposit')
             ->firstOrFail();
 
-        // Payment methods with account details
         $paymentMethods = [
             'wallet_qris' => [
                 'name' => 'Wallet & QRIS & E-Bank',
@@ -62,6 +73,21 @@ class DepositController extends Controller
                         'name' => 'QRIS Payment'
                     ]
                 ]
+            ],
+            'bank_transfer' => [
+                'name' => 'Bank Transfer',
+                'accounts' => [
+                    [
+                        'type' => 'BRI',
+                        'number' => '1122334455',
+                        'name' => 'PT EXAMPLE'
+                    ],
+                    [
+                        'type' => 'BNI',
+                        'number' => '5544332211',
+                        'name' => 'PT EXAMPLE'
+                    ]
+                ]
             ]
         ];
 
@@ -74,29 +100,31 @@ class DepositController extends Controller
             'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        $deposit = Deposit::where('id', $id)
+        $deposit = Transaction::where('id', $id)
             ->where('user_id', Auth::id())
+            ->where('type', 'deposit')
             ->where('status', 'pending')
             ->firstOrFail();
 
-        // Upload payment proof
         if ($request->hasFile('payment_proof')) {
             $file = $request->file('payment_proof');
             $fileName = 'deposit_proof_' . $deposit->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             $filePath = $file->storeAs('deposits/proofs', $fileName, 'public');
 
             $deposit->update([
-                'proof_url' => $filePath,
+                'payment_proof' => $filePath,
                 'status' => 'waiting_confirmation'
             ]);
         }
 
-        return redirect()->route('member.deposit.log')->with('success', 'Bukti pembayaran berhasil diupload. Menunggu verifikasi admin.');
+        return redirect()->route('member.deposit.log')
+            ->with('success', 'Bukti pembayaran berhasil diupload. Menunggu verifikasi admin.');
     }
 
     public function log()
     {
-        $deposits = Deposit::where('user_id', Auth::id())
+        $deposits = Transaction::where('user_id', Auth::id())
+            ->where('type', 'deposit')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 

@@ -17,6 +17,14 @@
     <form action="{{ route('member.deposit.store') }}" method="POST" id="depositForm">
         @csrf
         <div class="card-dark p-3">
+            <!-- Success Message -->
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             <!-- Error Messages -->
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -33,8 +41,8 @@
                 <h6 class="text-white mb-3">Jumlah Deposit</h6>
                 <div class="form-group">
                     <input type="text" class="form-control form-control-dark" placeholder="Jumlah Deposit"
-                        id="depositAmount" name="amount" required>
-                    <input type="hidden" id="rawAmount" name="raw_amount">
+                        id="depositAmount" required>
+                    <input type="hidden" id="rawAmount" name="amount">
                 </div>
             </div>
 
@@ -42,13 +50,8 @@
             <div class="amount-grid mb-4">
                 <div class="row g-2">
                     <div class="col-4">
-                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="220000">
-                            Rp 220K
-                        </button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="480000">
-                            Rp 480K
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="50000">
+                            Rp 50K
                         </button>
                     </div>
                     <div class="col-4">
@@ -57,13 +60,13 @@
                         </button>
                     </div>
                     <div class="col-4">
-                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="50000">
-                            Rp 50K
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="200000">
+                            Rp 200K
                         </button>
                     </div>
                     <div class="col-4">
-                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="200000">
-                            Rp 200K
+                        <button type="button" class="btn btn-outline-gold w-100 amount-btn" data-amount="480000">
+                            Rp 480K
                         </button>
                     </div>
                     <div class="col-4">
@@ -100,7 +103,7 @@
 
                 <!-- Payment Method 1 - Selected -->
                 <div class="payment-method selected mb-2" data-method="wallet_qris">
-                    <input type="radio" name="method" value="wallet_qris" checked style="display: none;">
+                    <input type="radio" name="payment_method" value="wallet_qris" checked style="display: none;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-white mb-1">Wallet & QRIS & E-Bank</h6>
@@ -117,7 +120,7 @@
 
                 <!-- Payment Method 2 -->
                 <div class="payment-method mb-2" data-method="bank_transfer">
-                    <input type="radio" name="method" value="bank_transfer" style="display: none;">
+                    <input type="radio" name="payment_method" value="bank_transfer" style="display: none;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-white mb-1">Bank Transfer</h6>
@@ -170,13 +173,10 @@
             // Handle payment method selection
             paymentMethods.forEach(method => {
                 method.addEventListener('click', function() {
-                    // Remove selected class from all methods
                     paymentMethods.forEach(m => {
                         m.classList.remove('selected');
                         m.querySelector('input[type="radio"]').checked = false;
                     });
-
-                    // Add selected class to clicked method
                     this.classList.add('selected');
                     this.querySelector('input[type="radio"]').checked = true;
                 });
@@ -193,26 +193,14 @@
                 }
             });
 
-            // Form submission
+            // Form submission validation
             form.addEventListener('submit', function(e) {
-                // Set the amount value to raw number for submission
-                const rawValue = rawAmountInput.value || depositInput.value.replace(/[^0-9]/g, '');
-
+                const rawValue = rawAmountInput.value;
                 if (!rawValue || rawValue < 50000 || rawValue > 50000000) {
                     e.preventDefault();
                     alert('Jumlah deposit harus antara Rp 50.000 - Rp 50.000.000');
                     return;
                 }
-
-                // Create a hidden input with the raw amount
-                const hiddenAmount = document.createElement('input');
-                hiddenAmount.type = 'hidden';
-                hiddenAmount.name = 'amount';
-                hiddenAmount.value = rawValue;
-                this.appendChild(hiddenAmount);
-
-                // Remove the formatted input from form data
-                depositInput.removeAttribute('name');
             });
         });
     </script>
