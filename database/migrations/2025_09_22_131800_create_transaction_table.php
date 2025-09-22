@@ -11,17 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('deposits', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->decimal('amount', 15, 2);
-            $table->string('method')->nullable();
-            $table->enum('status', ['pending', 'waiting_confirmation', 'confirmed', 'rejected'])
+
+            $table->foreignId('product_id')->nullable()->constrained()->nullOnDelete();
+
+            $table->string('reference')->unique();
+            $table->bigInteger('amount');
+
+            $table->enum('type', ['deposit', 'withdraw', 'purchase', 'refund']);
+
+            $table->enum('status', ['pending', 'waiting_confirmation', 'success', 'failed'])
                 ->default('pending');
-            $table->string('proof_url')->nullable();
+
+            $table->string('payment_method')->nullable();
+            $table->string('payment_proof')->nullable();
+
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('approved_at')->nullable();
+
             $table->timestamps();
         });
     }
@@ -31,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('deposits');
+        Schema::dropIfExists('transactions');
     }
 };

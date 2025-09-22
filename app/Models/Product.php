@@ -28,9 +28,4 @@ class Product extends Model
     protected $attributes = [
         'is_active' => true,
     ];
-
-    public function deposits()
-    {
-        return $this->hasMany(Deposit::class);
-    }
 }

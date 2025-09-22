@@ -42,10 +42,6 @@ class User extends Authenticatable
         };
     }
 
-    public function deposits()
-    {
-        return $this->hasMany(Deposit::class);
-    }
     public function wallets()
     {
         return $this->hasMany(Wallet::class);
@@ -54,9 +50,5 @@ class User extends Authenticatable
     public function primaryWallet()
     {
         return $this->hasOne(Wallet::class)->where('is_primary', true);
-    }
-    public function withdrawals()
-    {
-        return $this->hasMany(Withdrawal::class);
     }
 }
