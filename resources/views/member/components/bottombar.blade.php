@@ -10,7 +10,8 @@
         <i class="bi bi-graph-up d-block fs-5"></i>
         <span>Investasi</span>
     </a>
-    <a href="#" class="nav-item {{ request()->routeIs('member.bonus.*') ? 'active' : '' }}">
+    <a href="{{ route('member.bonus.index') }}"
+        class="nav-item {{ request()->routeIs('member.bonus.*') ? 'active' : '' }}">
         <i class="bi bi-gift-fill d-block fs-5"></i>
         <span>Bonus</span>
     </a>

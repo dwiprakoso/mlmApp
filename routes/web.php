@@ -15,6 +15,7 @@ use App\Http\Controllers\Member\DepositController as MemberDepositController;
 use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
 use App\Http\Controllers\Member\DompetController as MemberDompetController;
+use App\Http\Controllers\Member\BonusController as MemberBonusController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'signIn'])->name('login');
@@ -93,6 +94,10 @@ Route::middleware('auth')->group(function () {
         Route::prefix('invest')->name('invest.')->group(function () {
             Route::get('/', [MemberInvestController::class, 'index'])->name('index');
             Route::get('/log', [MemberInvestController::class, 'log'])->name('log');
+        });
+        // Bonus Routes
+        Route::prefix('bonus')->name('bonus.')->group(function () {
+            Route::get('/', [MemberBonusController::class, 'index'])->name('index');
         });
         // Dompet Routes
         Route::prefix('dompet')->name('dompet.')->group(function () {
