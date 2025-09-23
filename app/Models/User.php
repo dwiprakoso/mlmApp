@@ -79,4 +79,19 @@ class User extends Authenticatable
     {
         return $this->hasOne(Wallet::class)->where('is_primary', true);
     }
+    /**
+     * Referral yang dimiliki user ini (orang yang pakai kode referral dia)
+     */
+    public function referrals()
+    {
+        return $this->hasMany(ReferralUsage::class, 'user_referral');
+    }
+
+    /**
+     * Referral yang dipakai user ini saat daftar
+     */
+    public function usedReferral()
+    {
+        return $this->hasOne(ReferralUsage::class, 'used_by');
+    }
 }
