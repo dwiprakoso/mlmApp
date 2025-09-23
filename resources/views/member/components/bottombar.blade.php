@@ -11,7 +11,7 @@
         <span>Investasi</span>
     </a>
     <a href="{{ route('member.team.index') }}" class="nav-item {{ request()->routeIs('member.team.*') ? 'active' : '' }}">
-        <i class="bi bi-gift-fill d-block fs-5"></i>
+        <i class="bi bi-people-fill d-block fs-5"></i>
         <span>Team</span>
     </a>
     <a href="{{ route('member.dompet.index') }}"
