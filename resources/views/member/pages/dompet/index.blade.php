@@ -6,7 +6,7 @@
         <!-- Balance Card -->
         <div class="balance-card">
             <div class="text-center mb-3">
-                <h2 class="text-white mb-1">IDR 75,000</h2>
+                <h2 class="text-white mb-1">IDR {{ number_format($balance, 0, ',', '.') }}</h2>
                 <p class="text-muted mb-0">Saldo akun</p>
             </div>
 

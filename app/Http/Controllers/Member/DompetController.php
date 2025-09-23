@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Member;
 
 use App\Models\Wallet;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +18,13 @@ class DompetController extends Controller
         // Ambil wallet user yang login
         $wallets = Auth::user()->wallets()->orderByDesc('is_primary')->orderBy('created_at')->get();
 
-        return view('member.pages.dompet.index', compact('wallets'));
+        // Hitung saldo realtime dari transaksi deposit yang berhasil
+        $balance = Transaction::where('user_id', Auth::user()->id)
+            ->where('type', 'deposit')
+            ->where('status', 'success')
+            ->sum('amount');
+
+        return view('member.pages.dompet.index', compact('wallets', 'balance'));
     }
 
     public function detail()
