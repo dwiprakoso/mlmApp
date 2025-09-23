@@ -156,16 +156,16 @@
                                 </div>
                                 <!--end:Menu item-->
                                 <!--begin:Menu item-->
-                                <div class="menu-item pt-5">
+                                {{-- <div class="menu-item pt-5">
                                     <!--begin:Menu content-->
                                     <div class="menu-content">
                                         <span class="menu-heading fw-bold text-uppercase fs-7">Pages</span>
                                     </div>
                                     <!--end:Menu content-->
-                                </div>
+                                </div> --}}
                                 <!--end:Menu item-->
                                 <!--begin:Menu item-->
-                                <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                {{-- <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
                                     <!--begin:Menu link-->
                                     <span class="menu-link">
                                         <span class="menu-icon">
@@ -203,10 +203,10 @@
                                         <!--end:Menu item-->
                                     </div>
                                     <!--end:Menu sub-->
-                                </div>
+                                </div> --}}
                                 <!--end:Menu item-->
                                 <!--begin:Menu item-->
-                                <div class="menu-item">
+                                {{-- <div class="menu-item">
                                     <!--begin:Menu link-->
                                     <a class="menu-link" href="{{ route('admin.dashboard.index') }}">
                                         <span class="menu-icon">
@@ -215,7 +215,7 @@
                                         <span class="menu-title">Single Sidebar Example</span>
                                     </a>
                                     <!--end:Menu link-->
-                                </div>
+                                </div> --}}
                                 <!--end:Menu item-->
 
                             </div>
