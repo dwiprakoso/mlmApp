@@ -82,7 +82,9 @@
                     </div>
                 </div>
             </div>
-            <button class="btn btn-gold w-100">Lihat tim saya</button>
+            <a href="{{ route('member.team.index') }}" class="btn btn-gold w-100">
+                <i class="bi bi-people me-2"></i>Lihat Tim Saya
+            </a>
         </div>
     </div>
 
