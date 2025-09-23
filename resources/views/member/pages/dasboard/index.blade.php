@@ -56,7 +56,7 @@
     </div>
 
     <!-- Kartu Undangan -->
-    <div class="content-section">
+    <div class="content-section mb-5 pb-4">
         <div class="card-dark shadow-sm p-3">
             <h6 class="text-white mb-2">Kartu undangan saya</h6>
             <p class="small text-muted">Undangan yang berhasil akan memberi Anda hak untuk komisi <span
@@ -87,59 +87,6 @@
     </div>
 
 
-    <!-- Pesanan saya yang valid -->
-    {{-- <div class="content-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="text-white mb-0">Pesanan saya yang valid</h6>
-            <small class="text-gold">Lihat semua</small>
-        </div>
-
-        <div class="row g-2">
-            <div class="col-4">
-                <div class="order-card">
-                    <small class="text-muted">IDR</small>
-                    <h6 class="text-success fw-bold mb-0">175,000.00</h6>
-                    <small class="text-muted">Jumlah Pesanan</small>
-                    <hr class="my-2 border-secondary">
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Periode Kembali</small>
-                        <small class="text-white">25 Hari</small>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Total pendapatan</small>
-                        <small class="text-white">IDR 1,575,000.00</small>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Hari Kerja</small>
-                        <small class="text-white">6 Hari</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-
-    <!-- Kegiatan Terbaru -->
-    {{-- <div class="content-section" style="padding-bottom: 100px;">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="text-white mb-0">Kegiatan Terbaru</h6>
-            <small class="text-gold">Lihat semua</small>
-        </div>
-
-        <div class="activity-list">
-            <div class="activity-item">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-white mb-1">Investasi</h6>
-                        <small class="text-muted">2025-09-15 09:04:15</small>
-                    </div>
-                    <div class="text-end">
-                        <span class="text-danger">IDR -175,000</span>
-                        <small class="text-muted d-block">IDR 75,000</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
     <script>
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function() {
