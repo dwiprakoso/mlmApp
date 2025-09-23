@@ -35,22 +35,28 @@
         <h6 class="text-white mb-3">Bantuan & Perawatan</h6>
         <div class="row text-center">
             <div class="col">
-                <div class="circle-icon bg-primary text-white">
-                    <i class="bi bi-headset"></i>
-                </div>
-                <small class="text-muted">Layanan Pelanggan Online</small>
+                <a href="https://wa.me/6281266818738" class="text-decoration-none">
+                    <div class="circle-icon bg-primary text-white">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <small class="text-muted">Layanan Pelanggan Online</small>
+                </a>
             </div>
             <div class="col">
-                <div class="circle-icon bg-success text-white">
-                    <i class="bi bi-whatsapp"></i>
-                </div>
-                <small class="text-muted">Saluran WhatsApp</small>
+                <a href="https://wa.me/6281266818738" target="_blank" class="text-decoration-none">
+                    <div class="circle-icon bg-success text-white">
+                        <i class="bi bi-whatsapp"></i>
+                    </div>
+                    <small class="text-muted">Saluran WhatsApp</small>
+                </a>
             </div>
             <div class="col">
-                <div class="circle-icon bg-gold text-dark">
-                    <i class="bi bi-question-lg"></i>
-                </div>
-                <small class="text-muted">Layanan Mandiri</small>
+                <a href="{{ route('member.dashboard.index') }}" class="text-decoration-none">
+                    <div class="circle-icon bg-gold text-dark">
+                        <i class="bi bi-question-lg"></i>
+                    </div>
+                    <small class="text-muted">Layanan Mandiri</small>
+                </a>
             </div>
         </div>
     </div>
