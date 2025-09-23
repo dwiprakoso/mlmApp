@@ -17,9 +17,22 @@
                         </div>
                     @endif
 
+                    @if ($referrer ?? false)
+                        <div class="alert alert-info mb-8">
+                            <i class="ki-outline ki-information fs-2 me-2"></i>
+                            Anda diundang oleh: <strong>{{ $referrer->name }}</strong>
+                        </div>
+                    @endif
+
                     <!--begin::Form-->
                     <form class="form w-100" method="POST" action="{{ route('guest.process-sign-up') }}">
                         @csrf
+
+                        <!-- Hidden field untuk referral code -->
+                        @if ($referralCode ?? false)
+                            <input type="hidden" name="ref" value="{{ $referralCode }}">
+                        @endif
+
                         <!--begin::Heading-->
                         <div class="text-center mb-11">
                             <!--begin::Title-->

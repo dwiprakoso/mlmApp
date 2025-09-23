@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guest;
 use App\Http\Controllers\Controller;
 
 use App\Models\User;
+use App\Models\ReferralUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -60,9 +61,16 @@ class AuthController extends Controller
         return redirect()->intended('/member/dashboard');
     }
 
-    public function signUp()
+    public function signUp(Request $request)
     {
-        return view('guest.pages.sign-up.index');
+        $referralCode = $request->get('ref');
+        $referrer = null;
+
+        if ($referralCode) {
+            $referrer = User::where('refferal_code', $referralCode)->first();
+        }
+
+        return view('guest.pages.sign-up.index', compact('referralCode', 'referrer'));
     }
 
     public function processSignUp(Request $request)
@@ -92,6 +100,19 @@ class AuthController extends Controller
         ]);
 
         $user->assignRole('member');
+
+        // Handle referral jika ada
+        $referralCode = $request->get('ref');
+        if ($referralCode) {
+            $referrer = User::where('refferal_code', $referralCode)->first();
+
+            if ($referrer) {
+                ReferralUsage::create([
+                    'user_referral' => $referrer->id,
+                    'used_by' => $user->id
+                ]);
+            }
+        }
 
         Auth::login($user);
 
