@@ -15,6 +15,7 @@ class Transaction extends Model
         'reference',
         'amount',
         'type',
+        'wallet_id',
         'status',
         'payment_method',
         'payment_proof',
@@ -35,6 +36,11 @@ class Transaction extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function wallet()
+    {
+        return $this->belongsTo(Wallet::class);
     }
 
     public function approvedBy()

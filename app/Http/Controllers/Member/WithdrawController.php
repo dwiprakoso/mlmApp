@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Models\Wallet;
 use App\Models\Withdrawal;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -72,50 +73,55 @@ class WithdrawController extends Controller
         try {
             DB::beginTransaction();
 
-            $fee = Withdrawal::calculateFee($amount);
+            // Generate unique reference ID untuk withdrawal
+            $reference = $this->generateWithdrawalReference();
+
+            // Hitung fee dan net amount
+            $fee = $amount * 0.10; // 10% fee
             $netAmount = $amount - $fee;
 
-            $withdrawalData = [
+            // Create withdrawal transaction
+            $transaction = Transaction::create([
                 'user_id' => Auth::id(),
-                'wallet_id' => $wallet->id,
-                'transaction_id' => Withdrawal::generateTransactionId(),
+                'product_id' => null, // Withdrawal tidak memerlukan product
+                'reference' => $reference,
                 'amount' => $amount,
+                'type' => 'withdraw',
+                'status' => 'pending', // Default status pending
+                'payment_method' => $wallet->wallet_type === 'bank' ? 'bank_transfer' : $wallet->ewallet_provider,
+                'payment_proof' => null, // Withdrawal tidak memerlukan payment proof
+                'approved_by' => null, // Belum disetujui
+            ]);
+
+            // Store withdrawal details in separate table or JSON field
+            // Anda bisa membuat tabel withdrawal_details atau menyimpan di JSON
+            $this->storeWithdrawalDetails($transaction->id, [
+                'wallet_id' => $wallet->id,
                 'fee' => $fee,
                 'net_amount' => $netAmount,
-                'status' => Withdrawal::STATUS_PENDING,
-                'payment_method' => $wallet->wallet_type,
                 'notes' => $request->notes,
-                'requested_at' => now(),
-            ];
-
-            // Copy wallet details ke withdrawal record
-            if ($wallet->wallet_type === 'bank') {
-                $withdrawalData = array_merge($withdrawalData, [
+                'wallet_details' => $wallet->wallet_type === 'bank' ? [
                     'bank_name' => $wallet->bank_name,
                     'bank_account' => $wallet->bank_account,
                     'account_name' => $wallet->account_name,
-                ]);
-            } else {
-                $withdrawalData = array_merge($withdrawalData, [
+                ] : [
                     'ewallet_provider' => $wallet->ewallet_provider,
                     'ewallet_number' => $wallet->ewallet_number,
                     'ewallet_name' => $wallet->ewallet_name,
-                ]);
-            }
-
-            $withdrawal = Withdrawal::create($withdrawalData);
+                ]
+            ]);
 
             // TODO: Kurangi saldo user di sini sesuai logic bisnis Anda
             // $this->deductUserBalance(Auth::id(), $amount);
 
             DB::commit();
-            Log::info('Withdrawal created successfully:', $withdrawal->toArray());
+            Log::info('Withdrawal transaction created successfully:', $transaction->toArray());
 
             return redirect()->route('member.withdraw.index')
-                ->with('success', "Permintaan penarikan berhasil dibuat. ID Transaksi: {$withdrawal->transaction_id}");
+                ->with('success', "Permintaan penarikan berhasil dibuat. ID Transaksi: {$transaction->reference}");
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error creating withdrawal:', [
+            Log::error('Error creating withdrawal transaction:', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -126,6 +132,19 @@ class WithdrawController extends Controller
         }
     }
 
+    /**
+     * Generate unique withdrawal reference
+     */
+    private function generateWithdrawalReference(): string
+    {
+        $prefix = 'WTH-';
+        $timestamp = now()->format('ymd');
+        $random = strtoupper(substr(uniqid(), -6));
+
+        return $prefix . $timestamp . $random;
+    }
+
+
     public function log()
     {
         $withdrawals = Auth::user()->withdrawals()
@@ -135,53 +154,14 @@ class WithdrawController extends Controller
 
         return view('member.pages.withdraw.log', compact('withdrawals'));
     }
-
-    /**
-     * Get available balance for withdrawal
-     * Sesuaikan dengan logic bisnis Anda
-     */
     private function getAvailableBalance(): float
     {
-        // TODO: Implement sesuai dengan sistem saldo Anda
-        // Misalnya dari tabel user_balances atau transactions
-        return 75000; // Contoh saldo
-    }
+        $user = auth()->user();
+        $balance = Transaction::where('user_id', $user->id)
+            ->where('type', 'deposit')
+            ->where('status', 'success')
+            ->sum('amount');
 
-    /**
-     * Check daily withdrawal limit
-     */
-    private function checkDailyLimit(int $userId): bool
-    {
-        $today = now()->format('Y-m-d');
-
-        $todayWithdrawals = Withdrawal::forUser($userId)
-            ->whereDate('requested_at', $today)
-            ->whereIn('status', [
-                Withdrawal::STATUS_PENDING,
-                Withdrawal::STATUS_PROCESSING,
-                Withdrawal::STATUS_COMPLETED
-            ])
-            ->count();
-
-        return $todayWithdrawals >= 1; // Max 1 withdrawal per day
-    }
-
-    /**
-     * Check if current time is within withdrawal hours (09:00 - 18:00)
-     */
-    private function isWithdrawalTimeAllowed(): bool
-    {
-        $currentHour = now()->format('H');
-        return $currentHour >= 9 && $currentHour < 18;
-    }
-
-    /**
-     * Deduct user balance
-     * TODO: Implement sesuai dengan sistem saldo Anda
-     */
-    private function deductUserBalance(int $userId, float $amount): void
-    {
-        // Implement logic untuk mengurangi saldo user
-        // Misalnya update tabel user_balances atau buat record di transactions table
+        return $balance;
     }
 }
