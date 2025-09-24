@@ -70,21 +70,25 @@
 
             <div class="row text-center mb-3">
                 <div class="col-4">
-                    <div class="invitation-box" onclick="generateQR('{{ $referralLink }}')">
+                    <div class="invitation-box d-flex flex-column align-items-center justify-content-center"
+                        onclick="generateQR('{{ $referralLink }}')">
                         <i class="bi bi-qr-code fs-3 text-gold"></i>
-                        <small class="text-muted d-block mt-2">Undang Kode QR</small>
+                        <small class="text-muted mt-2" style="font-size: 0.7rem; line-height: 1.2;">Undang Kode QR</small>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="invitation-box" onclick="copyToClipboard('{{ $referralLink }}')">
+                    <div class="invitation-box d-flex flex-column align-items-center justify-content-center"
+                        onclick="copyToClipboard('{{ $referralLink }}')">
                         <i class="bi bi-link-45deg fs-3 text-gold"></i>
-                        <small class="text-muted d-block mt-2">Undang tautan</small>
+                        <small class="text-muted mt-2" style="font-size: 0.7rem; line-height: 1.2;">Undang tautan</small>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="invitation-box" onclick="copyToClipboard('{{ $referralCode }}')">
-                        <h5 class="fw-bold mb-0 text-gold">{{ $referralCode }}</h5>
-                        <small class="text-muted d-block mt-2">Undang Kode</small>
+                    <div class="invitation-box d-flex flex-column align-items-center justify-content-center"
+                        onclick="copyToClipboard('{{ $referralCode }}')">
+                        <div class="text-gold fw-bold mb-1"
+                            style="font-size: 0.9rem; word-break: break-all; line-height: 1.1;">{{ $referralCode }}</div>
+                        <small class="text-muted" style="font-size: 0.7rem; line-height: 1.2;">Undang Kode</small>
                     </div>
                 </div>
             </div>
@@ -94,6 +98,56 @@
         </div>
     </div>
 
+    <style>
+        .invitation-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invitation-box:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .invitation-box:active {
+            transform: translateY(0);
+        }
+
+        /* Memastikan semua kotak memiliki lebar yang sama */
+        .row .col-4 {
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        /* Responsif untuk mobile */
+        @media (max-width: 576px) {
+            .invitation-box {
+                min-height: 70px;
+                padding: 8px 4px;
+            }
+
+            .invitation-box i {
+                font-size: 1.5rem !important;
+            }
+
+            .invitation-box .text-gold {
+                font-size: 0.8rem !important;
+            }
+
+            .invitation-box small {
+                font-size: 0.65rem !important;
+            }
+        }
+    </style>
 
     <script>
         function copyToClipboard(text) {
