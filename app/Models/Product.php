@@ -16,6 +16,9 @@ class Product extends Model
         'price',
         'type',
         'is_active',
+        'presentase',
+        'profit',
+        'total_profit'
     ];
 
     // Cast attributes to appropriate types
