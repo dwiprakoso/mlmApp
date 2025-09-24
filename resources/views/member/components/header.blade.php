@@ -3,10 +3,11 @@
     <!-- User Info Section -->
     <div class="d-flex align-items-center">
         <div class="me-3">
-            <img src="https://via.placeholder.com/40" class="rounded-circle" alt="User">
+            <img src="{{ $appLogo ?? 'https://via.placeholder.com/40' }}" class="rounded-circle" alt="User"
+                style="width: 40px; height: 40px; object-fit: cover;">
         </div>
         <div>
-            <small class="text-muted">Selamat datang kembali</small>
+            <small class="text-muted">{{ $legalName ?? 'My Application' }}</small>
         </div>
     </div>
 

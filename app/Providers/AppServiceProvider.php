@@ -21,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('guest.layouts.app', ConfigComposer::class);
+        View::composer([
+            'guest.layouts.app',
+            'member.layouts.app'
+        ], ConfigComposer::class);
     }
 }

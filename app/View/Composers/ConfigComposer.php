@@ -12,6 +12,7 @@ class ConfigComposer
         $view->with([
             'appName' => Config::get('app_name', 'My Application'),
             'appLogo' => Config::get('app_logo', '/assets/media/logos/default-logo.png'),
+            'legalName' => Config::get('legal_name', '/assets/media/logos/default-logo.png'),
         ]);
     }
 }
