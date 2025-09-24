@@ -78,7 +78,15 @@
                     @csrf
                     <!--begin::Card body-->
                     <div class="card-body p-9">
-                        <!--begin::Row-->
+                        <!-- App Settings Section -->
+                        <div class="row mb-10">
+                            <div class="col-12">
+                                <h3 class="fw-bold text-dark mb-6">Application Information</h3>
+                                <div class="separator separator-dashed my-6"></div>
+                            </div>
+                        </div>
+
+                        <!--begin::Row App Logo-->
                         <div class="row mb-5">
                             <!--begin::Col-->
                             <div class="col-xl-3">
@@ -133,7 +141,7 @@
                         </div>
                         <!--end::Row-->
 
-                        <!--begin::Row-->
+                        <!--begin::Row App Name-->
                         <div class="row mb-8">
                             <!--begin::Col-->
                             <div class="col-xl-3">
@@ -152,7 +160,7 @@
                         </div>
                         <!--end::Row-->
 
-                        <!--begin::Row-->
+                        <!--begin::Row App Description-->
                         <div class="row mb-8">
                             <!--begin::Col-->
                             <div class="col-xl-3">
@@ -167,6 +175,163 @@
                                 @enderror
                             </div>
                             <!--begin::Col-->
+                        </div>
+                        <!--end::Row-->
+
+                        <!-- Bank Settings Section -->
+                        <div class="row mb-10">
+                            <div class="col-12">
+                                <h3 class="fw-bold text-dark mb-6">Payment Information</h3>
+                                <div class="separator separator-dashed my-6"></div>
+                            </div>
+                        </div>
+
+                        <!--begin::Row Bank Name-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Bank Name</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <input type="text"
+                                    class="form-control form-control-solid @error('bank_name') is-invalid @enderror"
+                                    name="bank_name" value="{{ old('bank_name', $configs['bank_name']) }}" />
+                                @error('bank_name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!--end::Row-->
+
+                        <!--begin::Row Bank Account Number-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Bank Account Number</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <input type="text"
+                                    class="form-control form-control-solid @error('bank_account_number') is-invalid @enderror"
+                                    name="bank_account_number"
+                                    value="{{ old('bank_account_number', $configs['bank_account_number']) }}" />
+                                @error('bank_account_number')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!--end::Row-->
+
+                        <!--begin::Row Account Name-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Account Name</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <input type="text"
+                                    class="form-control form-control-solid @error('account_name') is-invalid @enderror"
+                                    name="account_name" value="{{ old('account_name', $configs['account_name']) }}" />
+                                @error('account_name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!--end::Row-->
+
+                        <!--begin::Row Payment QR Code-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Payment QR Code</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-lg-8">
+                                <!--begin::Image input-->
+                                <div class="image-input image-input-outline" data-kt-image-input="true"
+                                    style="background-image: url('assets/media/svg/avatars/blank.svg')">
+                                    <!--begin::Preview existing QR Code-->
+                                    <div class="image-input-wrapper w-125px h-125px bgi-position-center"
+                                        style="background-size: 90%; background-image: url('{{ $configs['payment_qr_code'] ?: 'assets/media/svg/files/blank-image.svg' }}')">
+                                    </div>
+                                    <!--end::Preview existing QR Code-->
+                                    <!--begin::Label-->
+                                    <label
+                                        class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow"
+                                        data-kt-image-input-action="change" data-bs-toggle="tooltip"
+                                        title="Change QR Code">
+                                        <i class="ki-outline ki-pencil fs-7"></i>
+                                        <!--begin::Inputs-->
+                                        <input type="file" name="payment_qr_code" accept=".png, .jpg, .jpeg" />
+                                        <input type="hidden" name="payment_qr_code_remove" />
+                                        <!--end::Inputs-->
+                                    </label>
+                                    <!--end::Label-->
+                                    <!--begin::Cancel-->
+                                    <span
+                                        class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow"
+                                        data-kt-image-input-action="cancel" data-bs-toggle="tooltip"
+                                        title="Cancel QR Code">
+                                        <i class="ki-outline ki-cross fs-2"></i>
+                                    </span>
+                                    <!--end::Cancel-->
+                                    <!--begin::Remove-->
+                                    <span
+                                        class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow"
+                                        data-kt-image-input-action="remove" data-bs-toggle="tooltip"
+                                        title="Remove QR Code">
+                                        <i class="ki-outline ki-cross fs-2"></i>
+                                    </span>
+                                    <!--end::Remove-->
+                                </div>
+                                <!--end::Image input-->
+                                <!--begin::Hint-->
+                                <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
+                                <!--end::Hint-->
+                                @error('payment_qr_code')
+                                    <div class="text-danger fs-7">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <!--end::Col-->
+                        </div>
+                        <!--end::Row-->
+
+                        <!-- Team Settings Section -->
+                        <div class="row mb-10">
+                            <div class="col-12">
+                                <h3 class="fw-bold text-dark mb-6">Team Settings</h3>
+                                <div class="separator separator-dashed my-6"></div>
+                            </div>
+                        </div>
+
+                        <!--begin::Row Team Invite Presentation-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Team Invite Presentation</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <div class="input-group">
+                                    <input type="text"
+                                        class="form-control form-control-solid @error('team_invite_presentation') is-invalid @enderror"
+                                        name="team_invite_presentation"
+                                        value="{{ old('team_invite_presentation', $configs['team_invite_presentation']) }}" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="form-text">Enter the percentage for team invite presentation (e.g., 10 for 10%)
+                                </div>
+                                @error('team_invite_presentation')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
                         <!--end::Row-->
                     </div>
