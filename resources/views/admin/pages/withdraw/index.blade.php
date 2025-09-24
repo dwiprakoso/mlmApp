@@ -161,10 +161,11 @@
                     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_customers_table">
                         <thead>
                             <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-125px">Customer Name</th>
-                                <th class="min-w-125px">Email</th>
-                                <th class="min-w-125px">Reference</th>
+                                <th class="min-w-125px">ID</th>
+                                <th class="min-w-125px">Nama</th>
+                                <th class="min-w-125px">No Hp</th>
                                 <th class="min-w-125px">Amount</th>
+                                <th class="min-w-125px">Wallet</th>
                                 <th class="min-w-125px">Created Date</th>
                                 <th class="text-end min-w-70px">Actions</th>
                             </tr>
@@ -172,16 +173,34 @@
                         <tbody class="fw-semibold text-gray-600">
                             @forelse($withdrawTransactions as $transaction)
                                 <tr>
+                                    <td>{{ $transaction->reference }}</td>
                                     <td>
                                         <a href="#"
                                             class="text-gray-800 text-hover-primary mb-1">{{ $transaction->user->name ?? 'N/A' }}</a>
                                     </td>
                                     <td>
                                         <a href="#"
-                                            class="text-gray-600 text-hover-primary mb-1">{{ $transaction->user->email ?? '-' }}</a>
+                                            class="text-gray-600 text-hover-primary mb-1">{{ $transaction->user->phone ?? '-' }}</a>
                                     </td>
-                                    <td>{{ $transaction->reference }}</td>
                                     <td>{{ $transaction->amount }}</td>
+                                    <td>
+                                        @if ($transaction->wallet)
+                                            @if ($transaction->wallet->wallet_type == 'ewallet')
+                                                <span
+                                                    class="text-muted">{{ $transaction->wallet->ewallet_provider }}</span>
+                                                <small
+                                                    class="text-muted d-block">{{ $transaction->wallet->ewallet_number }}</small>
+                                                <small class="text-muted">{{ $transaction->wallet->ewallet_name }}</small>
+                                            @elseif ($transaction->wallet->wallet_type == 'bank')
+                                                <span class="text-muted">{{ $transaction->wallet->bank_name }}</span>
+                                                <small
+                                                    class="text-muted d-block">{{ $transaction->wallet->bank_account }}</small>
+                                                <small class="text-muted">{{ $transaction->wallet->account_name }}</small>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $transaction->created_at->format('d M Y, H:i') }}</td>
                                     <td class="text-end">
                                         <a href="#"
