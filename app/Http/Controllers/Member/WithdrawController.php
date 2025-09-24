@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Member;
 
 use App\Models\Wallet;
-use App\Models\Withdrawal;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,58 +59,38 @@ class WithdrawController extends Controller
             return back()->with('error', 'Saldo tidak mencukupi')->withInput();
         }
 
-        // Cek limit harian
-        if ($this->checkDailyLimit(Auth::id())) {
-            return back()->with('error', 'Batas penarikan harian telah tercapai (1 kali per hari)')->withInput();
-        }
-
-        // Cek waktu operasional (09:00 - 18:00)
-        if (!$this->isWithdrawalTimeAllowed()) {
-            return back()->with('error', 'Penarikan hanya diperbolehkan pada jam 09:00 - 18:00')->withInput();
-        }
 
         try {
             DB::beginTransaction();
 
-            // Generate unique reference ID untuk withdrawal
+            // Generate unique reference ID untuk withdrawal (WD-6digit)
             $reference = $this->generateWithdrawalReference();
-
-            // Hitung fee dan net amount
-            $fee = $amount * 0.10; // 10% fee
-            $netAmount = $amount - $fee;
 
             // Create withdrawal transaction
             $transaction = Transaction::create([
                 'user_id' => Auth::id(),
-                'product_id' => null, // Withdrawal tidak memerlukan product
+                'product_id' => null, // null untuk withdrawal
                 'reference' => $reference,
                 'amount' => $amount,
                 'type' => 'withdraw',
-                'status' => 'pending', // Default status pending
-                'payment_method' => $wallet->wallet_type === 'bank' ? 'bank_transfer' : $wallet->ewallet_provider,
-                'payment_proof' => null, // Withdrawal tidak memerlukan payment proof
-                'approved_by' => null, // Belum disetujui
+                'wallet_id' => $wallet->id, // ID wallet yang dipilih user
+                'status' => 'pending', // Status pending
+                'payment_method' => null, // null untuk withdrawal
+                'payment_proof' => null, // null untuk withdrawal
+                'approved_by' => null, // null karena belum diapprove
             ]);
 
-            // Store withdrawal details in separate table or JSON field
-            // Anda bisa membuat tabel withdrawal_details atau menyimpan di JSON
-            $this->storeWithdrawalDetails($transaction->id, [
-                'wallet_id' => $wallet->id,
-                'fee' => $fee,
-                'net_amount' => $netAmount,
-                'notes' => $request->notes,
-                'wallet_details' => $wallet->wallet_type === 'bank' ? [
-                    'bank_name' => $wallet->bank_name,
-                    'bank_account' => $wallet->bank_account,
-                    'account_name' => $wallet->account_name,
-                ] : [
-                    'ewallet_provider' => $wallet->ewallet_provider,
-                    'ewallet_number' => $wallet->ewallet_number,
-                    'ewallet_name' => $wallet->ewallet_name,
-                ]
-            ]);
+            // Optional: Simpan notes di field terpisah jika diperlukan
+            // Atau bisa menambah field 'notes' di tabel transactions
+            if ($request->notes) {
+                // Jika ada field notes di tabel transactions, uncomment baris berikut:
+                // $transaction->update(['notes' => $request->notes]);
 
-            // TODO: Kurangi saldo user di sini sesuai logic bisnis Anda
+                // Atau simpan di tabel terpisah jika diperlukan
+                Log::info('Withdrawal notes:', ['transaction_id' => $transaction->id, 'notes' => $request->notes]);
+            }
+
+            // TODO: Implementasi pengurangan saldo user sesuai business logic
             // $this->deductUserBalance(Auth::id(), $amount);
 
             DB::commit();
@@ -133,35 +112,53 @@ class WithdrawController extends Controller
     }
 
     /**
-     * Generate unique withdrawal reference
+     * Generate unique withdrawal reference (WD-6digit)
      */
     private function generateWithdrawalReference(): string
     {
-        $prefix = 'WTH-';
-        $timestamp = now()->format('ymd');
-        $random = strtoupper(substr(uniqid(), -6));
+        $prefix = 'WD-';
 
-        return $prefix . $timestamp . $random;
+        // Generate 6 digit random number
+        do {
+            $randomNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $reference = $prefix . $randomNumber;
+        } while (Transaction::where('reference', $reference)->exists());
+
+        return $reference;
     }
 
 
     public function log()
     {
-        $withdrawals = Auth::user()->withdrawals()
+        // Ambil semua withdrawal transactions user
+        $withdrawals = Transaction::where('user_id', Auth::id())
+            ->where('type', 'withdraw')
             ->with('wallet')
             ->orderByDesc('created_at')
             ->paginate(15);
 
         return view('member.pages.withdraw.log', compact('withdrawals'));
     }
+
+    /**
+     * Get available balance for withdrawal
+     */
     private function getAvailableBalance(): float
     {
-        $user = auth()->user();
-        $balance = Transaction::where('user_id', $user->id)
+        $user = Auth::user();
+
+        // Hitung total deposit yang sukses
+        $totalDeposit = Transaction::where('user_id', $user->id)
             ->where('type', 'deposit')
             ->where('status', 'success')
             ->sum('amount');
 
-        return $balance;
+        // Hitung total withdrawal yang sudah sukses atau pending
+        $totalWithdraw = Transaction::where('user_id', $user->id)
+            ->where('type', 'withdraw')
+            ->whereIn('status', ['success', 'pending'])
+            ->sum('amount');
+
+        return $totalDeposit - $totalWithdraw;
     }
 }

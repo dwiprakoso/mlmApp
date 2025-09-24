@@ -30,6 +30,13 @@
         </div>
     @endif
 
+    @if ($availableBalance <= 0)
+        <div class="alert alert-warning" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Saldo tidak mencukupi untuk melakukan penarikan.
+        </div>
+    @endif
+
     <!-- Form Withdrawal -->
     <form action="{{ route('member.withdraw.store') }}" method="POST" id="withdrawalForm">
         @csrf
@@ -39,7 +46,8 @@
             <!-- Wallet Selection -->
             <div class="mb-3">
                 <label class="form-label text-white">Pilih Wallet untuk Penarikan</label>
-                <select name="wallet_id" class="form-select bg-dark text-white border-secondary" id="walletSelect" required>
+                <select name="wallet_id" class="form-select bg-dark text-white border-secondary" id="walletSelect"
+                    {{ $availableBalance <= 0 ? 'disabled' : '' }} required>
                     <option value="">-- Pilih Wallet --</option>
                     @foreach ($wallets as $wallet)
                         <option value="{{ $wallet->id }}" data-type="{{ $wallet->wallet_type }}"
@@ -90,6 +98,9 @@
                     <small class="text-muted">IDR</small>
                     <span class="text-gold fs-4 fw-bold">{{ number_format($availableBalance, 0, ',', '.') }}</span>
                 </div>
+                @if ($availableBalance <= 0)
+                    <small class="text-danger">Saldo tidak mencukupi untuk penarikan</small>
+                @endif
             </div>
 
             <!-- Jumlah penarikan -->
@@ -98,8 +109,16 @@
                 <div class="form-group mt-2">
                     <input type="number" name="amount" class="form-control bg-dark text-white border-secondary"
                         placeholder="Minimal IDR 50,000" id="withdrawAmount" value="{{ old('amount') }}" min="50000"
-                        max="50000000" step="1000" required>
-                    <small class="text-muted">Pajak 10% akan dipotong dari jumlah ini</small>
+                        max="{{ $availableBalance > 0 ? $availableBalance : 0 }}" step="1000"
+                        {{ $availableBalance <= 0 ? 'disabled' : '' }} required>
+                    <small class="text-muted">
+                        @if ($availableBalance > 0)
+                            Pajak 10% akan dipotong dari jumlah ini. Maksimal: IDR
+                            {{ number_format($availableBalance, 0, ',', '.') }}
+                        @else
+                            Saldo tidak mencukupi untuk penarikan
+                        @endif
+                    </small>
                 </div>
                 @error('amount')
                     <small class="text-danger">{{ $message }}</small>
@@ -128,7 +147,7 @@
             <div class="mb-4">
                 <label class="form-label text-white">Catatan (Opsional)</label>
                 <textarea name="notes" class="form-control bg-dark text-white border-secondary" rows="2"
-                    placeholder="Catatan untuk penarikan...">{{ old('notes') }}</textarea>
+                    placeholder="Catatan untuk penarikan..." {{ $availableBalance <= 0 ? 'disabled' : '' }}>{{ old('notes') }}</textarea>
                 @error('notes')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -136,9 +155,13 @@
 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-success w-100 btn-lg" id="withdrawBtn"
-                {{ $availableBalance == 0 ? 'disabled' : '' }}>
+                {{ $availableBalance <= 0 ? 'disabled' : '' }}>
                 <i class="bi bi-download me-2"></i>
-                Ajukan Penarikan
+                @if ($availableBalance <= 0)
+                    Saldo Tidak Mencukupi
+                @else
+                    Ajukan Penarikan
+                @endif
             </button>
         </div>
     </form>
@@ -149,23 +172,23 @@
         <div class="instruction-list">
             <div class="instruction-item mb-2">
                 <span class="text-gold fw-bold">1.</span>
-                <span class="text-white ms-2">Waktu penarikan harian: 09:00 - 18:00</span>
+                <span class="text-white ms-2">Minimal penarikan IDR 50,000</span>
             </div>
             <div class="instruction-item mb-2">
                 <span class="text-gold fw-bold">2.</span>
-                <span class="text-white ms-2">Batas penarikan harian: 1 kali, jumlah IDR 50,000 - IDR 50,000,000</span>
-            </div>
-            <div class="instruction-item mb-2">
-                <span class="text-gold fw-bold">3.</span>
                 <span class="text-white ms-2">Pajak penarikan: 10% dari jumlah yang ditarik</span>
             </div>
             <div class="instruction-item mb-2">
-                <span class="text-gold fw-bold">4.</span>
+                <span class="text-gold fw-bold">3.</span>
                 <span class="text-white ms-2">Pastikan informasi wallet sudah benar sebelum mengajukan</span>
             </div>
             <div class="instruction-item mb-2">
-                <span class="text-gold fw-bold">5.</span>
+                <span class="text-gold fw-bold">4.</span>
                 <span class="text-white ms-2">Penarikan akan diproses dalam 1-3 hari kerja</span>
+            </div>
+            <div class="instruction-item mb-2">
+                <span class="text-gold fw-bold">5.</span>
+                <span class="text-white ms-2">Pastikan saldo mencukupi sebelum melakukan penarikan</span>
             </div>
         </div>
     </div>
@@ -231,15 +254,20 @@
                     feeInfo.style.display = 'none';
                 }
 
-                // Validation
+                // Validation dengan check available balance
                 if (amount > availableBalance) {
-                    this.setCustomValidity('Jumlah melebihi saldo yang tersedia');
+                    this.setCustomValidity('Jumlah melebihi saldo yang tersedia (IDR ' + availableBalance
+                        .toLocaleString('id-ID') + ')');
+                    withdrawBtn.disabled = true;
                 } else if (amount < 50000 && amount > 0) {
                     this.setCustomValidity('Minimal penarikan IDR 50,000');
-                } else if (amount > 50000000) {
-                    this.setCustomValidity('Maksimal penarikan IDR 50,000,000');
+                    withdrawBtn.disabled = true;
+                } else if (availableBalance <= 0) {
+                    this.setCustomValidity('Saldo tidak mencukupi');
+                    withdrawBtn.disabled = true;
                 } else {
                     this.setCustomValidity('');
+                    withdrawBtn.disabled = false;
                 }
             });
 
@@ -253,13 +281,42 @@
                 withdrawInput.dispatchEvent(new Event('input'));
             }
 
-            // Disable form if balance is 0
-            if (availableBalance === 0) {
+            // Disable form if balance is 0 or less
+            if (availableBalance <= 0) {
                 withdrawInput.disabled = true;
                 walletSelect.disabled = true;
                 withdrawBtn.disabled = true;
-                withdrawBtn.textContent = 'Saldo Tidak Mencukupi';
+                document.querySelector('textarea[name="notes"]').disabled = true;
             }
+
+            // Form submission validation
+            document.getElementById('withdrawalForm').addEventListener('submit', function(e) {
+                const amount = parseFloat(withdrawInput.value) || 0;
+
+                if (amount <= 0) {
+                    e.preventDefault();
+                    alert('Masukkan jumlah penarikan yang valid');
+                    return false;
+                }
+
+                if (amount > availableBalance) {
+                    e.preventDefault();
+                    alert('Jumlah penarikan melebihi saldo yang tersedia');
+                    return false;
+                }
+
+                if (amount < 50000) {
+                    e.preventDefault();
+                    alert('Minimal penarikan IDR 50,000');
+                    return false;
+                }
+
+                if (!walletSelect.value) {
+                    e.preventDefault();
+                    alert('Pilih wallet untuk penarikan');
+                    return false;
+                }
+            });
         });
     </script>
 @endsection
