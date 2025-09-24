@@ -15,10 +15,20 @@ class DashboardController extends Controller
         $referralCode = $user->refferal_code;
         $referralLink = route('guest.sign-up', ['ref' => $referralCode]);
 
-        $balance = Transaction::where('user_id', $user->id)
+
+
+        // Hitung total deposit yang sukses
+        $totalDeposit = Transaction::where('user_id', $user->id)
             ->where('type', 'deposit')
             ->where('status', 'success')
             ->sum('amount');
+
+        // Hitung total withdrawal yang sudah sukses atau pending
+        $totalWithdraw = Transaction::where('user_id', $user->id)
+            ->where('type', 'withdraw')
+            ->whereIn('status', ['success', 'pending'])
+            ->sum('amount');
+        $balance = $totalDeposit - $totalWithdraw;
 
         $commissionRate = Config::where('key', 'team_invite_presentation')
             ->value('value') ?? '10';

@@ -68,30 +68,11 @@
 
                     <hr class="border-secondary my-2">
 
-                    <!-- Status and Time Info -->
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted">Waktu Pengajuan</span>
-                        <span class="text-white">{{ $withdrawal->requested_at->format('H:i, d M Y') }}</span>
-                    </div>
-
-                    @if ($withdrawal->processed_at)
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-muted">Waktu Diproses</span>
-                            <span class="text-white">{{ $withdrawal->processed_at->format('H:i, d M Y') }}</span>
-                        </div>
-                    @endif
-
-                    @if ($withdrawal->completed_at)
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-muted">Waktu Selesai</span>
-                            <span class="text-white">{{ $withdrawal->completed_at->format('H:i, d M Y') }}</span>
-                        </div>
-                    @endif
 
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted">Status</span>
                         <span class="badge bg-{{ $withdrawal->status_badge_color }}">
-                            {{ \App\Models\Withdrawal::STATUSES[$withdrawal->status] ?? ucfirst($withdrawal->status) }}
+                            {{ $withdrawal->status }}
                         </span>
                     </div>
 
