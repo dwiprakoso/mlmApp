@@ -23,7 +23,7 @@ class ProductController extends Controller
                 'duration' => 'required|integer|min:1',
                 'price' => 'required|numeric|min:0',
                 'type' => 'required|string|in:Rencana Lanjutan,Pendapatan Stabil,Keuntungan VIP',
-                'presentase' => 'required|integer|min:1|max:100',
+                'presentase' => 'required|integer|min:1',
                 'is_active' => 'required|boolean',
             ]);
 
@@ -62,7 +62,7 @@ class ProductController extends Controller
                 'duration' => 'required|integer|min:1',
                 'price' => 'required|numeric|min:0',
                 'type' => 'required|string|in:Rencana Lanjutan,Pendapatan Stabil,Keuntungan VIP',
-                'presentase' => 'required|integer|min:1|max:100',
+                'presentase' => 'required|integer|min:1',
                 'is_active' => 'required|boolean',
             ]);
 

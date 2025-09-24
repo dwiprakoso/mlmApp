@@ -296,8 +296,8 @@
                                     <label class="required fw-semibold fs-6 mb-2">Percentage (%)</label>
                                     <div class="input-group">
                                         <input type="number" name="presentase" class="form-control form-control-solid"
-                                            min="1" max="100" placeholder="Enter percentage"
-                                            value="{{ old('presentase') }}" required />
+                                            min="1" placeholder="Enter percentage" value="{{ old('presentase') }}"
+                                            required />
                                         <span class="input-group-text">%</span>
                                     </div>
                                 </div>
@@ -384,8 +384,7 @@
                                     <label class="required fw-semibold fs-6 mb-2">Percentage (%)</label>
                                     <div class="input-group">
                                         <input type="number" name="presentase" class="form-control form-control-solid"
-                                            min="1" max="100" placeholder="Enter percentage"
-                                            id="edit_presentase" required />
+                                            min="1" placeholder="Enter percentage" id="edit_presentase" required />
                                         <span class="input-group-text">%</span>
                                     </div>
                                 </div>
