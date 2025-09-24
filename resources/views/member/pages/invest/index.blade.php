@@ -58,49 +58,44 @@
                 @if ($typeProducts->count() > 0)
                     @foreach ($typeProducts as $product)
                         <div class="card-dark p-3 mb-3">
-                            <h6 class="text-white mb-3">{{ $product->name }}</h6>
-                            <div class="row">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h6 class="text-white mb-0">{{ $product->name }}</h6>
+                                <span class="badge {{ $product->is_active ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ $product->is_active ? 'Aktif' : 'Tidak Aktif' }}
+                                </span>
+                            </div>
+
+                            <!-- Informasi Utama -->
+                            <div class="row mb-3">
                                 <div class="col-6">
-                                    <div class="mb-2">
-                                        <small class="text-muted">Harga</small>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Modal Investasi</small>
                                         <h6 class="text-gold mb-0">IDR {{ number_format($product->price, 0, ',', '.') }}
                                         </h6>
                                     </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">Tipe</small>
-                                        <h6 class="text-gold mb-0">{{ $product->type }}</h6>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Durasi</small>
+                                        <h6 class="text-white mb-0">{{ $product->duration }} Hari</h6>
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="mb-2">
-                                        <small class="text-muted">Durasi</small>
-                                        <h6 class="text-gold mb-0">{{ $product->duration }} Hari</h6>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Total Profit</small>
+                                        <h6 class="text-white mb-0">IDR
+                                            {{ number_format($product->total_profit, 0, ',', '.') }}</h6>
                                     </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">Status</small>
-                                        <h6 class="text-gold mb-0">
-                                            <span class="badge {{ $product->is_active ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ $product->is_active ? 'Aktif' : 'Tidak Aktif' }}
-                                            </span>
-                                        </h6>
+                                    <div class="mb-3">
+                                        <small class="text-muted">Profit Harian</small>
+                                        <h6 class="text-warning mb-0">IDR
+                                            {{ number_format($product->profit, 0, ',', '.') }}</h6>
                                     </div>
                                 </div>
                             </div>
-                            @if ($product->description)
-                                <div class="mb-2">
-                                    <small class="text-muted">Deskripsi</small>
-                                    <p class="text-white mb-0">{{ $product->description }}</p>
-                                </div>
-                            @endif
+
                             <hr style="border-color: var(--border-color);">
+
+                            <!-- Action Button -->
                             <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-gold circle-icon me-2"
-                                        style="width: 30px; height: 30px; font-size: 14px;">
-                                        <i class="bi bi-gem text-dark"></i>
-                                    </div>
-                                    <small class="text-white">ID: {{ $product->id }}</small>
-                                </div>
                                 @if ($product->is_active)
                                     <button class="btn btn-gold btn-sm px-3" onclick="investNow({{ $product->id }})">
                                         <small>Investasi Sekarang</small>
@@ -130,17 +125,11 @@
     </div>
 
     <!-- Quick Navigation -->
-    <div class="row g-2 mt-4">
+    <div class="row justify-content-center mt-4">
         <div class="col-6">
             <a href="{{ route('member.invest.log') }}" class="btn btn-outline-gold w-100">
                 <i class="bi bi-clock-history me-2"></i>
                 <small>Riwayat Investasi</small>
-            </a>
-        </div>
-        <div class="col-6">
-            <a href="{{ route('member.dashboard.index') }}" class="btn btn-outline-gold w-100">
-                <i class="bi bi-house me-2"></i>
-                <small>Dashboard</small>
             </a>
         </div>
     </div>
@@ -325,6 +314,10 @@
             padding: 2px 4px;
         }
 
+        .fw-bold {
+            font-weight: 600 !important;
+        }
+
         @media (max-width: 768px) {
             .col-4 {
                 margin-bottom: 0.25rem;
@@ -337,6 +330,10 @@
 
             .card-dark {
                 margin-bottom: 1rem;
+            }
+
+            .row .col-6 {
+                margin-bottom: 0.5rem;
             }
         }
     </style>
