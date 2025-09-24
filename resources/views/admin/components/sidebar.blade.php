@@ -151,7 +151,7 @@
                                                 <span class="path5"></span>
                                             </i>
                                         </span>
-                                        <span class="menu-title">About</span>
+                                        <span class="menu-title">Configuration</span>
                                     </a>
                                 </div>
                                 <!--end:Menu item-->
