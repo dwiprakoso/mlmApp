@@ -58,9 +58,9 @@
                         <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
                         <!--end::Export buttons-->
                     </div>
-                    <!--end::Card title==
+                    <!--end::Card title-->
 
-                                        <!==begin::Card toolbar-->
+                    <!--begin::Card toolbar-->
                     <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
                         <!--begin::Daterangepicker-->
                         <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range"
@@ -73,10 +73,9 @@
                                 data-placeholder="Status" data-kt-ecommerce-order-filter="status">
                                 <option></option>
                                 <option value="all">All</option>
-                                <option value="active">Active</option>
-                                <option value="locked">Locked</option>
-                                <option value="disabled">Disabled</option>
-                                <option value="banned">Banned</option>
+                                <option value="success">Success</option>
+                                <option value="pending">Pending</option>
+                                <option value="failed">Failed</option>
                             </select>
                             <!--end::Select2-->
                         </div>
@@ -125,41 +124,73 @@
                         id="kt_ecommerce_report_customer_orders_table">
                         <thead>
                             <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                                <th class="min-w-100px">Product</th>
+                                <th class="min-w-100px">Reference</th>
                                 <th class="min-w-100px">Customer Name</th>
-                                <th class="min-w-100px">Email</th>
+                                <th class="min-w-100px">Phone</th>
+                                <th class="text-end min-w-75px">Amount</th>
                                 <th class="min-w-100px">Status</th>
-                                <th class="min-w-100px">Date Joined</th>
-                                <th class="text-end min-w-75px">No. Orders</th>
-                                <th class="text-end min-w-75px">No. Products</th>
-                                <th class="text-end min-w-100px">Total</th>
+                                <th class="min-w-100px">Created At</th>
                             </tr>
                         </thead>
                         <tbody class="fw-semibold text-gray-600">
-                            <tr>
-                                <td>
-                                    <a href="apps/ecommerce/customers/details.html"
-                                        class="text-gray-900 text-hover-primary">Emma Smith</a>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-gray-900 text-hover-primary">smith@kpmg.com</a>
-                                </td>
-                                <td>
-                                    <div class="badge badge-light-success">Active</div>
-                                </td>
-                                <td>25 Jul 2024, 9:23 pm</td>
-                                <td class="text-end pe-0">19</td>
-                                <td class="text-end pe-0">27</td>
-                                <td class="text-end">$1829.00</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!--end::Table-->
+                            @forelse($transactions as $transaction)
+                                <tr>
+                                    <td>
+                                        <span class="text-gray-900">{{ $transaction->product->name ?? 'N/A' }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-gray-900">{{ $transaction->reference ?? 'N/A' }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-gray-900">{{ $transaction->user->name ?? 'N/A' }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-gray-900">{{ $transaction->user->phone ?? 'N/A' }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span
+                                            class="text-gray-900">{{ number_format($transaction->amount, 0, ',', '.') }}</span>
+                                    </td>
+                                    <td>
+                                        @switch($transaction->status)
+                                            @case('success')
+                                                <div class="badge badge-light-success">Success</div>
+                                            @break
+
+                                            @case('pending')
+                                                <div class="badge badge-light-warning">Pending</div>
+                                            @break
+
+                                            @case('failed')
+                                                <div class="badge badge-light-danger">Failed</div>
+                                            @break
+
+                                            @default
+                                                <div class="badge badge-light-secondary">{{ ucfirst($transaction->status) }}</div>
+                                        @endswitch
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="text-gray-900">{{ $transaction->created_at->format('d M Y, h:i A') }}</span>
+                                    </td>
+                                </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center py-10">
+                                            <div class="text-gray-600">No purchase transactions found</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        <!--end::Table-->
+                    </div>
+                    <!--end::Card body-->
                 </div>
-                <!--end::Card body-->
+                <!--end::Products-->
             </div>
-            <!--end::Products-->
+            <!--end::Content container-->
         </div>
-        <!--end::Content container-->
-    </div>
-    <!--end::Content-->
-@endsection
+        <!--end::Content-->
+    @endsection
