@@ -53,7 +53,8 @@
                     <i class="bi bi-people fs-1 text-muted mb-3 d-block"></i>
                     <h6 class="text-white mb-2">Belum Ada Anggota Tim</h6>
                     <p class="text-muted mb-3 small">Bagikan kode referral Anda untuk mulai membangun tim dan mendapatkan
-                        komisi <span class="text-gold fw-bold">35%</span> dari setiap investasi mereka.</p>
+                        komisi <span class="text-gold fw-bold">{{ $commissionRate }}%</span> dari setiap investasi mereka.
+                    </p>
 
                     <div class="row text-center mb-3">
                         <div class="col-4">

@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Member;
 
+use App\Models\Config;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction; // Import model Transaction
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -19,6 +20,9 @@ class DashboardController extends Controller
             ->where('status', 'success')
             ->sum('amount');
 
-        return view('member.pages.dasboard.index', compact('user', 'referralCode', 'referralLink', 'balance'));
+        $commissionRate = Config::where('key', 'team_invite_presentation')
+            ->value('value') ?? '10';
+
+        return view('member.pages.dasboard.index', compact('user', 'referralCode', 'referralLink', 'balance', 'commissionRate'));
     }
 }

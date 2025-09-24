@@ -66,7 +66,7 @@
         <div class="card-dark shadow-sm p-3">
             <h6 class="text-white mb-2">Kartu undangan saya</h6>
             <p class="small text-muted">Undangan yang berhasil akan memberi Anda hak untuk komisi <span
-                    class="text-gold fw-bold">35%</span> pada setiap investasi yang dibuat.</p>
+                    class="text-gold fw-bold">{{ $commissionRate }}%</span> pada setiap investasi yang dibuat.</p>
 
             <div class="row text-center mb-3">
                 <div class="col-4">
