@@ -21,7 +21,10 @@ class InvestController extends Controller
             ->get()
             ->groupBy('type');
 
-        return view('member.pages.invest.index', compact('products'));
+        // Get current user balance
+        $currentBalance = Transaction::calculateUserBalance(Auth::id());
+
+        return view('member.pages.invest.index', compact('products', 'currentBalance'));
     }
 
     public function store(Request $request)
@@ -45,40 +48,55 @@ class InvestController extends Controller
 
             // Check if product is active
             if (!$product->is_active) {
+                DB::rollBack();
                 return back()->with('error', 'Produk ini tidak tersedia.');
+            }
+
+            // Check user balance
+            $currentBalance = Transaction::calculateUserBalance(Auth::id());
+
+            if ($currentBalance < $product->price) {
+                DB::rollBack();
+                return back()->with('error', 'Saldo tidak mencukupi. Saldo Anda: Rp ' . number_format($currentBalance, 0, ',', '.') . ', Harga produk: Rp ' . number_format($product->price, 0, ',', '.'));
             }
 
             // Generate unique reference number
             $reference = $this->generateReference();
 
-            // Create transaction with explicit null values
+            // Create successful purchase transaction
             $transaction = Transaction::create([
                 'user_id' => Auth::id(),
                 'product_id' => $product->id,
                 'reference' => $reference,
                 'amount' => $product->price,
                 'type' => 'purchase',
-                'status' => 'pending',
-                'payment_method' => null,
+                'status' => 'success',
+                'payment_method' => 'balance',
                 'payment_proof' => null,
                 'approved_by' => null,
             ]);
 
             DB::commit();
 
-            Log::info('Investment Transaction Created', [
+            Log::info('Investment Transaction Created Successfully', [
                 'transaction_id' => $transaction->id,
-                'reference' => $reference
+                'reference' => $reference,
+                'user_id' => Auth::id(),
+                'product_id' => $product->id,
+                'amount' => $product->price,
+                'previous_balance' => $currentBalance,
+                'new_balance' => $currentBalance - $product->price
             ]);
 
-            return redirect()->route('member.invest.show', $transaction->id)
-                ->with('success', 'Transaksi berhasil dibuat. Silakan lanjutkan pembayaran.');
+            return redirect()->route('member.invest.log')
+                ->with('success', 'Pembelian berhasil! Produk ' . $product->name . ' telah ditambahkan ke portofolio Anda.');
         } catch (\Exception $e) {
             DB::rollBack();
 
             Log::error('Investment Store Error', [
                 'error' => $e->getMessage(),
                 'product_id' => $request->product_id,
+                'user_id' => Auth::id(),
                 'trace' => $e->getTraceAsString()
             ]);
 
@@ -86,6 +104,7 @@ class InvestController extends Controller
         }
     }
 
+    // Method show masih bisa dipakai kalau ada case khusus yang butuh
     public function show($id)
     {
         $transaction = Transaction::with(['product', 'user'])
@@ -103,52 +122,10 @@ class InvestController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('member.pages.invest.log', compact('transactions'));
-    }
+        // Get current balance for display
+        $currentBalance = Transaction::calculateUserBalance(Auth::id());
 
-    public function uploadPaymentProof(Request $request)
-    {
-        $request->validate([
-            'transaction_id' => 'required|exists:transactions,id',
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB
-            'payment_method' => 'required|string|in:bank_transfer,mobile_banking,atm,wallet_gris'
-        ]);
-
-        try {
-            $transaction = Transaction::where('id', $request->transaction_id)
-                ->where('user_id', Auth::id())
-                ->where('status', 'pending')
-                ->firstOrFail();
-
-            // Handle file upload
-            if ($request->hasFile('payment_proof')) {
-                $file = $request->file('payment_proof');
-
-                // Create filename with proper path
-                $filename = 'invest/proofs/invest_proof_' . $transaction->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-
-                // Store file in storage/app/public directory
-                $file->storeAs('public', $filename);
-
-                // Update transaction - save path without 'storage/' prefix
-                $transaction->update([
-                    'payment_proof' => $filename,
-                    'payment_method' => $request->payment_method,
-                    'status' => 'waiting_confirmation'
-                ]);
-
-                return back()->with('success', 'Bukti pembayaran berhasil diupload. Menunggu konfirmasi admin.');
-            }
-
-            return back()->with('error', 'File bukti pembayaran tidak ditemukan.');
-        } catch (\Exception $e) {
-            Log::error('Upload Payment Proof Error', [
-                'error' => $e->getMessage(),
-                'transaction_id' => $request->transaction_id
-            ]);
-
-            return back()->with('error', 'Terjadi kesalahan saat upload bukti pembayaran.');
-        }
+        return view('member.pages.invest.log', compact('transactions', 'currentBalance'));
     }
 
     private function generateReference()

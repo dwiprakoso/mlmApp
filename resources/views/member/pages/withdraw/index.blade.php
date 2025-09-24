@@ -130,14 +130,14 @@
             </div>
 
             <!-- Notes -->
-            <div class="mb-4">
+            {{-- <div class="mb-4">
                 <label class="form-label text-white">Catatan (Opsional)</label>
                 <textarea name="notes" class="form-control bg-dark text-white border-secondary" rows="2"
                     placeholder="Catatan untuk penarikan..." {{ $availableBalance <= 0 ? 'disabled' : '' }}>{{ old('notes') }}</textarea>
                 @error('notes')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
-            </div>
+            </div> --}}
 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-success w-100 btn-lg" id="withdrawBtn"
