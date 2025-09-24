@@ -10,7 +10,7 @@
                 <div class="page-title d-flex flex-column justify-content-center gap-1 me-3">
                     <!--begin::Title-->
                     <h1 class="page-heading d-flex flex-column justify-content-center text-gray-900 fw-bold fs-3 m-0">
-                        Products</h1>
+                        Invest</h1>
                     <!--end::Title-->
                     <!--begin::Breadcrumb-->
                     <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0">
@@ -25,7 +25,7 @@
                         </li>
                         <!--end::Item-->
                         <!--begin::Item-->
-                        <li class="breadcrumb-item text-muted">Products</li>
+                        <li class="breadcrumb-item text-muted">Invest</li>
                         <!--end::Item-->
                     </ul>
                     <!--end::Breadcrumb-->
@@ -110,7 +110,7 @@
                     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_products">
                         <thead>
                             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-200px">Product</th>
+                                <th class="min-w-200px">Invest</th>
                                 <th class="min-w-125px">Type</th>
                                 <th class="min-w-100px">Duration</th>
                                 <th class="min-w-125px">Price</th>

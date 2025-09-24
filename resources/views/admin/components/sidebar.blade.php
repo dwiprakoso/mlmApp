@@ -72,7 +72,7 @@
                                                 <span class="path5"></span>
                                             </i>
                                         </span>
-                                        <span class="menu-title">Product</span>
+                                        <span class="menu-title">Invest</span>
                                     </a>
                                 </div>
                                 <!--end:Menu item-->
