@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use App\Models\Config; // Add this import
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -53,23 +54,24 @@ class DepositController extends Controller
             ->where('type', 'deposit')
             ->firstOrFail();
 
+        // Get dynamic payment methods from configs table
+        $configs = Config::whereIn('key', [
+            'app_name',
+            'app_logo',
+            'app_description',
+            'bank_name',
+            'bank_account_number',
+            'account_name',
+            'payment_qr_code'
+        ])->pluck('value', 'key');
+
         $paymentMethods = [
             'wallet_qris' => [
-                'name' => 'Wallet & QRIS & E-Bank',
+                'name' => 'QRIS',
                 'accounts' => [
                     [
-                        'type' => 'BCA',
-                        'number' => '1234567890',
-                        'name' => 'PT EXAMPLE'
-                    ],
-                    [
-                        'type' => 'Mandiri',
-                        'number' => '0987654321',
-                        'name' => 'PT EXAMPLE'
-                    ],
-                    [
                         'type' => 'QRIS',
-                        'qr_code' => 'qris_code_image.png',
+                        'qr_code' => $configs['payment_qr_code'] ?? null,
                         'name' => 'QRIS Payment'
                     ]
                 ]
@@ -78,14 +80,9 @@ class DepositController extends Controller
                 'name' => 'Bank Transfer',
                 'accounts' => [
                     [
-                        'type' => 'BRI',
-                        'number' => '1122334455',
-                        'name' => 'PT EXAMPLE'
-                    ],
-                    [
-                        'type' => 'BNI',
-                        'number' => '5544332211',
-                        'name' => 'PT EXAMPLE'
+                        'type' => $configs['bank_name'] ?? 'Bank',
+                        'number' => $configs['bank_account_number'] ?? '',
+                        'name' => $configs['account_name'] ?? ''
                     ]
                 ]
             ]

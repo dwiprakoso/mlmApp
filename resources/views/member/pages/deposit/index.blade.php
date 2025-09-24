@@ -106,7 +106,7 @@
                     <input type="radio" name="payment_method" value="wallet_qris" checked style="display: none;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-white mb-1">Wallet & QRIS & E-Bank</h6>
+                            <h6 class="text-white mb-1">QRIS</h6>
                             <small class="text-muted">
                                 Rentang Jumlah: <span class="text-gold">IDR</span> 50 K - <span class="text-gold">IDR</span>
                                 50,000 K

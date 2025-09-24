@@ -13,7 +13,7 @@
             @if ($deposit->status == 'pending') bg-warning text-dark
             @elseif($deposit->status == 'waiting_confirmation') bg-info
             @elseif($deposit->status == 'success') bg-success
-            @elseif($deposit->status == 'rejected') bg-danger
+            @elseif($deposit->status == 'failed') bg-danger
             @else bg-secondary @endif
         ">
             @if ($deposit->status == 'pending')
@@ -22,7 +22,7 @@
                 Menunggu Verifikasi
             @elseif($deposit->status == 'success')
                 Berhasil
-            @elseif($deposit->status == 'rejected')
+            @elseif($deposit->status == 'failed')
                 Ditolak
             @else
                 {{ ucfirst($deposit->status) }}
@@ -100,10 +100,17 @@
                         @if ($account['type'] == 'QRIS')
                             <div class="text-center">
                                 <h6 class="text-white mb-2">{{ $account['name'] }}</h6>
-                                <div class="qr-code-placeholder bg-white p-3 rounded mx-auto"
-                                    style="width: 200px; height: 200px; display: flex; align-items: center; justify-content: center;">
-                                    <span class="text-dark">QR Code Here</span>
-                                </div>
+                                @if (!empty($account['qr_code']))
+                                    <div class="qr-code-container mx-auto" style="width: 200px; height: 200px;">
+                                        <img src="{{ $account['qr_code'] }}" alt="QR Code" class="img-fluid rounded"
+                                            style="width: 100%; height: 100%; object-fit: cover; border: 2px solid #ddd;">
+                                    </div>
+                                @else
+                                    <div class="qr-code-placeholder bg-white p-3 rounded mx-auto"
+                                        style="width: 200px; height: 200px; display: flex; align-items: center; justify-content: center;">
+                                        <span class="text-dark">QR Code Belum Tersedia</span>
+                                    </div>
+                                @endif
                                 <small class="text-muted d-block mt-2">Scan QR Code untuk pembayaran</small>
                                 <small class="text-gold d-block mt-1 fw-bold">
                                     Jumlah: Rp {{ number_format($deposit->amount, 0, ',', '.') }}
@@ -114,19 +121,25 @@
                                 <div>
                                     <div class="d-flex align-items-center mb-2">
                                         <span class="badge bg-primary me-2">{{ $account['type'] }}</span>
-                                        <h6 class="text-white mb-0">{{ $account['name'] }}</h6>
                                     </div>
-                                    <p class="text-gold mb-0 fs-5 fw-bold">{{ $account['number'] }}</p>
-                                    <small class="text-muted">a.n {{ $account['name'] }}</small>
-                                    <br>
-                                    <small class="text-warning">
-                                        <i class="bi bi-exclamation-triangle me-1"></i>
-                                        Transfer tepat: Rp {{ number_format($deposit->amount, 0, ',', '.') }}
-                                    </small>
+                                    @if (!empty($account['number']))
+                                        <p class="text-gold mb-0 fs-5 fw-bold">{{ $account['number'] }}</p>
+                                        <small class="text-muted">a.n {{ $account['name'] }}</small>
+                                        <br>
+                                        <small class="text-warning">
+                                            <i class="bi bi-exclamation-triangle me-1"></i>
+                                            Transfer tepat: Rp {{ number_format($deposit->amount, 0, ',', '.') }}
+                                        </small>
+                                    @else
+                                        <p class="text-warning mb-0">Rekening belum tersedia</p>
+                                    @endif
                                 </div>
-                                <button class="btn btn-outline-gold btn-sm copy-btn" data-copy="{{ $account['number'] }}">
-                                    <i class="bi bi-copy"></i>
-                                </button>
+                                @if (!empty($account['number']))
+                                    <button class="btn btn-outline-gold btn-sm copy-btn"
+                                        data-copy="{{ $account['number'] }}">
+                                        <i class="bi bi-copy"></i>
+                                    </button>
+                                @endif
                             </div>
                         @endif
                     </div>
@@ -345,6 +358,12 @@
 
         .qr-code-placeholder {
             border: 2px dashed #ddd;
+        }
+
+        .qr-code-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .badge {
