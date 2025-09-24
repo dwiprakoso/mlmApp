@@ -58,11 +58,9 @@
                             data-ewallet-name="{{ $wallet->ewallet_name }}"
                             {{ old('wallet_id') == $wallet->id ? 'selected' : '' }}>
                             @if ($wallet->wallet_type === 'bank')
-                                {{ $wallet->bank_name }} -
-                                {{ substr($wallet->bank_account, 0, 4) }}***{{ substr($wallet->bank_account, -3) }}
+                                {{ $wallet->bank_name }} - {{ $wallet->bank_account }}
                             @else
-                                {{ $wallet->ewallet_provider }} -
-                                {{ substr($wallet->ewallet_number, 0, 4) }}***{{ substr($wallet->ewallet_number, -3) }}
+                                {{ $wallet->ewallet_provider }} - {{ $wallet->ewallet_number }}
                             @endif
                             @if ($wallet->is_primary)
                                 (Utama)
@@ -78,10 +76,7 @@
             <!-- Selected Wallet Info -->
             <div class="mb-3" id="walletInfo" style="display: none;">
                 <small class="text-muted">Detail wallet terpilih</small>
-                <div class="bank-info d-flex align-items-center mt-2">
-                    <div class="bank-icon me-3">
-                        <i class="bi bi-bank2 text-success bg-success bg-opacity-10 p-2 rounded-circle" id="walletIcon"></i>
-                    </div>
+                <div class="bank-info mt-2">
                     <div>
                         <h6 class="text-white mb-0" id="walletNumber"></h6>
                         <small class="text-muted" id="walletName"></small>
@@ -113,8 +108,7 @@
                         {{ $availableBalance <= 0 ? 'disabled' : '' }} required>
                     <small class="text-muted">
                         @if ($availableBalance > 0)
-                            Pajak 10% akan dipotong dari jumlah ini. Maksimal: IDR
-                            {{ number_format($availableBalance, 0, ',', '.') }}
+                            Maksimal: IDR {{ number_format($availableBalance, 0, ',', '.') }}
                         @else
                             Saldo tidak mencukupi untuk penarikan
                         @endif
@@ -125,20 +119,12 @@
                 @enderror
             </div>
 
-            <!-- Fee Info -->
-            <div class="mb-3" id="feeInfo" style="display: none;">
+            <!-- Amount Preview -->
+            <div class="mb-3" id="amountPreview" style="display: none;">
                 <div class="bg-secondary bg-opacity-25 p-2 rounded">
                     <div class="d-flex justify-content-between">
-                        <small class="text-muted">Jumlah penarikan:</small>
-                        <small class="text-white" id="amountDisplay">IDR 0</small>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <small class="text-muted">Pajak (10%):</small>
-                        <small class="text-warning" id="feeDisplay">IDR 0</small>
-                    </div>
-                    <div class="d-flex justify-content-between border-top pt-2 mt-2">
-                        <small class="text-white"><strong>Yang diterima:</strong></small>
-                        <small class="text-success" id="netDisplay"><strong>IDR 0</strong></small>
+                        <small class="text-muted">Jumlah yang akan diterima:</small>
+                        <small class="text-success fw-bold" id="netDisplay">IDR 0</small>
                     </div>
                 </div>
             </div>
@@ -176,18 +162,14 @@
             </div>
             <div class="instruction-item mb-2">
                 <span class="text-gold fw-bold">2.</span>
-                <span class="text-white ms-2">Pajak penarikan: 10% dari jumlah yang ditarik</span>
-            </div>
-            <div class="instruction-item mb-2">
-                <span class="text-gold fw-bold">3.</span>
                 <span class="text-white ms-2">Pastikan informasi wallet sudah benar sebelum mengajukan</span>
             </div>
             <div class="instruction-item mb-2">
-                <span class="text-gold fw-bold">4.</span>
+                <span class="text-gold fw-bold">3.</span>
                 <span class="text-white ms-2">Penarikan akan diproses dalam 1-3 hari kerja</span>
             </div>
             <div class="instruction-item mb-2">
-                <span class="text-gold fw-bold">5.</span>
+                <span class="text-gold fw-bold">4.</span>
                 <span class="text-white ms-2">Pastikan saldo mencukupi sebelum melakukan penarikan</span>
             </div>
         </div>
@@ -197,15 +179,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const walletSelect = document.getElementById('walletSelect');
             const walletInfo = document.getElementById('walletInfo');
-            const walletIcon = document.getElementById('walletIcon');
             const walletNumber = document.getElementById('walletNumber');
             const walletName = document.getElementById('walletName');
             const divider = document.getElementById('divider');
             const withdrawInput = document.getElementById('withdrawAmount');
             const withdrawBtn = document.getElementById('withdrawBtn');
-            const feeInfo = document.getElementById('feeInfo');
-            const amountDisplay = document.getElementById('amountDisplay');
-            const feeDisplay = document.getElementById('feeDisplay');
+            const amountPreview = document.getElementById('amountPreview');
             const netDisplay = document.getElementById('netDisplay');
             const availableBalance = {{ $availableBalance }};
 
@@ -216,14 +195,10 @@
                     const type = option.dataset.type;
 
                     if (type === 'bank') {
-                        walletIcon.className =
-                            'bi bi-credit-card text-success bg-success bg-opacity-10 p-2 rounded-circle';
                         walletNumber.textContent = option.dataset.bankAccount;
                         walletName.textContent = option.dataset.bankName + ' - ' + option.dataset
                             .accountName;
                     } else {
-                        walletIcon.className =
-                            'bi bi-phone text-success bg-success bg-opacity-10 p-2 rounded-circle';
                         walletNumber.textContent = option.dataset.ewalletNumber;
                         walletName.textContent = option.dataset.ewalletProvider + ' - ' + option.dataset
                             .ewalletName;
@@ -237,21 +212,15 @@
                 }
             });
 
-            // Handle amount input and fee calculation
+            // Handle amount input
             withdrawInput.addEventListener('input', function() {
                 const amount = parseFloat(this.value) || 0;
 
                 if (amount > 0) {
-                    const fee = amount * 0.10; // 10% fee
-                    const net = amount - fee;
-
-                    amountDisplay.textContent = 'IDR ' + amount.toLocaleString('id-ID');
-                    feeDisplay.textContent = 'IDR ' + fee.toLocaleString('id-ID');
-                    netDisplay.textContent = 'IDR ' + net.toLocaleString('id-ID');
-
-                    feeInfo.style.display = 'block';
+                    netDisplay.textContent = 'IDR ' + amount.toLocaleString('id-ID');
+                    amountPreview.style.display = 'block';
                 } else {
-                    feeInfo.style.display = 'none';
+                    amountPreview.style.display = 'none';
                 }
 
                 // Validation dengan check available balance

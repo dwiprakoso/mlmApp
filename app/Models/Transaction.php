@@ -63,15 +63,21 @@ class Transaction extends Model
      */
     public static function calculateUserBalance($userId)
     {
-        // Calculate income (deposit + revenue + commission)
+        // Calculate income (deposit + revenue + commission) - only success
         $income = self::where('user_id', $userId)
             ->where('status', 'success')
             ->whereIn('type', ['deposit', 'revenue', 'commission'])
             ->sum('amount');
 
-        // Calculate expenses (purchase + withdraw)
+        // Calculate expenses (purchase + withdraw) - include pending withdrawals
         $expenses = self::where('user_id', $userId)
-            ->where('status', 'success')
+            ->where(function ($query) {
+                $query->where('status', 'success')
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->where('status', 'pending')
+                            ->where('type', 'withdraw');
+                    });
+            })
             ->whereIn('type', ['purchase', 'withdraw'])
             ->sum('amount');
 
@@ -86,20 +92,27 @@ class Transaction extends Model
      */
     public static function getUserBalanceBreakdown($userId)
     {
-        $transactions = self::where('user_id', $userId)
+        // Get successful transactions breakdown
+        $successTransactions = self::where('user_id', $userId)
             ->where('status', 'success')
             ->selectRaw('type, SUM(amount) as total')
             ->groupBy('type')
             ->pluck('total', 'type');
 
-        $deposit = $transactions['deposit'] ?? 0;
-        $revenue = $transactions['revenue'] ?? 0;
-        $commission = $transactions['commission'] ?? 0;
-        $purchase = $transactions['purchase'] ?? 0;
-        $withdraw = $transactions['withdraw'] ?? 0;
+        // Get pending withdrawals
+        $pendingWithdrawals = self::where('user_id', $userId)
+            ->where('status', 'pending')
+            ->where('type', 'withdraw')
+            ->sum('amount');
+
+        $deposit = $successTransactions['deposit'] ?? 0;
+        $revenue = $successTransactions['revenue'] ?? 0;
+        $commission = $successTransactions['commission'] ?? 0;
+        $successPurchase = $successTransactions['purchase'] ?? 0;
+        $successWithdraw = $successTransactions['withdraw'] ?? 0;
 
         $totalIncome = $deposit + $revenue + $commission;
-        $totalExpenses = $purchase + $withdraw;
+        $totalExpenses = $successPurchase + $successWithdraw + $pendingWithdrawals;
         $balance = $totalIncome - $totalExpenses;
 
         return [
@@ -110,12 +123,27 @@ class Transaction extends Model
                 'total' => $totalIncome
             ],
             'expenses' => [
-                'purchase' => $purchase,
-                'withdraw' => $withdraw,
+                'purchase' => $successPurchase,
+                'withdraw' => [
+                    'success' => $successWithdraw,
+                    'pending' => $pendingWithdrawals,
+                    'total' => $successWithdraw + $pendingWithdrawals
+                ],
                 'total' => $totalExpenses
             ],
             'balance' => $balance
         ];
+    }
+
+    /**
+     * Get available balance (excluding pending withdrawals)
+     *
+     * @param int $userId
+     * @return float
+     */
+    public static function getAvailableBalance($userId)
+    {
+        return self::calculateUserBalance($userId);
     }
 
     /**

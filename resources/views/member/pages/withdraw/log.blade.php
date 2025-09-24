@@ -27,47 +27,33 @@
 
                     <!-- Wallet Info -->
                     <div class="mb-2">
-                        <small class="text-muted d-block">Tujuan Penarikan</small>
-                        @if ($withdrawal->payment_method === 'bank')
-                            <div class="d-flex align-items-center mt-1">
-                                <i class="bi bi-credit-card text-muted me-2"></i>
-                                <span class="text-white">{{ $withdrawal->bank_name }}</span>
-                                <span
-                                    class="text-muted ms-2">{{ substr($withdrawal->bank_account, 0, 4) }}***{{ substr($withdrawal->bank_account, -3) }}</span>
+                        <small class="text-muted d-block mb-1">Tujuan Penarikan</small>
+
+                        @if ($withdrawal->wallet->wallet_type == 'ewallet')
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="fw-bold text-white">{{ $withdrawal->wallet->ewallet_provider }}</span>
+                                    <span class="text-muted ms-2">{{ $withdrawal->wallet->ewallet_number }}</span>
+                                </div>
+                                <div>
+                                    <small class="text-muted">{{ $withdrawal->wallet->ewallet_name }}</small>
+                                </div>
                             </div>
-                            <small class="text-muted ms-4">{{ $withdrawal->account_name }}</small>
-                        @else
-                            <div class="d-flex align-items-center mt-1">
-                                <i class="bi bi-phone text-muted me-2"></i>
-                                <span class="text-white">{{ $withdrawal->ewallet_provider }}</span>
-                                <span
-                                    class="text-muted ms-2">{{ substr($withdrawal->ewallet_number, 0, 4) }}***{{ substr($withdrawal->ewallet_number, -3) }}</span>
+                        @elseif ($withdrawal->wallet->wallet_type == 'bank')
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="fw-bold text-white">{{ $withdrawal->wallet->bank_name }}</span>
+                                    <span class="text-muted ms-2">{{ $withdrawal->wallet->bank_account }}</span>
+                                </div>
+                                <div>
+                                    <small class="text-muted">{{ $withdrawal->wallet->account_name }}</small>
+                                </div>
                             </div>
-                            <small class="text-muted ms-4">{{ $withdrawal->ewallet_name }}</small>
                         @endif
                     </div>
 
-                    <!-- Fee Info -->
-                    <div class="mb-2">
-                        <div class="row">
-                            <div class="col-4">
-                                <small class="text-muted d-block">Jumlah</small>
-                                <small class="text-white">IDR {{ number_format($withdrawal->amount, 0, ',', '.') }}</small>
-                            </div>
-                            <div class="col-4">
-                                <small class="text-muted d-block">Pajak (10%)</small>
-                                <small class="text-warning">IDR {{ number_format($withdrawal->fee, 0, ',', '.') }}</small>
-                            </div>
-                            <div class="col-4">
-                                <small class="text-muted d-block">Diterima</small>
-                                <small class="text-success">IDR
-                                    {{ number_format($withdrawal->net_amount, 0, ',', '.') }}</small>
-                            </div>
-                        </div>
-                    </div>
 
                     <hr class="border-secondary my-2">
-
 
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted">Status</span>
@@ -75,6 +61,17 @@
                             {{ $withdrawal->status }}
                         </span>
                     </div>
+
+                    <!-- Payment Proof Button -->
+                    @if ($withdrawal->payment_proof && $withdrawal->status === 'success')
+                        <div class="mb-2">
+                            <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#proofModal{{ $withdrawal->id }}">
+                                <i class="bi bi-image me-1"></i>
+                                Lihat Bukti Transfer
+                            </button>
+                        </div>
+                    @endif
 
                     <!-- Notes -->
                     @if ($withdrawal->notes)
@@ -98,6 +95,14 @@
                             <small><strong>Alasan Penolakan:</strong><br>{{ $withdrawal->rejection_reason }}</small>
                         </div>
                     @endif
+
+                    <!-- Timestamp -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">{{ $withdrawal->created_at->format('d M Y, H:i') }}</small>
+                        @if ($withdrawal->updated_at != $withdrawal->created_at)
+                            <small class="text-muted">Update: {{ $withdrawal->updated_at->format('d M Y, H:i') }}</small>
+                        @endif
+                    </div>
                 </div>
             </div>
         @empty
@@ -113,10 +118,61 @@
         @endforelse
     </div>
 
+    <!-- Fullscreen Image Modal -->
+    <div class="modal fade" id="fullscreenModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-black">
+                <div class="modal-header border-0 position-absolute top-0 end-0 z-3">
+                    <button type="button" class="btn-close btn-close-white me-3 mt-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center justify-content-center p-0">
+                    <img id="fullscreenImage" src="" alt="Bukti Transfer" class="img-fluid"
+                        style="max-height: 100vh; max-width: 100vw;">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Pagination -->
     @if ($withdrawals->hasPages())
         <div class="d-flex justify-content-center mb-4">
             {{ $withdrawals->links() }}
+        </div>
+    @endif
+
+    <!-- Payment Proof Modal -->
+    @if ($withdrawal->payment_proof && $withdrawal->status === 'success')
+        <div class="modal fade" id="proofModal{{ $withdrawal->id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content bg-dark border-secondary">
+                    <div class="modal-header border-secondary">
+                        <h6 class="modal-title text-white">
+                            <i class="bi bi-image me-2"></i>
+                            Bukti Transfer
+                        </h6>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="mb-3">
+                            <small class="text-muted">{{ $withdrawal->transaction_id }}</small>
+                        </div>
+                        <img src="{{ asset('storage/' . $withdrawal->payment_proof) }}" class="img-fluid rounded"
+                            alt="Bukti Transfer" style="max-height: 50vh; width: auto; cursor: pointer;"
+                            onclick="openFullscreen('{{ asset('storage/' . $withdrawal->payment_proof) }}')">
+                        <div class="mt-2">
+                            <small class="text-muted">Tap gambar untuk memperbesar</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary justify-content-center">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                        <a href="{{ asset('storage/' . $withdrawal->payment_proof) }}" download
+                            class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-download me-1"></i>
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     @endif
 
@@ -125,19 +181,30 @@
             const statusFilter = document.getElementById('statusFilter');
             const logItems = document.querySelectorAll('.log-item');
 
-            // Status filter functionality
-            statusFilter.addEventListener('change', function() {
-                const selectedStatus = this.value;
+            // Status filter functionality (if filter exists)
+            if (statusFilter) {
+                statusFilter.addEventListener('change', function() {
+                    const selectedStatus = this.value;
 
-                logItems.forEach(item => {
-                    if (selectedStatus === '' || item.dataset.status === selectedStatus) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
+                    logItems.forEach(item => {
+                        if (selectedStatus === '' || item.dataset.status === selectedStatus) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
                 });
-            });
+            }
         });
+
+        // Function to open fullscreen image
+        function openFullscreen(imageSrc) {
+            const fullscreenModal = new bootstrap.Modal(document.getElementById('fullscreenModal'));
+            const fullscreenImage = document.getElementById('fullscreenImage');
+
+            fullscreenImage.src = imageSrc;
+            fullscreenModal.show();
+        }
 
         // Auto refresh every 30 seconds for pending withdrawals
         const hasPendingWithdrawals = document.querySelectorAll('[data-status="pending"]').length > 0;
@@ -163,6 +230,41 @@
 
         .badge {
             font-size: 0.75rem;
+        }
+
+        /* Modal customizations for mobile */
+        @media (max-width: 576px) {
+            .modal-dialog {
+                margin: 15px;
+                max-width: calc(100% - 30px);
+            }
+
+            .modal-sm {
+                max-width: calc(100% - 30px);
+            }
+
+            .modal-content {
+                border-radius: 10px;
+            }
+        }
+
+        /* Modal size control */
+        .modal-sm {
+            max-width: 400px;
+        }
+
+        /* Fullscreen modal styles */
+        .modal-fullscreen .modal-content {
+            background-color: rgba(0, 0, 0, 0.95) !important;
+        }
+
+        .modal-fullscreen .modal-header {
+            background: transparent;
+        }
+
+        /* Button styling */
+        .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
         }
     </style>
 @endsection

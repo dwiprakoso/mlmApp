@@ -19,20 +19,7 @@ class DompetController extends Controller
         // Ambil wallet user yang login
         $wallets = Auth::user()->wallets()->orderByDesc('is_primary')->orderBy('created_at')->get();
 
-        // Hitung saldo realtime dari transaksi deposit yang berhasil
-        // Hitung total deposit yang sukses
-        $totalDeposit = Transaction::where('user_id', $user->id)
-            ->where('type', 'deposit')
-            ->where('status', 'success')
-            ->sum('amount');
-
-        // Hitung total withdrawal yang sudah sukses atau pending
-        $totalWithdraw = Transaction::where('user_id', $user->id)
-            ->where('type', 'withdraw')
-            ->whereIn('status', ['success', 'pending'])
-            ->sum('amount');
-        $balance = $totalDeposit - $totalWithdraw;
-
+        $balance = Transaction::calculateUserBalance(Auth::id());
         return view('member.pages.dompet.index', compact('wallets', 'balance'));
     }
 
