@@ -17,12 +17,23 @@ use App\Http\Controllers\Member\InvestController as MemberInvestController;
 use App\Http\Controllers\Member\DompetController as MemberDompetController;
 use App\Http\Controllers\Member\TeamController as MemberTeamController;
 
+Route::get('/', function () {
+    if (auth()->check()) {
+        return auth()->user()->role === 'admin'
+            ? redirect()->route('admin.dashboard.index')
+            : redirect()->route('member.dashboard.index');
+    }
+    return redirect()->route('login');
+});
+
 Route::middleware('guest')->group(function () {
-    Route::get('/', [AuthController::class, 'signIn'])->name('login');
+    Route::get('/login', [AuthController::class, 'signIn'])->name('login');
     Route::post('/sign-in', [AuthController::class, 'processSignIn'])->name('guest.process-sign-in');
+
     Route::get('/sign-up', [AuthController::class, 'signUp'])->name('guest.sign-up');
     Route::post('/sign-up', [AuthController::class, 'processSignUp'])->name('guest.process-sign-up');
 });
+
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
