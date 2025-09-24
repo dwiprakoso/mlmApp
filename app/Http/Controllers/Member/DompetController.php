@@ -16,11 +16,24 @@ class DompetController extends Controller
     public function index()
     {
         $user = auth()->user();
-        // Ambil wallet user yang login
         $wallets = Auth::user()->wallets()->orderByDesc('is_primary')->orderBy('created_at')->get();
 
         $balance = Transaction::calculateUserBalance(Auth::id());
-        return view('member.pages.dompet.index', compact('wallets', 'balance'));
+
+        // Ambil data real menggunakan method yang sudah ada di model
+        $totalDeposit = Transaction::getTotalDeposit(Auth::id());
+        $totalWithdraw = Transaction::getTotalWithdraw(Auth::id());
+        $totalRevenue = Transaction::getTotalRevenue(Auth::id()); // Total hadiah
+        $totalCommission = Transaction::getTotalCommission(Auth::id()); // Total komisi
+
+        return view('member.pages.dompet.index', compact(
+            'wallets',
+            'balance',
+            'totalDeposit',
+            'totalWithdraw',
+            'totalRevenue',
+            'totalCommission'
+        ));
     }
 
     public function detail()

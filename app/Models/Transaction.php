@@ -169,4 +169,78 @@ class Transaction extends Model
     {
         return $query->whereIn('type', ['purchase', 'withdraw']);
     }
+    /**
+     * Get sum of each transaction type with success status
+     *
+     * @param int|null $userId Optional - filter by user_id
+     * @return array
+     */
+    public static function getTransactionSummary($userId = null)
+    {
+        $query = self::where('status', 'success');
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        $summary = $query->selectRaw('type, SUM(amount) as total')
+            ->groupBy('type')
+            ->pluck('total', 'type');
+
+        return [
+            'deposit' => $summary['deposit'] ?? 0,
+            'withdraw' => $summary['withdraw'] ?? 0,
+            'purchase' => $summary['purchase'] ?? 0,
+            'revenue' => $summary['revenue'] ?? 0,
+            'commission' => $summary['commission'] ?? 0,
+        ];
+    }
+
+    /**
+     * Get total for specific transaction type with success status
+     *
+     * @param string $type
+     * @param int|null $userId
+     * @return float
+     */
+    public static function getTotalByType($type, $userId = null)
+    {
+        $query = self::where('status', 'success')
+            ->where('type', $type);
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        return $query->sum('amount');
+    }
+
+    /**
+     * Get individual totals
+     */
+    public static function getTotalDeposit($userId = null)
+    {
+        return self::getTotalByType('deposit', $userId);
+    }
+
+    public static function getTotalWithdraw($userId = null)
+    {
+        return self::getTotalByType('withdraw', $userId);
+    }
+
+    public static function getTotalPurchase($userId = null)
+    {
+        return self::getTotalByType('purchase', $userId);
+    }
+
+    public static function getTotalRevenue($userId = null)
+    {
+        return self::getTotalByType('revenue', $userId);
+    }
+
+
+    public static function getTotalCommission($userId = null)
+    {
+        return self::getTotalByType('commission', $userId);
+    }
 }

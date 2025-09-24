@@ -85,40 +85,6 @@
                 </div>
             </div>
 
-            <!-- Deposit Balance -->
-            <div class="col-6">
-                <div class="card-dark p-3 h-100">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
-                            style="width: 40px; height: 40px;">
-                            <i class="bi bi-upload me-2"></i>
-                        </div>
-                        <a href="{{ route('member.deposit.log') }}" class="text-gold text-decoration-none">
-                            <small>Lihat Log →</small>
-                        </a>
-                    </div>
-                    <h6 class="text-gold mb-1">IDR 75,000</h6>
-                    <small class="text-muted">Saldo deposit</small>
-                </div>
-            </div>
-
-            <!-- Withdrawal Balance -->
-            <div class="col-6">
-                <div class="card-dark p-3 h-100">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
-                            style="width: 40px; height: 40px;">
-                            <i class="bi bi-download me-2"></i>
-                        </div>
-                        <a href="{{ route('member.withdraw.log') }}" class="text-gold text-decoration-none">
-                            <small>Lihat Log →</small>
-                        </a>
-                    </div>
-                    <h6 class="text-gold mb-1">IDR 0</h6>
-                    <small class="text-muted">Saldo penarikan</small>
-                </div>
-            </div>
-
             <!-- Total Deposit -->
             <div class="col-6">
                 <div class="card-dark p-3 h-100">
@@ -131,7 +97,7 @@
                             <small>Lihat Log →</small>
                         </a>
                     </div>
-                    <h6 class="text-gold mb-1">IDR 400,000</h6>
+                    <h6 class="text-gold mb-1">IDR {{ number_format($totalDeposit, 0, ',', '.') }}</h6>
                     <small class="text-muted">Total deposit</small>
                 </div>
             </div>
@@ -148,7 +114,7 @@
                             <small>Lihat Log →</small>
                         </a>
                     </div>
-                    <h6 class="text-gold mb-1">IDR 80,000</h6>
+                    <h6 class="text-gold mb-1">IDR {{ number_format($totalWithdraw, 0, ',', '.') }}</h6>
                     <small class="text-muted">Total penarikan</small>
                 </div>
             </div>
@@ -165,7 +131,7 @@
                             <small>Lihat Log →</small>
                         </a>
                     </div>
-                    <h6 class="text-gold mb-1">IDR 0</h6>
+                    <h6 class="text-gold mb-1">IDR {{ number_format($totalRevenue, 0, ',', '.') }}</h6>
                     <small class="text-muted">Total hadiah</small>
                 </div>
             </div>
@@ -182,7 +148,7 @@
                             <small>Lihat Log →</small>
                         </a>
                     </div>
-                    <h6 class="text-gold mb-1">IDR 0</h6>
+                    <h6 class="text-gold mb-1">IDR {{ number_format($totalCommission, 0, ',', '.') }}</h6>
                     <small class="text-muted">Total komisi</small>
                 </div>
             </div>
