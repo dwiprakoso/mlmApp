@@ -94,12 +94,8 @@ License: For each use you must have a valid license purchased only from above li
                     <h1 class="text-gray-800 fs-2qx fw-bold text-center mb-7">{{ $appName ?? 'My Application' }}</h1>
                     <!--end::Title-->
                     <!--begin::Text-->
-                    <div class="text-gray-600 fs-base text-center fw-semibold">In this kind of post,
-                        <a href="#" class="opacity-75-hover text-primary me-1">the blogger</a>introduces a person
-                        they’ve interviewed
-                        <br />and provides some background information about
-                        <a href="#" class="opacity-75-hover text-primary me-1">the interviewee</a>and their
-                        <br />work following this is a transcript of the interview.
+                    <div class="text-gray-600 fs-base text-center fw-semibold">
+                        {{ $appDescription ?? 'My Application' }}
                     </div>
                     <!--end::Text-->
                 </div>
