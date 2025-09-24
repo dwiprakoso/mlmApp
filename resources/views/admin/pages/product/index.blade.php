@@ -114,6 +114,9 @@
                                 <th class="min-w-125px">Type</th>
                                 <th class="min-w-100px">Duration</th>
                                 <th class="min-w-125px">Price</th>
+                                <th class="min-w-100px">Percentage</th>
+                                <th class="min-w-125px">Total Profit</th>
+                                <th class="min-w-125px">Daily Profit</th>
                                 <th class="min-w-125px">Status</th>
                                 <th class="text-end min-w-100px">Actions</th>
                             </tr>
@@ -158,6 +161,17 @@
                                         <span class="fw-bold">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
                                     </td>
                                     <td>
+                                        <span class="badge badge-light-primary fw-bold">{{ $product->presentase }}%</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-success">Rp
+                                            {{ number_format($product->total_profit, 0, ',', '.') }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-info">Rp
+                                            {{ number_format($product->profit, 0, ',', '.') }}</span>
+                                    </td>
+                                    <td>
                                         @if ($product->is_active)
                                             <div class="badge badge-light-success fw-bold">Active</div>
                                         @else
@@ -182,6 +196,7 @@
                                                     data-product-duration="{{ $product->duration }}"
                                                     data-product-price="{{ $product->price }}"
                                                     data-product-type="{{ $product->type }}"
+                                                    data-product-presentase="{{ $product->presentase }}"
                                                     data-product-status="{{ $product->is_active ? '1' : '0' }}">Edit</a>
                                             </div>
                                             <!--end::Menu item-->
@@ -199,7 +214,7 @@
                                 </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
+                                        <td colspan="9" class="text-center py-5">
                                             <span class="text-muted">No products found</span>
                                         </td>
                                     </tr>
@@ -274,6 +289,16 @@
                                         <input type="number" name="price" class="form-control form-control-solid"
                                             step="0.01" min="0" placeholder="0" value="{{ old('price') }}"
                                             required />
+                                    </div>
+                                </div>
+                                {{-- Percentage --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Percentage (%)</label>
+                                    <div class="input-group">
+                                        <input type="number" name="presentase" class="form-control form-control-solid"
+                                            min="1" max="100" placeholder="Enter percentage"
+                                            value="{{ old('presentase') }}" required />
+                                        <span class="input-group-text">%</span>
                                     </div>
                                 </div>
                                 {{-- Status --}}
@@ -354,6 +379,16 @@
                                             step="0.01" min="0" id="edit_price" required />
                                     </div>
                                 </div>
+                                {{-- Percentage --}}
+                                <div class="fv-row mb-7">
+                                    <label class="required fw-semibold fs-6 mb-2">Percentage (%)</label>
+                                    <div class="input-group">
+                                        <input type="number" name="presentase" class="form-control form-control-solid"
+                                            min="1" max="100" placeholder="Enter percentage"
+                                            id="edit_presentase" required />
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
                                 {{-- Status --}}
                                 <div class="fv-row mb-7">
                                     <label class="required fw-semibold fs-6 mb-2">Status</label>
@@ -422,6 +457,7 @@
                         const productDuration = button.getAttribute('data-product-duration');
                         const productPrice = button.getAttribute('data-product-price');
                         const productType = button.getAttribute('data-product-type');
+                        const productPresentase = button.getAttribute('data-product-presentase');
                         const productStatus = button.getAttribute('data-product-status');
 
                         // Update form action
@@ -434,6 +470,7 @@
                         document.getElementById('edit_duration').value = productDuration || '';
                         document.getElementById('edit_price').value = productPrice;
                         document.getElementById('edit_type').value = productType || '';
+                        document.getElementById('edit_presentase').value = productPresentase || '';
                         document.getElementById('edit_status').value = productStatus;
                     });
 

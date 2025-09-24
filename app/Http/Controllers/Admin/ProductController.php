@@ -23,8 +23,17 @@ class ProductController extends Controller
                 'duration' => 'required|integer|min:1',
                 'price' => 'required|numeric|min:0',
                 'type' => 'required|string|in:Rencana Lanjutan,Pendapatan Stabil,Keuntungan VIP',
+                'presentase' => 'required|integer|min:1|max:100',
                 'is_active' => 'required|boolean',
             ]);
+
+            // Calculate total_profit and profit
+            $price = $request->price;
+            $presentase = $request->presentase;
+            $duration = $request->duration;
+
+            $total_profit = ($price * $presentase) / 100;
+            $profit = $total_profit / $duration;
 
             Product::create([
                 'name' => $request->name,
@@ -32,6 +41,9 @@ class ProductController extends Controller
                 'duration' => $request->duration,
                 'price' => $request->price,
                 'type' => $request->type,
+                'presentase' => $request->presentase,
+                'total_profit' => $total_profit,
+                'profit' => $profit,
                 'is_active' => $request->is_active == '1' ? 1 : 0,
             ]);
 
@@ -50,8 +62,17 @@ class ProductController extends Controller
                 'duration' => 'required|integer|min:1',
                 'price' => 'required|numeric|min:0',
                 'type' => 'required|string|in:Rencana Lanjutan,Pendapatan Stabil,Keuntungan VIP',
+                'presentase' => 'required|integer|min:1|max:100',
                 'is_active' => 'required|boolean',
             ]);
+
+            // Calculate total_profit and profit
+            $price = $request->price;
+            $presentase = $request->presentase;
+            $duration = $request->duration;
+
+            $total_profit = ($price * $presentase) / 100;
+            $profit = $total_profit / $duration;
 
             $product->update([
                 'name' => $request->name,
@@ -59,6 +80,9 @@ class ProductController extends Controller
                 'duration' => $request->duration,
                 'price' => $request->price,
                 'type' => $request->type,
+                'presentase' => $request->presentase,
+                'total_profit' => $total_profit,
+                'profit' => $profit,
                 'is_active' => $request->is_active == '1' ? 1 : 0,
             ]);
 
