@@ -44,12 +44,16 @@ class ConfigSeeder extends Seeder
             ],
             [
                 'key' => 'team_invite_presentation',
-                'value' => '10%',
+                'value' => '10',
+            ],
+            [
+                'key' => 'header_text',
+                'value' => 'Investasi pertambangan',
             ],
         ];
 
         foreach ($configs as $config) {
-            Config::updateOrCreate(
+            Config::firstOrCreate(
                 ['key' => $config['key']],
                 ['value' => $config['value']]
             );
