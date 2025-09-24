@@ -19,7 +19,7 @@ use App\Http\Controllers\Member\TeamController as MemberTeamController;
 
 Route::get('/', function () {
     if (auth()->check()) {
-        return auth()->user()->role === 'admin'
+        return auth()->user()->hasRole('admin')
             ? redirect()->route('admin.dashboard.index')
             : redirect()->route('member.dashboard.index');
     }
@@ -60,6 +60,10 @@ Route::middleware('auth')->group(function () {
         // Withdraw Routes
         Route::prefix('withdraw')->name('withdraw.')->group(function () {
             Route::get('/', [WithdrawController::class, 'index'])->name('index');
+            Route::get('/{id}', [WithdrawController::class, 'show'])->name('show');
+            Route::post('/{id}/confirm', [WithdrawController::class, 'confirm'])->name('confirm');
+            Route::post('/{id}/reject', [WithdrawController::class, 'reject'])->name('reject');
+            Route::post('/{id}/update-payment-proof', [WithdrawController::class, 'updatePaymentProof'])->name('update-payment-proof');
         });
         // Product Routes
         Route::prefix('product')->name('product.')->group(function () {

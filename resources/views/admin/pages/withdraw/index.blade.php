@@ -166,6 +166,7 @@
                                 <th class="min-w-125px">No Hp</th>
                                 <th class="min-w-125px">Amount</th>
                                 <th class="min-w-125px">Wallet</th>
+                                <th class="min-w-125px">Status</th>
                                 <th class="min-w-125px">Created Date</th>
                                 <th class="text-end min-w-70px">Actions</th>
                             </tr>
@@ -201,6 +202,7 @@
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
+                                    <td>{{ $transaction->status }}</td>
                                     <td>{{ $transaction->created_at->format('d M Y, H:i') }}</td>
                                     <td class="text-end">
                                         <a href="#"
@@ -212,7 +214,8 @@
                                             data-kt-menu="true">
                                             <!--begin::Menu item-->
                                             <div class="menu-item px-3">
-                                                <a href="#" class="menu-link px-3">View</a>
+                                                <a href="{{ route('admin.withdraw.show', $transaction->id) }}"
+                                                    class="menu-link px-3">Detail</a>
                                             </div>
                                             <!--end::Menu item-->
                                             <!--begin::Menu item-->
