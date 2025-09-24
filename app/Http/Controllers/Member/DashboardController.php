@@ -22,7 +22,9 @@ class DashboardController extends Controller
 
         $commissionRate = Config::where('key', 'team_invite_presentation')
             ->value('value') ?? '10';
+        $headerText = Config::where('key', 'header_text')
+            ->value('value') ?? '10';
 
-        return view('member.pages.dasboard.index', compact('user', 'referralCode', 'referralLink', 'balance', 'commissionRate'));
+        return view('member.pages.dasboard.index', compact('user', 'referralCode', 'referralLink', 'balance', 'commissionRate', 'headerText'));
     }
 }

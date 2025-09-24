@@ -4,7 +4,7 @@
     <div class="hero-card">
         <!-- Tagline -->
         <div class="mb-3">
-            <h5 class="mb-0 text-white">Solusi pintar untuk uang pintar.</h5>
+            <h5 class="mb-0 text-white">{{ $headerText }}</h5>
         </div>
 
         <!-- Balance Card -->

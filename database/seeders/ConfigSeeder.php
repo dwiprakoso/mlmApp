@@ -50,6 +50,10 @@ class ConfigSeeder extends Seeder
                 'key' => 'header_text',
                 'value' => 'Investasi pertambangan',
             ],
+            [
+                'key' => 'legal_name',
+                'value' => 'PT RICH KINGDOM ID',
+            ],
         ];
 
         foreach ($configs as $config) {
