@@ -163,8 +163,8 @@
                             <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
                                 <th class="min-w-125px">Customer Name</th>
                                 <th class="min-w-125px">Email</th>
-                                <th class="min-w-125px">Company</th>
-                                <th class="min-w-125px">Payment Method</th>
+                                <th class="min-w-125px">Reference</th>
+                                <th class="min-w-125px">Amount</th>
                                 <th class="min-w-125px">Created Date</th>
                                 <th class="text-end min-w-70px">Actions</th>
                             </tr>
@@ -181,9 +181,7 @@
                                             class="text-gray-600 text-hover-primary mb-1">{{ $transaction->user->email ?? '-' }}</a>
                                     </td>
                                     <td>{{ $transaction->reference }}</td>
-                                    <td data-filter="{{ strtolower($transaction->payment_method) }}">
-                                        {{ $transaction->payment_method ?? '-' }}
-                                    </td>
+                                    <td>{{ $transaction->amount }}</td>
                                     <td>{{ $transaction->created_at->format('d M Y, H:i') }}</td>
                                     <td class="text-end">
                                         <a href="#"
