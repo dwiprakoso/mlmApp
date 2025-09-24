@@ -26,6 +26,26 @@ class ConfigSeeder extends Seeder
                 'key' => 'app_description',
                 'value' => 'This is a sample application built with Laravel',
             ],
+            [
+                'key' => 'bank_name',
+                'value' => 'BRI',
+            ],
+            [
+                'key' => 'bank_account_number',
+                'value' => '1234567890',
+            ],
+            [
+                'key' => 'account_name',
+                'value' => 'John Doe',
+            ],
+            [
+                'key' => 'payment_qr_code',
+                'value' => '',
+            ],
+            [
+                'key' => 'team_invite_presentation',
+                'value' => '10%',
+            ],
         ];
 
         foreach ($configs as $config) {
