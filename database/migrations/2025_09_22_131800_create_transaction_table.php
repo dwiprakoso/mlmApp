@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('reference')->unique();
             $table->bigInteger('amount');
 
-            $table->enum('type', ['deposit', 'withdraw', 'purchase', 'refund']);
+            $table->enum('type', ['deposit', 'withdraw', 'purchase', 'revenue', 'commission'])->default('purchase');
 
             $table->enum('status', ['pending', 'waiting_confirmation', 'success', 'failed'])
                 ->default('pending');
