@@ -20,7 +20,12 @@ class AboutController extends Controller
             'bank_account_number' => Config::get('bank_account_number', '1234567890'),
             'account_name' => Config::get('account_name', 'John Doe'),
             'payment_qr_code' => Config::get('payment_qr_code', ''),
-            'team_invite_presentation' => Config::get('team_invite_presentation', '10%'),
+            'team_invite_presentation' => Config::get('team_invite_presentation', '10'),
+            'header_text' => Config::get('header_text', 'Investasi pertambangan'),
+            'legal_name' => Config::get('legal_name', 'PT RICH KINGDOM ID'),
+            'withdrawal_fee' => Config::get('withdrawal_fee', '15'),
+            'whatsapp_channel' => Config::get('whatsapp_channel', ''),
+            'whatsapp_number' => Config::get('whatsapp_number', '628123456790'),
         ];
 
         return view('admin.pages.about.index', compact('configs'));
@@ -36,7 +41,12 @@ class AboutController extends Controller
             'bank_account_number' => 'required|string|max:50',
             'account_name' => 'required|string|max:255',
             'payment_qr_code' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
-            'team_invite_presentation' => 'required|string|max:10',
+            'team_invite_presentation' => 'required|numeric|min:0|max:100',
+            'header_text' => 'required|string|max:255',
+            'legal_name' => 'required|string|max:255',
+            'withdrawal_fee' => 'required|numeric|min:0',
+            'whatsapp_channel' => 'nullable|url',
+            'whatsapp_number' => 'required|string|max:20|regex:/^[0-9]+$/',
         ]);
 
         if ($validator->fails()) {
@@ -77,8 +87,17 @@ class AboutController extends Controller
                 Config::set('payment_qr_code', '/storage/' . $qrCodePath);
             }
 
-            // Update team invite presentation
+            // Update team settings
             Config::set('team_invite_presentation', $request->team_invite_presentation);
+
+            // Update general settings
+            Config::set('header_text', $request->header_text);
+            Config::set('legal_name', $request->legal_name);
+            Config::set('withdrawal_fee', $request->withdrawal_fee);
+
+            // Update contact settings
+            Config::set('whatsapp_channel', $request->whatsapp_channel);
+            Config::set('whatsapp_number', $request->whatsapp_number);
 
             return redirect()->route('admin.about.index')
                 ->with('success', 'App settings updated successfully!');

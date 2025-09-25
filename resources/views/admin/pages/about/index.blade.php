@@ -178,7 +178,45 @@
                         </div>
                         <!--end::Row-->
 
-                        <!-- Bank Settings Section -->
+                        <!--begin::Row Header Text-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Header Text</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <input type="text"
+                                    class="form-control form-control-solid @error('header_text') is-invalid @enderror"
+                                    name="header_text" value="{{ old('header_text', $configs['header_text']) }}" />
+                                @error('header_text')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!--end::Row-->
+
+                        <!--begin::Row Legal Name-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Legal Company Name</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <input type="text"
+                                    class="form-control form-control-solid @error('legal_name') is-invalid @enderror"
+                                    name="legal_name" value="{{ old('legal_name', $configs['legal_name']) }}" />
+                                @error('legal_name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!--end::Row-->
+
+                        <!-- Payment Settings Section -->
                         <div class="row mb-10">
                             <div class="col-12">
                                 <h3 class="fw-bold text-dark mb-6">Payment Information</h3>
@@ -302,6 +340,32 @@
                         </div>
                         <!--end::Row-->
 
+                        <!--begin::Row Withdrawal Fee-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">Withdrawal Fee</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <div class="input-group">
+
+                                    <input type="number"
+                                        class="form-control form-control-solid @error('withdrawal_fee') is-invalid @enderror"
+                                        name="withdrawal_fee"
+                                        value="{{ old('withdrawal_fee', $configs['withdrawal_fee']) }}" min="0"
+                                        max="100" step="0.01" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="form-text">Enter the percentage for team invite presentation (0-100%)</div>
+                                @error('withdrawal_fee')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!--end::Row-->
+
                         <!-- Team Settings Section -->
                         <div class="row mb-10">
                             <div class="col-12">
@@ -320,15 +384,70 @@
                             <!--begin::Col-->
                             <div class="col-xl-9 fv-row">
                                 <div class="input-group">
-                                    <input type="text"
+                                    <input type="number"
                                         class="form-control form-control-solid @error('team_invite_presentation') is-invalid @enderror"
                                         name="team_invite_presentation"
-                                        value="{{ old('team_invite_presentation', $configs['team_invite_presentation']) }}" />
+                                        value="{{ old('team_invite_presentation', $configs['team_invite_presentation']) }}"
+                                        min="0" max="100" step="0.01" />
                                     <span class="input-group-text">%</span>
                                 </div>
-                                <div class="form-text">Enter the percentage for team invite presentation (e.g., 10 for 10%)
-                                </div>
+                                <div class="form-text">Enter the percentage for team invite presentation (0-100%)</div>
                                 @error('team_invite_presentation')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!--end::Row-->
+
+                        <!-- Contact Settings Section -->
+                        <div class="row mb-10">
+                            <div class="col-12">
+                                <h3 class="fw-bold text-dark mb-6">Contact Information</h3>
+                                <div class="separator separator-dashed my-6"></div>
+                            </div>
+                        </div>
+
+                        <!--begin::Row WhatsApp Number-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">WhatsApp Number</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <div class="input-group">
+                                    <span class="input-group-text">+</span>
+                                    <input type="text"
+                                        class="form-control form-control-solid @error('whatsapp_number') is-invalid @enderror"
+                                        name="whatsapp_number"
+                                        value="{{ old('whatsapp_number', $configs['whatsapp_number']) }}"
+                                        placeholder="628123456790" />
+                                </div>
+                                <div class="form-text">Enter WhatsApp number with country code (without +)</div>
+                                @error('whatsapp_number')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!--end::Row-->
+
+                        <!--begin::Row WhatsApp Channel-->
+                        <div class="row mb-8">
+                            <!--begin::Col-->
+                            <div class="col-xl-3">
+                                <div class="fs-6 fw-semibold mt-2 mb-3">WhatsApp Channel</div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-xl-9 fv-row">
+                                <input type="url"
+                                    class="form-control form-control-solid @error('whatsapp_channel') is-invalid @enderror"
+                                    name="whatsapp_channel"
+                                    value="{{ old('whatsapp_channel', $configs['whatsapp_channel']) }}"
+                                    placeholder="https://whatsapp.com/channel/..." />
+                                <div class="form-text">Enter WhatsApp channel URL (optional)</div>
+                                @error('whatsapp_channel')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
