@@ -20,7 +20,13 @@ class DashboardController extends Controller
         $commissionRate = Config::where('key', 'team_invite_presentation')
             ->value('value') ?? '10';
         $headerText = Config::where('key', 'header_text')
-            ->value('value') ?? '10';
+            ->value('value') ?? 'Investasi pertambangan';
+
+        // Ambil config WhatsApp
+        $whatsappNumber = Config::where('key', 'whatsapp_number')
+            ->value('value') ?? '6281266818738';
+        $whatsappChannel = Config::where('key', 'whatsapp_channel')
+            ->value('value') ?? 'https://whatsapp.com/channel/0029Vb6sugA47Xe9';
 
         return view('member.pages.dasboard.index', compact(
             'user',
@@ -28,7 +34,9 @@ class DashboardController extends Controller
             'referralLink',
             'balance',
             'commissionRate',
-            'headerText'
+            'headerText',
+            'whatsappNumber',
+            'whatsappChannel'
         ));
     }
 }

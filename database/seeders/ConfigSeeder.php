@@ -58,6 +58,14 @@ class ConfigSeeder extends Seeder
                 'key' => 'withdrawal_fee',
                 'value' => '15',
             ],
+            [
+                'key' => 'whatsapp_channel',
+                'value' => 'https://whatsapp.com/channel/0029Vb6sugA47Xe9Y7jV080U',
+            ],
+            [
+                'key' => 'whatsapp_number',
+                'value' => '6281234567890',
+            ],
         ];
 
         foreach ($configs as $config) {

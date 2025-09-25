@@ -31,11 +31,12 @@
     </div>
 
     <!-- Bantuan & Perawatan -->
+    <!-- Bantuan & Perawatan -->
     <div class="content-section">
         <h6 class="text-white mb-3">Bantuan & Perawatan</h6>
         <div class="row text-center">
             <div class="col">
-                <a href="https://wa.me/6281266818738" class="text-decoration-none">
+                <a href="https://wa.me/{{ $whatsappNumber }}" class="text-decoration-none">
                     <div class="circle-icon bg-primary text-white">
                         <i class="bi bi-headset"></i>
                     </div>
@@ -43,7 +44,7 @@
                 </a>
             </div>
             <div class="col">
-                <a href="https://wa.me/6281266818738" target="_blank" class="text-decoration-none">
+                <a href="{{ $whatsappChannel }}" target="_blank" class="text-decoration-none">
                     <div class="circle-icon bg-success text-white">
                         <i class="bi bi-whatsapp"></i>
                     </div>
