@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
 class DepositController extends Controller
 {
@@ -80,10 +81,24 @@ class DepositController extends Controller
             'approved_by' => auth()->id(),
         ]);
 
+        // DEBUG: Log deposit info
+        Log::info('Deposit confirmed', [
+            'deposit_id' => $deposit->id,
+            'user_id' => $deposit->user_id,
+            'amount' => $deposit->amount
+        ]);
+
         // Cek apakah user yang deposit pernah menggunakan referral code
         $referralUsage = DB::table('referral_usages')
             ->where('used_by', $deposit->user_id)
             ->first();
+
+        // DEBUG: Log referral usage check
+        Log::info('Referral usage check', [
+            'user_id' => $deposit->user_id,
+            'referral_usage_found' => $referralUsage ? 'yes' : 'no',
+            'referral_usage' => $referralUsage
+        ]);
 
         if ($referralUsage) {
             // Cek apakah ini deposit pertama dengan status success
@@ -93,6 +108,13 @@ class DepositController extends Controller
                 ->where('id', '!=', $deposit->id) // Exclude deposit yang baru saja dikonfirmasi
                 ->count();
 
+            // DEBUG: Log deposit count
+            Log::info('Successful deposit count', [
+                'user_id' => $deposit->user_id,
+                'count' => $successfulDepositCount,
+                'is_first_deposit' => $successfulDepositCount == 0 ? 'yes' : 'no'
+            ]);
+
             // Jika ini adalah deposit success pertama (belum pernah ada deposit success sebelumnya)
             if ($successfulDepositCount == 0) {
                 // Ambil persentase commission dari config
@@ -100,25 +122,82 @@ class DepositController extends Controller
                     ->where('key', 'team_invite_presentation')
                     ->value('value');
 
-                if ($commissionRate) {
-                    // Hitung commission amount
-                    $commissionAmount = $deposit->amount * ($commissionRate / 100);
+                // DEBUG: Log commission rate
+                Log::info('Commission rate check', [
+                    'raw_commission_rate' => $commissionRate,
+                    'commission_rate_type' => gettype($commissionRate)
+                ]);
 
-                    // Buat transaction commission untuk user pemilik referral code
-                    Transaction::create([
-                        'user_id' => $referralUsage->user_referral, // User pemilik referral code
-                        'wallet_id' => null, // Sesuaikan dengan kebutuhan
-                        'product_id' => null,
-                        'reference' => 'REF-COMM-' . time() . '-' . $deposit->user_id,
-                        'amount' => $commissionAmount,
-                        'type' => 'commission',
-                        'withdrawal_fee' => 0,
-                        'status' => 'success',
-                        'payment_method' => 'referral_commission',
-                        'payment_proof' => null,
+                if ($commissionRate) {
+                    // Decode JSON string if needed, then convert to numeric
+                    $commissionRate = json_decode($commissionRate, true) ?? $commissionRate;
+                    $commissionRate = (float) $commissionRate;
+
+                    // DEBUG: Log converted commission rate
+                    Log::info('Commission rate converted', [
+                        'converted_rate' => $commissionRate,
+                        'is_valid_percentage' => ($commissionRate > 0 && $commissionRate <= 100) ? 'yes' : 'no'
                     ]);
+
+                    // Additional validation to ensure it's a valid percentage
+                    if ($commissionRate > 0 && $commissionRate <= 100) {
+                        // Hitung commission amount
+                        $commissionAmount = $deposit->amount * ($commissionRate / 100);
+
+                        // DEBUG: Log commission calculation
+                        Log::info('Commission calculation', [
+                            'deposit_amount' => $deposit->amount,
+                            'commission_rate' => $commissionRate,
+                            'commission_amount' => $commissionAmount,
+                            'referral_owner_id' => $referralUsage->user_referral
+                        ]);
+
+                        try {
+                            // Buat transaction commission untuk user pemilik referral code
+                            $commissionTransaction = Transaction::create([
+                                'user_id' => $referralUsage->user_referral, // User pemilik referral code
+                                'wallet_id' => null, // Sesuaikan dengan kebutuhan
+                                'product_id' => null,
+                                'reference' => 'REF-COMM-' . time() . '-' . $deposit->user_id,
+                                'amount' => $commissionAmount,
+                                'type' => 'commission',
+                                'withdrawal_fee' => 0,
+                                'status' => 'success',
+                                'payment_method' => 'referral_commission',
+                                'payment_proof' => null,
+                            ]);
+
+                            // DEBUG: Log successful commission creation
+                            Log::info('Commission transaction created successfully', [
+                                'commission_transaction_id' => $commissionTransaction->id,
+                                'amount' => $commissionAmount,
+                                'for_user_id' => $referralUsage->user_referral
+                            ]);
+                        } catch (\Exception $e) {
+                            // DEBUG: Log any errors during commission creation
+                            Log::error('Failed to create commission transaction', [
+                                'error' => $e->getMessage(),
+                                'trace' => $e->getTraceAsString()
+                            ]);
+                        }
+                    } else {
+                        Log::warning('Invalid commission rate', [
+                            'commission_rate' => $commissionRate
+                        ]);
+                    }
+                } else {
+                    Log::warning('No commission rate found in config');
                 }
+            } else {
+                Log::info('Not first deposit, skipping commission', [
+                    'user_id' => $deposit->user_id,
+                    'previous_successful_deposits' => $successfulDepositCount
+                ]);
             }
+        } else {
+            Log::info('No referral usage found for user', [
+                'user_id' => $deposit->user_id
+            ]);
         }
 
         return redirect()->back()->with('success', 'Deposit berhasil dikonfirmasi.');
