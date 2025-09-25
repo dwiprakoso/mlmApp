@@ -52,7 +52,6 @@
                         @endif
                     </div>
 
-
                     <hr class="border-secondary my-2">
 
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -105,6 +104,43 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Payment Proof Modal - MOVED INSIDE THE LOOP -->
+            @if ($withdrawal->payment_proof && $withdrawal->status === 'success')
+                <div class="modal fade" id="proofModal{{ $withdrawal->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content bg-dark border-secondary">
+                            <div class="modal-header border-secondary">
+                                <h6 class="modal-title text-white">
+                                    <i class="bi bi-image me-2"></i>
+                                    Bukti Transfer
+                                </h6>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div class="mb-3">
+                                    <small class="text-muted">{{ $withdrawal->transaction_id }}</small>
+                                </div>
+                                <img src="{{ asset('storage/' . $withdrawal->payment_proof) }}" class="img-fluid rounded"
+                                    alt="Bukti Transfer" style="max-height: 50vh; width: auto; cursor: pointer;"
+                                    onclick="openFullscreen('{{ asset('storage/' . $withdrawal->payment_proof) }}')">
+                                <div class="mt-2">
+                                    <small class="text-muted">Tap gambar untuk memperbesar</small>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-secondary justify-content-center">
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                    data-bs-dismiss="modal">Tutup</button>
+                                <a href="{{ asset('storage/' . $withdrawal->payment_proof) }}" download
+                                    class="btn btn-outline-info btn-sm">
+                                    <i class="bi bi-download me-1"></i>
+                                    Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         @empty
             <div class="text-center py-5">
                 <i class="bi bi-receipt text-muted display-1 mb-3"></i>
@@ -137,42 +173,6 @@
     @if ($withdrawals->hasPages())
         <div class="d-flex justify-content-center mb-4">
             {{ $withdrawals->links() }}
-        </div>
-    @endif
-
-    <!-- Payment Proof Modal -->
-    @if ($withdrawal->payment_proof && $withdrawal->status === 'success')
-        <div class="modal fade" id="proofModal{{ $withdrawal->id }}" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-sm">
-                <div class="modal-content bg-dark border-secondary">
-                    <div class="modal-header border-secondary">
-                        <h6 class="modal-title text-white">
-                            <i class="bi bi-image me-2"></i>
-                            Bukti Transfer
-                        </h6>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <div class="mb-3">
-                            <small class="text-muted">{{ $withdrawal->transaction_id }}</small>
-                        </div>
-                        <img src="{{ asset('storage/' . $withdrawal->payment_proof) }}" class="img-fluid rounded"
-                            alt="Bukti Transfer" style="max-height: 50vh; width: auto; cursor: pointer;"
-                            onclick="openFullscreen('{{ asset('storage/' . $withdrawal->payment_proof) }}')">
-                        <div class="mt-2">
-                            <small class="text-muted">Tap gambar untuk memperbesar</small>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-secondary justify-content-center">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
-                        <a href="{{ asset('storage/' . $withdrawal->payment_proof) }}" download
-                            class="btn btn-outline-info btn-sm">
-                            <i class="bi bi-download me-1"></i>
-                            Download
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
     @endif
 
