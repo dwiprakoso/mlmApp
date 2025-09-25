@@ -23,7 +23,8 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer([
             'guest.layouts.app',
-            'member.layouts.app'
+            'member.layouts.app',
+            'admin.layouts.app'
         ], ConfigComposer::class);
     }
 }
