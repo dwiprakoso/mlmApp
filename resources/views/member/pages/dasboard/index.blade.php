@@ -36,7 +36,7 @@
         <h6 class="text-white mb-3">Bantuan & Perawatan</h6>
         <div class="row text-center">
             <div class="col">
-                <a href="https://wa.me/{{ $whatsappNumber }}" class="text-decoration-none">
+                <a href="https://wa.me/{{ $whatsappNumber }}" class="text-decoration-none" target="_blank">
                     <div class="circle-icon bg-primary text-white">
                         <i class="bi bi-headset"></i>
                     </div>
