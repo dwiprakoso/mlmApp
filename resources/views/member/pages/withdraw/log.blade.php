@@ -25,6 +25,30 @@
                         </div>
                     </div>
 
+                    <!-- Amount Breakdown -->
+                    @if ($withdrawal->withdrawal_fee > 0)
+                        <div class="mb-2">
+                            <div class="bg-secondary bg-opacity-25 p-2 rounded">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small class="text-white">Jumlah penarikan:</small>
+                                    <small class="text-white">IDR
+                                        {{ number_format($withdrawal->amount, 0, ',', '.') }}</small>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small class="text-white">Biaya admin:</small>
+                                    <small class="text-danger">IDR
+                                        {{ number_format($withdrawal->withdrawal_fee, 0, ',', '.') }}</small>
+                                </div>
+                                <hr class="border-secondary my-1">
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-white fw-bold">Jumlah diterima:</small>
+                                    <small class="text-white fw-bold">IDR
+                                        {{ number_format($withdrawal->amount - $withdrawal->withdrawal_fee, 0, ',', '.') }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Wallet Info -->
                     <div class="mb-2">
                         <small class="text-muted d-block mb-1">Tujuan Penarikan</small>

@@ -54,6 +54,10 @@ class ConfigSeeder extends Seeder
                 'key' => 'legal_name',
                 'value' => 'PT RICH KINGDOM ID',
             ],
+            [
+                'key' => 'withdrawal_fee',
+                'value' => '15',
+            ],
         ];
 
         foreach ($configs as $config) {

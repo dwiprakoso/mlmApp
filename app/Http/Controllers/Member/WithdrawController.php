@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Config;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,8 +19,10 @@ class WithdrawController extends Controller
         $wallets = Auth::user()->wallets()->orderByDesc('is_primary')->orderBy('created_at')->get();
 
         $availableBalance = Transaction::calculateUserBalance(Auth::id());
+        $withdrawalFeeConfig = Config::where('key', 'withdrawal_fee')->first();
+        $withdrawalFeePercent = $withdrawalFeeConfig ? (float) $withdrawalFeeConfig->value : 0;
 
-        return view('member.pages.withdraw.index', compact('wallets', 'availableBalance'));
+        return view('member.pages.withdraw.index', compact('wallets', 'availableBalance', 'withdrawalFeePercent'));
     }
 
     public function store(Request $request)
@@ -42,12 +45,21 @@ class WithdrawController extends Controller
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
+
         $wallet = Auth::user()->wallets()->find($request->wallet_id);
         if (!$wallet) {
             return back()->with('error', 'Wallet tidak valid')->withInput();
         }
 
         $amount = $request->amount;
+
+        $withdrawalFeeConfig = Config::where('key', 'withdrawal_fee')->first();
+        $withdrawalFeePercent = $withdrawalFeeConfig ? (float) $withdrawalFeeConfig->value : 0;
+
+        // Calculate withdrawal fee
+        $withdrawalFee = ($amount * $withdrawalFeePercent) / 100;
+        $withdrawalFee = round($withdrawalFee); // Round to nearest integer
+        $netAmount = $amount - $withdrawalFee;
 
         $availableBalance = Transaction::calculateUserBalance(Auth::id());
 
@@ -65,6 +77,7 @@ class WithdrawController extends Controller
                 'product_id' => null,
                 'reference' => $reference,
                 'amount' => $amount,
+                'withdrawal_fee' => $withdrawalFee,
                 'type' => 'withdraw',
                 'wallet_id' => $wallet->id,
                 'status' => 'pending',
@@ -72,15 +85,20 @@ class WithdrawController extends Controller
                 'payment_proof' => null,
                 'approved_by' => null,
             ]);
+
             if ($request->notes) {
                 Log::info('Withdrawal notes:', ['transaction_id' => $transaction->id, 'notes' => $request->notes]);
             }
 
             DB::commit();
-            Log::info('Withdrawal transaction created successfully:', $transaction->toArray());
+            Log::info('Withdrawal transaction created successfully:', [
+                'transaction' => $transaction->toArray(),
+                'withdrawal_fee' => $withdrawalFee,
+                'net_amount' => $netAmount
+            ]);
 
             return redirect()->route('member.withdraw.log')
-                ->with('success', "Permintaan penarikan berhasil dibuat. ID Transaksi: {$transaction->reference}");
+                ->with('success', "Permintaan penarikan berhasil dibuat. ID Transaksi: {$transaction->reference}. Biaya admin: IDR " . number_format($withdrawalFee, 0, ',', '.') . ". Jumlah diterima: IDR " . number_format($netAmount, 0, ',', '.'));
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error creating withdrawal transaction:', [

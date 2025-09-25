@@ -98,6 +98,20 @@
                 @endif
             </div>
 
+            <!-- Fee Information -->
+            @if ($withdrawalFeePercent > 0)
+                <div class="mb-3">
+                    <div class="bg-warning bg-opacity-20 p-2 rounded border border-warning border-opacity-50">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle text-dark me-2"></i>
+                            <small class="text-dark fw-bold">
+                                Biaya admin penarikan: {{ $withdrawalFeePercent }}%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Jumlah penarikan -->
             <div class="mb-3">
                 <label class="form-label text-white">Jumlah penarikan</label>
@@ -121,23 +135,24 @@
 
             <!-- Amount Preview -->
             <div class="mb-3" id="amountPreview" style="display: none;">
-                <div class="bg-secondary bg-opacity-25 p-2 rounded">
+                <div class="bg-secondary bg-opacity-25 p-3 rounded">
+                    <div class="d-flex justify-content-between mb-2">
+                        <small class="text-white">Jumlah penarikan:</small>
+                        <small class="text-white fw-bold" id="withdrawalDisplay">IDR 0</small>
+                    </div>
+                    @if ($withdrawalFeePercent > 0)
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-white">Biaya admin ({{ $withdrawalFeePercent }}%):</small>
+                            <small class="text-danger fw-bold" id="feeDisplay">IDR 0</small>
+                        </div>
+                        <hr class="border-secondary my-2">
+                    @endif
                     <div class="d-flex justify-content-between">
-                        <small class="text-muted">Jumlah yang akan diterima:</small>
-                        <small class="text-success fw-bold" id="netDisplay">IDR 0</small>
+                        <small class="text-white">Jumlah yang akan diterima:</small>
+                        <small class="text-white fw-bold" id="netDisplay">IDR 0</small>
                     </div>
                 </div>
             </div>
-
-            <!-- Notes -->
-            {{-- <div class="mb-4">
-                <label class="form-label text-white">Catatan (Opsional)</label>
-                <textarea name="notes" class="form-control bg-dark text-white border-secondary" rows="2"
-                    placeholder="Catatan untuk penarikan..." {{ $availableBalance <= 0 ? 'disabled' : '' }}>{{ old('notes') }}</textarea>
-                @error('notes')
-                    <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div> --}}
 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-success w-100 btn-lg" id="withdrawBtn"
@@ -160,16 +175,23 @@
                 <span class="text-gold fw-bold">1.</span>
                 <span class="text-white ms-2">Minimal penarikan IDR 50,000</span>
             </div>
+            @if ($withdrawalFeePercent > 0)
+                <div class="instruction-item mb-2">
+                    <span class="text-gold fw-bold">2.</span>
+                    <span class="text-white ms-2">Biaya admin {{ $withdrawalFeePercent }}% akan dipotong dari jumlah
+                        penarikan</span>
+                </div>
+            @endif
             <div class="instruction-item mb-2">
-                <span class="text-gold fw-bold">2.</span>
+                <span class="text-gold fw-bold">{{ $withdrawalFeePercent > 0 ? '3' : '2' }}.</span>
                 <span class="text-white ms-2">Pastikan informasi wallet sudah benar sebelum mengajukan</span>
             </div>
             <div class="instruction-item mb-2">
-                <span class="text-gold fw-bold">3.</span>
-                <span class="text-white ms-2">Penarikan akan diproses dalam 1-3 hari kerja</span>
+                <span class="text-gold fw-bold">{{ $withdrawalFeePercent > 0 ? '4' : '3' }}.</span>
+                <span class="text-white ms-2">Penarikan akan diproses dalam 12 / 48jam</span>
             </div>
             <div class="instruction-item mb-2">
-                <span class="text-gold fw-bold">4.</span>
+                <span class="text-gold fw-bold">{{ $withdrawalFeePercent > 0 ? '5' : '4' }}.</span>
                 <span class="text-white ms-2">Pastikan saldo mencukupi sebelum melakukan penarikan</span>
             </div>
         </div>
@@ -185,8 +207,11 @@
             const withdrawInput = document.getElementById('withdrawAmount');
             const withdrawBtn = document.getElementById('withdrawBtn');
             const amountPreview = document.getElementById('amountPreview');
+            const withdrawalDisplay = document.getElementById('withdrawalDisplay');
+            const feeDisplay = document.getElementById('feeDisplay');
             const netDisplay = document.getElementById('netDisplay');
             const availableBalance = {{ $availableBalance }};
+            const withdrawalFeePercent = {{ $withdrawalFeePercent }};
 
             // Handle wallet selection
             walletSelect.addEventListener('change', function() {
@@ -217,7 +242,15 @@
                 const amount = parseFloat(this.value) || 0;
 
                 if (amount > 0) {
-                    netDisplay.textContent = 'IDR ' + amount.toLocaleString('id-ID');
+                    // Calculate withdrawal fee
+                    const withdrawalFee = Math.round((amount * withdrawalFeePercent) / 100);
+                    const netAmount = amount - withdrawalFee;
+
+                    withdrawalDisplay.textContent = 'IDR ' + amount.toLocaleString('id-ID');
+                    if (feeDisplay) {
+                        feeDisplay.textContent = 'IDR ' + withdrawalFee.toLocaleString('id-ID');
+                    }
+                    netDisplay.textContent = 'IDR ' + netAmount.toLocaleString('id-ID');
                     amountPreview.style.display = 'block';
                 } else {
                     amountPreview.style.display = 'none';
@@ -255,7 +288,6 @@
                 withdrawInput.disabled = true;
                 walletSelect.disabled = true;
                 withdrawBtn.disabled = true;
-                document.querySelector('textarea[name="notes"]').disabled = true;
             }
 
             // Form submission validation
@@ -283,6 +315,26 @@
                 if (!walletSelect.value) {
                     e.preventDefault();
                     alert('Pilih wallet untuk penarikan');
+                    return false;
+                }
+
+                // Show confirmation with fee information
+                const withdrawalFee = Math.round((amount * withdrawalFeePercent) / 100);
+                const netAmount = amount - withdrawalFee;
+
+                let confirmMessage =
+                    `Konfirmasi penarikan:\n\nJumlah penarikan: IDR ${amount.toLocaleString('id-ID')}`;
+
+                if (withdrawalFeePercent > 0) {
+                    confirmMessage +=
+                        `\nBiaya admin (${withdrawalFeePercent}%): IDR ${withdrawalFee.toLocaleString('id-ID')}`;
+                }
+
+                confirmMessage +=
+                    `\nJumlah yang akan diterima: IDR ${netAmount.toLocaleString('id-ID')}\n\nLanjutkan?`;
+
+                if (!confirm(confirmMessage)) {
+                    e.preventDefault();
                     return false;
                 }
             });

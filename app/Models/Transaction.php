@@ -16,6 +16,7 @@ class Transaction extends Model
         'amount',
         'type',
         'wallet_id',
+        'withdrawal_fee',
         'status',
         'payment_method',
         'payment_proof',
