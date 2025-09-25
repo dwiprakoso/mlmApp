@@ -3,14 +3,14 @@
                     data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}"
                     data-kt-drawer-overlay="true" data-kt-drawer-width="250px" data-kt-drawer-direction="start"
                     data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
-                    <div class="app-sidebar-logo flex-shrink-0 d-none d-md-flex align-items-center px-8"
+                    <div class="app-sidebar-logo flex-shrink-0 d-none d-md-flex align-items-center justify-content-center px-8"
                         id="kt_app_sidebar_logo">
                         <!--begin::Logo-->
-                        <a href="index.html">
-                            <img alt="Logo" src="assets/media/logos/demo42.svg"
-                                class="h-25px d-none d-sm-inline app-sidebar-logo-default theme-light-show" />
-                            <img alt="Logo" src="assets/media/logos/demo42-dark.svg"
-                                class="h-25px h-lg-25px theme-dark-show" />
+                        <a href="index.html" class="d-flex align-items-center justify-content-center">
+                            <img alt="Logo" src="{{ $appLogo ?? 'https://via.placeholder.com/40' }}"
+                                class="h-40px d-none d-sm-inline app-sidebar-logo-default theme-light-show" />
+                            <img alt="Logo" src="{{ $appLogo ?? 'https://via.placeholder.com/40' }}"
+                                class="h-40px theme-dark-show" />
                         </a>
                         <!--end::Logo-->
                         <!--begin::Aside toggle-->
