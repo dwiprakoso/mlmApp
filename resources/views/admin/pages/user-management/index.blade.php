@@ -109,20 +109,7 @@
                             @foreach ($users as $user)
                                 <tr>
                                     <td class="d-flex align-items-center">
-                                        <!--begin:: Avatar -->
-                                        <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                            <div class="symbol-label fs-3 bg-light-primary text-primary">
-                                                {{ strtoupper(substr($user->name, 0, 1)) }}
-                                            </div>
-                                        </div>
-                                        <!--end::Avatar-->
-                                        <!--begin::User details-->
-                                        <div class="d-flex flex-column">
-                                            <a href="#"
-                                                class="text-gray-800 text-hover-primary mb-1">{{ $user->name }}</a>
-                                            <span>{{ $user->email }}</span>
-                                        </div>
-                                        <!--begin::User details-->
+                                        <div class="text-gray-800 text-hover-primary mb-1">{{ $user->phone }}</div>
                                     </td>
                                     <td>
                                         <div class="badge badge-light-{{ $user->status_badge_color }} fw-bold">
@@ -184,8 +171,7 @@
                     </button>
                 </div>
                 <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
-                    <form action="{{ route('admin.user-management.store') }}" method="POST"
-                        id="kt_modal_add_user_form">
+                    <form action="{{ route('admin.user-management.store') }}" method="POST" id="kt_modal_add_user_form">
                         @csrf
                         <div class="d-flex flex-column scroll-y me-n7 pe-7">
                             {{-- Name --}}
