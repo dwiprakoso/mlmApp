@@ -158,7 +158,7 @@ class DepositController extends Controller
                                 'user_id' => $referralUsage->user_referral, // User pemilik referral code
                                 'wallet_id' => null, // Sesuaikan dengan kebutuhan
                                 'product_id' => null,
-                                'reference' => 'REF-COMM-' . time() . '-' . $deposit->user_id,
+                                'reference' => 'COM-' . time() . '-' . $deposit->user_id,
                                 'amount' => $commissionAmount,
                                 'type' => 'commission',
                                 'withdrawal_fee' => 0,
