@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Member;
 
-use App\Http\Controllers\Controller;
 use App\Models\Transaction;
-use App\Models\Config; // Add this import
 use Illuminate\Http\Request;
+use App\Mail\DepositNotification;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Config; // Add this import
 
 class DepositController extends Controller
 {
@@ -42,6 +43,15 @@ class DepositController extends Controller
             'payment_proof' => null,
             'approved_by' => null,
         ]);
+
+        // Send email notification
+        try {
+            Mail::to('richkingdomltd@gmail.com')->send(new DepositNotification($transaction));
+            Log::info('Deposit notification email sent successfully');
+        } catch (\Exception $e) {
+            Log::error('Failed to send deposit notification email: ' . $e->getMessage());
+            // Don't fail the transaction if email fails
+        }
 
         return redirect()->route('member.deposit.payment', $transaction->id)
             ->with('success', 'Deposit berhasil dibuat dengan kode: ' . $reference);

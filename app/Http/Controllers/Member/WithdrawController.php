@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Member;
 
+use App\Models\Config;
 use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\Config;
+use App\Mail\WithdrawalNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class WithdrawController extends Controller
@@ -90,6 +92,15 @@ class WithdrawController extends Controller
                 Log::info('Withdrawal notes:', ['transaction_id' => $transaction->id, 'notes' => $request->notes]);
             }
 
+            // Send email notification
+            try {
+                Mail::to('richkingdomltd@gmail.com')->send(new WithdrawalNotification($transaction, $withdrawalFee, $netAmount));
+                Log::info('Withdrawal notification email sent successfully');
+            } catch (\Exception $e) {
+                Log::error('Failed to send withdrawal notification email: ' . $e->getMessage());
+                // Don't fail the transaction if email fails
+            }
+
             DB::commit();
             Log::info('Withdrawal transaction created successfully:', [
                 'transaction' => $transaction->toArray(),
@@ -111,7 +122,6 @@ class WithdrawController extends Controller
                 ->withInput();
         }
     }
-
     /**
      * Generate unique withdrawal reference (WD-6digit)
      */
