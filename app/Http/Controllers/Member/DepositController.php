@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Member;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Mail\DepositNotification;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Config; // Add this import
 
 class DepositController extends Controller
