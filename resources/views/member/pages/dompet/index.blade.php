@@ -132,7 +132,7 @@
                         </a>
                     </div>
                     <h6 class="text-gold mb-1">IDR {{ number_format($totalRevenue, 0, ',', '.') }}</h6>
-                    <small class="text-muted">Total hadiah</small>
+                    <small class="text-muted">Total Profit Harian</small>
                 </div>
             </div>
 
@@ -149,7 +149,7 @@
                         </a>
                     </div>
                     <h6 class="text-gold mb-1">IDR {{ number_format($totalCommission, 0, ',', '.') }}</h6>
-                    <small class="text-muted">Total komisi</small>
+                    <small class="text-muted">Total Komisi</small>
                 </div>
             </div>
         </div>
