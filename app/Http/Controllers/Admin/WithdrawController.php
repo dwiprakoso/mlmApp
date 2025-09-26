@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Mail\WithdrawRejected;
+use App\Mail\WithdrawConfirmed;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class WithdrawController extends Controller
@@ -65,6 +69,20 @@ class WithdrawController extends Controller
             'updated_at' => now()
         ]);
 
+        // Send confirmation email
+        try {
+            Mail::to($withdraw->user->email)->send(new WithdrawConfirmed($withdraw));
+            Log::info('Withdraw confirmation email sent', [
+                'withdraw_id' => $withdraw->id,
+                'user_email' => $withdraw->user->email
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send withdraw confirmation email', [
+                'withdraw_id' => $withdraw->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Withdraw berhasil dikonfirmasi dengan bukti transfer.');
     }
 
@@ -83,6 +101,20 @@ class WithdrawController extends Controller
             'approved_at' => now(),
             'updated_at' => now()
         ]);
+
+        // Send rejection email
+        try {
+            Mail::to($withdraw->user->email)->send(new WithdrawRejected($withdraw));
+            Log::info('Withdraw rejection email sent', [
+                'withdraw_id' => $withdraw->id,
+                'user_email' => $withdraw->user->email
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send withdraw rejection email', [
+                'withdraw_id' => $withdraw->id,
+                'error' => $e->getMessage()
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Withdraw has been rejected.');
     }

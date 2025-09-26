@@ -2,29 +2,28 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 use App\Models\Transaction;
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class DepositRejected extends Mailable
+class DepositRejected extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $deposit;
-
-    public function __construct(Transaction $deposit)
-    {
-        $this->deposit = $deposit;
-    }
+    public function __construct(
+        public Transaction $deposit
+    ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Deposit Ditolak',
+            subject: 'Deposit Ditolak - ' . config('app.name'),
+            from: config('mail.from.address'),
         );
     }
 
@@ -35,8 +34,10 @@ class DepositRejected extends Mailable
             with: [
                 'amount' => $this->deposit->amount,
                 'reference' => $this->deposit->reference,
-                'date' => $this->deposit->created_at->format('d/m/Y H:i'),
-                'userName' => $this->deposit->user->name,
+                'date' => $this->deposit->created_at?->format('d/m/Y H:i') ?? now()->format('d/m/Y H:i'),
+                'userName' => $this->deposit->user?->name ?? 'User',
+                'userId' => $this->deposit->user_id,
+                'transactionId' => $this->deposit->id,
             ]
         );
     }
@@ -44,5 +45,14 @@ class DepositRejected extends Mailable
     public function attachments(): array
     {
         return [];
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('DepositRejected email failed', [
+            'deposit_id' => $this->deposit->id,
+            'user_id' => $this->deposit->user_id,
+            'error' => $exception->getMessage()
+        ]);
     }
 }
