@@ -51,7 +51,8 @@
                         <div class="d-flex align-items-center position-relative my-1">
                             <i class="ki-outline ki-magnifier fs-3 position-absolute ms-4"></i>
                             <input type="text" data-kt-ecommerce-order-filter="search"
-                                class="form-control form-control-solid w-250px ps-12" placeholder="Search Report" />
+                                class="form-control form-control-solid w-100 w-md-250px ps-12"
+                                placeholder="Search Report" />
                         </div>
                         <!--end::Search-->
                         <!--begin::Export buttons-->
@@ -61,58 +62,66 @@
                     <!--end::Card title-->
 
                     <!--begin::Card toolbar-->
-                    <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                    <div class="card-toolbar flex-column flex-sm-row justify-content-end gap-2">
                         <!--begin::Daterangepicker-->
                         <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range"
                             id="kt_ecommerce_report_customer_orders_daterangepicker" />
                         <!--end::Daterangepicker-->
-                        <!--begin::Filter-->
-                        <div class="w-150px">
-                            <!--begin::Select2-->
-                            <select class="form-select form-select-solid" data-control="select2" data-hide-search="true"
-                                data-placeholder="Status" data-kt-ecommerce-order-filter="status">
-                                <option></option>
-                                <option value="all">All</option>
-                                <option value="success">Success</option>
-                                <option value="pending">Pending</option>
-                                <option value="failed">Failed</option>
-                            </select>
-                            <!--end::Select2-->
+
+                        <div class="d-flex gap-2 w-100 w-sm-auto">
+                            <!--begin::Filter-->
+                            <div class="flex-fill flex-sm-grow-0 w-sm-150px">
+                                <!--begin::Select2-->
+                                <select class="form-select form-select-solid" data-control="select2" data-hide-search="true"
+                                    data-placeholder="Status" data-kt-ecommerce-order-filter="status">
+                                    <option></option>
+                                    <option value="all">All</option>
+                                    <option value="success">Success</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="failed">Failed</option>
+                                </select>
+                                <!--end::Select2-->
+                            </div>
+                            <!--end::Filter-->
+                            <!--begin::Export dropdown-->
+                            <button type="button" class="btn btn-light-primary flex-shrink-0" data-kt-menu-trigger="click"
+                                data-kt-menu-placement="bottom-end">
+                                <i class="ki-outline ki-exit-up fs-2 d-none d-sm-inline"></i>
+                                <span class="d-sm-none">Export</span>
+                                <span class="d-none d-sm-inline">Export Report</span>
+                            </button>
+                            <!--begin::Menu-->
+                            <div id="kt_ecommerce_report_customer_orders_export_menu"
+                                class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                                data-kt-menu="true">
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-ecommerce-export="copy">Copy to
+                                        clipboard</a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-ecommerce-export="excel">Export as
+                                        Excel</a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-ecommerce-export="csv">Export as
+                                        CSV</a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-ecommerce-export="pdf">Export as
+                                        PDF</a>
+                                </div>
+                                <!--end::Menu item-->
+                            </div>
+                            <!--end::Menu-->
+                            <!--end::Export dropdown-->
                         </div>
-                        <!--end::Filter-->
-                        <!--begin::Export dropdown-->
-                        <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
-                            data-kt-menu-placement="bottom-end">
-                            <i class="ki-outline ki-exit-up fs-2"></i>Export Report</button>
-                        <!--begin::Menu-->
-                        <div id="kt_ecommerce_report_customer_orders_export_menu"
-                            class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
-                            data-kt-menu="true">
-                            <!--begin::Menu item-->
-                            <div class="menu-item px-3">
-                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="copy">Copy to
-                                    clipboard</a>
-                            </div>
-                            <!--end::Menu item-->
-                            <!--begin::Menu item-->
-                            <div class="menu-item px-3">
-                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="excel">Export as
-                                    Excel</a>
-                            </div>
-                            <!--end::Menu item-->
-                            <!--begin::Menu item-->
-                            <div class="menu-item px-3">
-                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="csv">Export as CSV</a>
-                            </div>
-                            <!--end::Menu item-->
-                            <!--begin::Menu item-->
-                            <div class="menu-item px-3">
-                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="pdf">Export as PDF</a>
-                            </div>
-                            <!--end::Menu item-->
-                        </div>
-                        <!--end::Menu-->
-                        <!--end::Export dropdown-->
                     </div>
                     <!--end::Card toolbar-->
                 </div>
@@ -120,77 +129,129 @@
                 <!--begin::Card body-->
                 <div class="card-body pt-0">
                     <!--begin::Table-->
-                    <table class="table align-middle table-row-dashed fs-6 gy-5"
-                        id="kt_ecommerce_report_customer_orders_table">
-                        <thead>
-                            <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-100px">Product</th>
-                                <th class="min-w-100px">Reference</th>
-                                <th class="min-w-100px">Customer Name</th>
-                                <th class="min-w-100px">Phone</th>
-                                <th class="text-end min-w-75px">Amount</th>
-                                <th class="min-w-100px">Status</th>
-                                <th class="min-w-100px">Created At</th>
-                            </tr>
-                        </thead>
-                        <tbody class="fw-semibold text-gray-600">
-                            @forelse($transactions as $transaction)
-                                <tr>
-                                    <td>
-                                        <span class="text-gray-900">{{ $transaction->product->name ?? 'N/A' }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="text-gray-900">{{ $transaction->reference ?? 'N/A' }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="text-gray-900">{{ $transaction->user->name ?? 'N/A' }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="text-gray-900">{{ $transaction->user->phone ?? 'N/A' }}</span>
-                                    </td>
-                                    <td class="text-end">
-                                        <span
-                                            class="text-gray-900">{{ number_format($transaction->amount, 0, ',', '.') }}</span>
-                                    </td>
-                                    <td>
-                                        @switch($transaction->status)
-                                            @case('success')
-                                                <div class="badge badge-light-success">Success</div>
-                                            @break
-
-                                            @case('pending')
-                                                <div class="badge badge-light-warning">Pending</div>
-                                            @break
-
-                                            @case('failed')
-                                                <div class="badge badge-light-danger">Failed</div>
-                                            @break
-
-                                            @default
-                                                <div class="badge badge-light-secondary">{{ ucfirst($transaction->status) }}</div>
-                                        @endswitch
-                                    </td>
-                                    <td>
-                                        <span
-                                            class="text-gray-900">{{ $transaction->created_at->format('d M Y, h:i A') }}</span>
-                                    </td>
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5"
+                            id="kt_ecommerce_report_customer_orders_table">
+                            <thead>
+                                <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="min-w-100px">Product</th>
+                                    <th class="min-w-100px d-none d-lg-table-cell">Reference</th>
+                                    <th class="min-w-100px d-none d-md-table-cell">Customer Name</th>
+                                    <th class="min-w-100px d-none d-xl-table-cell">Phone</th>
+                                    <th class="text-end min-w-75px">Amount</th>
+                                    <th class="min-w-100px d-none d-sm-table-cell">Status</th>
+                                    <th class="min-w-100px d-none d-lg-table-cell">Created At</th>
                                 </tr>
-                                @empty
+                            </thead>
+                            <tbody class="fw-semibold text-gray-600">
+                                @forelse($transactions as $transaction)
                                     <tr>
-                                        <td colspan="7" class="text-center py-10">
-                                            <div class="text-gray-600">No purchase transactions found</div>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span
+                                                    class="text-gray-900 fw-bold">{{ $transaction->product->name ?? 'N/A' }}</span>
+
+                                                <!-- Mobile-only info -->
+                                                <div class="d-md-none mt-1">
+                                                    <div class="text-muted fs-8 mb-1">
+                                                        {{ $transaction->user->name ?? 'N/A' }}</div>
+                                                </div>
+
+                                                <!-- Mobile reference and phone -->
+                                                <div class="d-lg-none mt-1">
+                                                    <div class="text-muted fs-8">Ref: {{ $transaction->reference ?? 'N/A' }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-xl-none mt-1">
+                                                    <div class="text-muted fs-8">{{ $transaction->user->phone ?? 'N/A' }}
+                                                    </div>
+                                                </div>
+
+                                                <!-- Mobile status -->
+                                                <div class="d-sm-none mt-2">
+                                                    @switch($transaction->status)
+                                                        @case('success')
+                                                            <div class="badge badge-light-success fs-8">Success</div>
+                                                        @break
+
+                                                        @case('pending')
+                                                            <div class="badge badge-light-warning fs-8">Pending</div>
+                                                        @break
+
+                                                        @case('failed')
+                                                            <div class="badge badge-light-danger fs-8">Failed</div>
+                                                        @break
+
+                                                        @default
+                                                            <div class="badge badge-light-secondary fs-8">
+                                                                {{ ucfirst($transaction->status) }}</div>
+                                                    @endswitch
+                                                </div>
+
+                                                <!-- Mobile date -->
+                                                <div class="d-lg-none mt-1">
+                                                    <div class="text-muted fs-8">
+                                                        {{ $transaction->created_at->format('d M Y, h:i A') }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-lg-table-cell">
+                                            <span class="text-gray-900">{{ $transaction->reference ?? 'N/A' }}</span>
+                                        </td>
+                                        <td class="d-none d-md-table-cell">
+                                            <span class="text-gray-900">{{ $transaction->user->name ?? 'N/A' }}</span>
+                                        </td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <span class="text-gray-900">{{ $transaction->user->phone ?? 'N/A' }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-flex flex-column align-items-end">
+                                                <span class="text-gray-900 fw-bold">
+                                                    <span class="d-none d-sm-inline">Rp
+                                                    </span>{{ number_format($transaction->amount, 0, ',', '.') }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-sm-table-cell">
+                                            @switch($transaction->status)
+                                                @case('success')
+                                                    <div class="badge badge-light-success">Success</div>
+                                                @break
+
+                                                @case('pending')
+                                                    <div class="badge badge-light-warning">Pending</div>
+                                                @break
+
+                                                @case('failed')
+                                                    <div class="badge badge-light-danger">Failed</div>
+                                                @break
+
+                                                @default
+                                                    <div class="badge badge-light-secondary">{{ ucfirst($transaction->status) }}
+                                                    </div>
+                                            @endswitch
+                                        </td>
+                                        <td class="d-none d-lg-table-cell">
+                                            <span
+                                                class="text-gray-900">{{ $transaction->created_at->format('d M Y, h:i A') }}</span>
                                         </td>
                                     </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center py-10">
+                                                <div class="text-gray-600">No purchase transactions found</div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                         <!--end::Table-->
                     </div>
-                    <!--end::Card body-->
+                    <!--end::Products-->
                 </div>
-                <!--end::Products-->
+                <!--end::Content container-->
             </div>
-            <!--end::Content container-->
-        </div>
-        <!--end::Content-->
-    @endsection
+            <!--end::Content-->
+        @endsection

@@ -73,7 +73,8 @@
                         <div class="d-flex align-items-center position-relative my-1">
                             <i class="ki-outline ki-magnifier fs-3 position-absolute ms-5"></i>
                             <input type="text" data-kt-customer-table-filter="search"
-                                class="form-control form-control-solid w-250px ps-12" placeholder="Search Customers" />
+                                class="form-control form-control-solid w-100 w-md-250px ps-12"
+                                placeholder="Search Customers" />
                         </div>
                         <!--end::Search-->
                     </div>
@@ -81,11 +82,15 @@
                     <!--begin::Card toolbar-->
                     <div class="card-toolbar">
                         <!--begin::Toolbar-->
-                        <div class="d-flex justify-content-end" data-kt-customer-table-toolbar="base">
+                        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2"
+                            data-kt-customer-table-toolbar="base">
                             <!--begin::Filter-->
-                            <button type="button" class="btn btn-light-primary me-3" data-kt-menu-trigger="click"
+                            <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
                                 data-kt-menu-placement="bottom-end">
-                                <i class="ki-outline ki-filter fs-2"></i>Filter</button>
+                                <i class="ki-outline ki-filter fs-2 d-none d-sm-inline"></i>
+                                <span class="d-sm-none">Filter</span>
+                                <span class="d-none d-sm-inline">Filter</span>
+                            </button>
                             <!--begin::Menu 1-->
                             <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true"
                                 id="kt-toolbar-filter">
@@ -174,13 +179,19 @@
                             <!--end::Menu 1-->
                             <!--end::Filter-->
                             <!--begin::Export-->
-                            <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-light-primary" data-bs-toggle="modal"
                                 data-bs-target="#kt_customers_export_modal">
-                                <i class="ki-outline ki-exit-up fs-2"></i>Export</button>
+                                <i class="ki-outline ki-exit-up fs-2 d-none d-sm-inline"></i>
+                                <span class="d-sm-none">Export</span>
+                                <span class="d-none d-sm-inline">Export</span>
+                            </button>
                             <!--end::Export-->
                             <!--begin::Add deposit-->
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#kt_modal_add_deposit">Tambah Deposit</button>
+                                data-bs-target="#kt_modal_add_deposit">
+                                <span class="d-sm-none">+ Deposit</span>
+                                <span class="d-none d-sm-inline">Tambah Deposit</span>
+                            </button>
                             <!--end::Add deposit-->
                         </div>
                         <!--end::Toolbar-->
@@ -201,80 +212,117 @@
                 <!--begin::Card body-->
                 <div class="card-body pt-0">
                     <!--begin::Table-->
-                    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_customers_table">
-                        <thead>
-                            <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-125px">Nama</th>
-                                <th class="min-w-125px">No Hp</th>
-                                <th class="min-w-125px">Jumlah</th>
-                                <th class="min-w-125px">Metode Pembayaran</th>
-                                <th class="min-w-125px">Status</th>
-                                <th class="min-w-125px">Waktu</th>
-                                <th class="text-end min-w-70px">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="fw-semibold text-gray-600">
-                            @foreach ($deposits as $deposit)
-                                <tr>
-                                    <td>
-                                        <div class="text-gray-800 text-hover-primary mb-1">{{ $deposit->user->name }}</div>
-                                    </td>
-                                    <td>
-                                        <div class="text-gray-800 text-hover-primary mb-1">{{ $deposit->user->phone }}
-                                        </div>
-                                    </td>
-                                    <td data-filter="mastercard">
-                                        <div class="text-gray-800 text-hover-primary mb-1">Rp
-                                            {{ number_format($deposit->amount, 0, ',', '.') }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-gray-800 text-hover-primary mb-1">{{ $deposit->payment_method }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        @if ($deposit->status == 'success')
-                                            <span class="badge badge-light-success">Confirmed</span>
-                                        @elseif($deposit->status == 'waiting_confirmation' || $deposit->status == 'pending')
-                                            <span class="badge badge-light-warning">Waiting</span>
-                                        @elseif($deposit->status == 'failed')
-                                            <span class="badge badge-light-danger">Rejected</span>
-                                        @else
-                                            <span class="badge badge-light-secondary">{{ $deposit->status }}</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="text-gray-800 text-hover-primary mb-1">
-                                            {{ $deposit->created_at instanceof \Carbon\Carbon ? $deposit->created_at->format('d/m/Y H:i') : \Carbon\Carbon::parse($deposit->created_at)->format('d/m/Y H:i') }}
-                                        </div>
-                                    </td>
-                                    <td class="text-end">
-                                        <a href="#"
-                                            class="btn btn-sm btn-light btn-flex btn-center btn-active-light-primary"
-                                            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                            <i class="ki-outline ki-down fs-5 ms-1"></i></a>
-                                        <!--begin::Menu-->
-                                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-                                            data-kt-menu="true">
-                                            <!--begin::Menu item-->
-                                            <div class="menu-item px-3">
-                                                <a href="{{ route('admin.deposit.edit', $deposit->id) }}"
-                                                    class="menu-link px-3">Detail</a>
-                                            </div>
-                                            <!--end::Menu item-->
-                                            <!--begin::Menu item-->
-                                            <div class="menu-item px-3">
-                                                <a href="#" class="menu-link px-3"
-                                                    data-kt-customer-table-filter="delete_row">Delete</a>
-                                            </div>
-                                            <!--end::Menu item-->
-                                        </div>
-                                        <!--end::Menu-->
-                                    </td>
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_customers_table">
+                            <thead>
+                                <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="min-w-125px">Nama</th>
+                                    <th class="min-w-125px d-none d-sm-table-cell">No Hp</th>
+                                    <th class="min-w-125px">Jumlah</th>
+                                    <th class="min-w-125px d-none d-lg-table-cell">Metode Pembayaran</th>
+                                    <th class="min-w-125px d-none d-md-table-cell">Status</th>
+                                    <th class="min-w-125px d-none d-xl-table-cell">Waktu</th>
+                                    <th class="text-end min-w-70px">Aksi</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="fw-semibold text-gray-600">
+                                @foreach ($deposits as $deposit)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <div class="text-gray-800 text-hover-primary mb-1 fw-bold">
+                                                    {{ $deposit->user->name }}</div>
+
+                                                <!-- Mobile-only info -->
+                                                <div class="d-sm-none">
+                                                    <div class="text-muted fs-8 mb-1">{{ $deposit->user->phone }}</div>
+                                                </div>
+
+                                                <!-- Mobile status and method -->
+                                                <div class="d-md-none mt-1">
+                                                    <div class="d-flex flex-wrap gap-1 mb-1">
+                                                        @if ($deposit->status == 'success')
+                                                            <span class="badge badge-light-success fs-8">Confirmed</span>
+                                                        @elseif($deposit->status == 'waiting_confirmation' || $deposit->status == 'pending')
+                                                            <span class="badge badge-light-warning fs-8">Waiting</span>
+                                                        @elseif($deposit->status == 'failed')
+                                                            <span class="badge badge-light-danger fs-8">Rejected</span>
+                                                        @else
+                                                            <span
+                                                                class="badge badge-light-secondary fs-8">{{ $deposit->status }}</span>
+                                                        @endif
+                                                    </div>
+
+                                                    <!-- Mobile payment method and time -->
+                                                    <div class="d-lg-none text-muted fs-8">{{ $deposit->payment_method }}
+                                                    </div>
+                                                    <div class="d-xl-none text-muted fs-8">
+                                                        {{ $deposit->created_at instanceof \Carbon\Carbon ? $deposit->created_at->format('d/m/Y H:i') : \Carbon\Carbon::parse($deposit->created_at)->format('d/m/Y H:i') }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-sm-table-cell">
+                                            <div class="text-gray-800 text-hover-primary mb-1">{{ $deposit->user->phone }}
+                                            </div>
+                                        </td>
+                                        <td data-filter="mastercard">
+                                            <div class="text-gray-800 text-hover-primary mb-1 fw-bold">
+                                                <span class="d-none d-sm-inline">Rp
+                                                </span>{{ number_format($deposit->amount, 0, ',', '.') }}
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-lg-table-cell">
+                                            <div class="text-gray-800 text-hover-primary mb-1">
+                                                {{ $deposit->payment_method }}</div>
+                                        </td>
+                                        <td class="d-none d-md-table-cell">
+                                            @if ($deposit->status == 'success')
+                                                <span class="badge badge-light-success">Confirmed</span>
+                                            @elseif($deposit->status == 'waiting_confirmation' || $deposit->status == 'pending')
+                                                <span class="badge badge-light-warning">Waiting</span>
+                                            @elseif($deposit->status == 'failed')
+                                                <span class="badge badge-light-danger">Rejected</span>
+                                            @else
+                                                <span class="badge badge-light-secondary">{{ $deposit->status }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="d-none d-xl-table-cell">
+                                            <div class="text-gray-800 text-hover-primary mb-1">
+                                                {{ $deposit->created_at instanceof \Carbon\Carbon ? $deposit->created_at->format('d/m/Y H:i') : \Carbon\Carbon::parse($deposit->created_at)->format('d/m/Y H:i') }}
+                                            </div>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="#"
+                                                class="btn btn-sm btn-light btn-flex btn-center btn-active-light-primary"
+                                                data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                <span class="d-none d-md-inline">Actions</span>
+                                                <span class="d-md-none">⋮</span>
+                                                <i class="ki-outline ki-down fs-5 ms-1 d-none d-md-inline"></i>
+                                            </a>
+                                            <!--begin::Menu-->
+                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
+                                                data-kt-menu="true">
+                                                <!--begin::Menu item-->
+                                                <div class="menu-item px-3">
+                                                    <a href="{{ route('admin.deposit.edit', $deposit->id) }}"
+                                                        class="menu-link px-3">Detail</a>
+                                                </div>
+                                                <!--end::Menu item-->
+                                                <!--begin::Menu item-->
+                                                <div class="menu-item px-3">
+                                                    <a href="#" class="menu-link px-3"
+                                                        data-kt-customer-table-filter="delete_row">Delete</a>
+                                                </div>
+                                                <!--end::Menu item-->
+                                            </div>
+                                            <!--end::Menu-->
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                     <!--end::Table-->
                 </div>
                 <!--end::Card body-->
@@ -288,7 +336,7 @@
     <!--begin::Modal - Add Deposit-->
     <div class="modal fade" id="kt_modal_add_deposit" tabindex="-1" aria-hidden="true">
         <!--begin::Modal dialog-->
-        <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-dialog modal-dialog-centered mw-650px mx-3 mx-sm-auto">
             <!--begin::Modal content-->
             <div class="modal-content">
                 <!--begin::Form-->
@@ -301,20 +349,17 @@
                         <h2 class="fw-bold">Tambah Deposit</h2>
                         <!--end::Modal title-->
                         <!--begin::Close-->
-                        <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-deposits-modal-action="close">
+                        <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-deposits-modal-action="close"
+                            data-bs-dismiss="modal">
                             <i class="ki-outline ki-cross fs-1"></i>
                         </div>
                         <!--end::Close-->
                     </div>
                     <!--end::Modal header-->
                     <!--begin::Modal body-->
-                    <div class="modal-body py-10 px-lg-17">
+                    <div class="modal-body py-5 px-3 px-lg-17">
                         <!--begin::Scroll-->
-                        <div class="scroll-y me-n7 pe-7" id="kt_modal_add_deposit_scroll" data-kt-scroll="true"
-                            data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto"
-                            data-kt-scroll-dependencies="#kt_modal_add_deposit_header"
-                            data-kt-scroll-wrappers="#kt_modal_add_deposit_scroll" data-kt-scroll-offset="300px">
-
+                        <div class="scroll-y" id="kt_modal_add_deposit_scroll">
                             <!--begin::Input group-->
                             <div class="fv-row mb-7">
                                 <!--begin::Label-->
@@ -393,6 +438,7 @@
             </div>
         </div>
     </div>
+
     <!--end::Modal - Add Deposit-->
 @endsection
 
