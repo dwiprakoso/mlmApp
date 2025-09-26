@@ -49,9 +49,16 @@ class Wallet extends Model
         'Permata' => 'Bank Permata',
         'BTN' => 'Bank Tabungan Negara',
         'BSI' => 'Bank Syariah Indonesia',
+        // Bank Digital
+        'SeaBank' => 'SeaBank Indonesia',
+        'Jago' => 'Bank Jago',
+        'BNC' => 'Bank Neo Commerce',
+        'Hibank' => 'Hibank',
+        'Blu' => 'BCA Digital (blu)',
+        'AlloBank' => 'Allo Bank',
+        'BankRaya' => 'Bank Raya Indonesia',
     ];
 
-    // E-wallet providers
     const EWALLET_PROVIDERS = [
         'GoPay' => 'GoPay',
         'OVO' => 'OVO',
@@ -60,7 +67,13 @@ class Wallet extends Model
         'LinkAja' => 'LinkAja',
         'Sakuku' => 'Sakuku',
         'Jenius' => 'Jenius Pay',
+        'DOKU' => 'DOKU',
+        'iSaku' => 'i.Saku',
+        'OctoMobile' => 'Octo Mobile',
+        'Bayarind' => 'Bayarind',
+        'OVONabung' => 'OVO Nabung (Rek-Wallet)',
     ];
+
 
     /**
      * Relationship dengan User
