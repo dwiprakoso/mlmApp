@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 
 class RevenueController extends Controller
 {
+
     public function index()
     {
         $userId = auth()->id();
@@ -16,7 +17,7 @@ class RevenueController extends Controller
             ->where('user_id', $userId)
             ->where('type', 'revenue')
             ->where('status', 'success')
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'desc') // Urutkan dari yang terbaru
             ->get()
             ->map(function ($transaction, $index) {
                 $transaction->revenue_count = $index + 1;
@@ -30,6 +31,9 @@ class RevenueController extends Controller
                 return $transaction;
             });
 
-        return view('member.pages.revenue.index', compact('revenues'));
+        // Hitung total revenue untuk summary
+        $totalRevenue = $revenues->sum('amount');
+
+        return view('member.pages.revenue.index', compact('revenues', 'totalRevenue'));
     }
 }
