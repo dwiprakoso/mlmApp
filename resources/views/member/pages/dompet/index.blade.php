@@ -127,7 +127,7 @@
                             style="width: 40px; height: 40px;">
                             <i class="bi bi-gift text-muted"></i>
                         </div>
-                        <a href="#" class="text-gold text-decoration-none">
+                        <a href="{{ route('member.revenue.log') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
                         </a>
                     </div>
@@ -144,7 +144,7 @@
                             style="width: 40px; height: 40px;">
                             <i class="bi bi-percent text-muted"></i>
                         </div>
-                        <a href="{{ route('member.revenue.index') }}" class="text-gold text-decoration-none">
+                        <a href="#" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
                         </a>
                     </div>
