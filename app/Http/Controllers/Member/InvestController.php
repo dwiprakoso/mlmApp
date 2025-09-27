@@ -52,6 +52,18 @@ class InvestController extends Controller
                 return back()->with('error', 'Produk ini tidak tersedia.');
             }
 
+            // Check maximum purchase limit per user per product (max 3)
+            $existingPurchases = Transaction::where('user_id', Auth::id())
+                ->where('product_id', $product->id)
+                ->where('type', 'purchase')
+                ->where('status', 'success')
+                ->count();
+
+            if ($existingPurchases >= 3) {
+                DB::rollBack();
+                return back()->with('error', 'Anda sudah mencapai batas maksimal pembelian produk ini (3 kali). Silahkan pilih produk lain.');
+            }
+
             // Check user balance
             $currentBalance = Transaction::calculateUserBalance(Auth::id());
 
@@ -85,11 +97,22 @@ class InvestController extends Controller
                 'product_id' => $product->id,
                 'amount' => $product->price,
                 'previous_balance' => $currentBalance,
-                'new_balance' => $currentBalance - $product->price
+                'new_balance' => $currentBalance - $product->price,
+                'existing_purchases' => $existingPurchases + 1,
+                'remaining_purchases' => 3 - ($existingPurchases + 1)
             ]);
 
+            $remainingPurchases = 3 - ($existingPurchases + 1);
+            $successMessage = 'Pembelian berhasil! Produk ' . $product->name . ' telah ditambahkan ke portofolio Anda.';
+
+            if ($remainingPurchases > 0) {
+                $successMessage .= ' Anda masih dapat membeli produk ini ' . $remainingPurchases . ' kali lagi.';
+            } else {
+                $successMessage .= ' Anda telah mencapai batas maksimal pembelian untuk produk ini.';
+            }
+
             return redirect()->route('member.invest.log')
-                ->with('success', 'Pembelian berhasil! Produk ' . $product->name . ' telah ditambahkan ke portofolio Anda.');
+                ->with('success', $successMessage);
         } catch (\Exception $e) {
             DB::rollBack();
 
