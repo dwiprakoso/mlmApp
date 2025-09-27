@@ -15,6 +15,7 @@ use App\Http\Controllers\Member\DepositController as MemberDepositController;
 use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
 use App\Http\Controllers\Member\InvestController as MemberInvestController;
 use App\Http\Controllers\Member\DompetController as MemberDompetController;
+use App\Http\Controllers\Member\RevenueController;
 use App\Http\Controllers\Member\TeamController as MemberTeamController;
 
 Route::get('/', function () {
@@ -116,6 +117,10 @@ Route::middleware('auth')->group(function () {
         // Team Routes
         Route::prefix('team')->name('team.')->group(function () {
             Route::get('/', [MemberTeamController::class, 'index'])->name('index');
+        });
+        // Revenue Routes
+        Route::prefix('revenue')->name('revenue.')->group(function () {
+            Route::get('/', [RevenueController::class, 'index'])->name('index');
         });
         // Dompet Routes
         Route::prefix('dompet')->name('dompet.')->group(function () {
