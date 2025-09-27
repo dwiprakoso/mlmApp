@@ -144,7 +144,7 @@
                             style="width: 40px; height: 40px;">
                             <i class="bi bi-percent text-muted"></i>
                         </div>
-                        <a href="#" class="text-gold text-decoration-none">
+                        <a href="{{ route('member.commission.index') }}" class="text-gold text-decoration-none">
                             <small>Lihat Log →</small>
                         </a>
                     </div>

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\WithdrawController;
+use App\Http\Controllers\Member\CommissionController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\DepositController as MemberDepositController;
 use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
@@ -133,6 +134,10 @@ Route::middleware('auth')->group(function () {
         // Revenue Routes
         Route::prefix('revenue')->name('revenue.')->group(function () {
             Route::get('/', [RevenueController::class, 'index'])->name('index');
+        });
+        // Commission Routes
+        Route::prefix('commission')->name('commission.')->group(function () {
+            Route::get('/', [CommissionController::class, 'index'])->name('index');
         });
     });
 });

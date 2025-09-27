@@ -246,4 +246,13 @@ class Transaction extends Model
     {
         return self::getTotalByType('commission', $userId);
     }
+    public function relatedTransaction()
+    {
+        return $this->belongsTo(Transaction::class, 'related_transaction_id');
+    }
+
+    public function sourceUser()
+    {
+        return $this->belongsTo(User::class, 'source_user_id');
+    }
 }
