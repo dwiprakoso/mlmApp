@@ -86,7 +86,7 @@
                     </div>
 
                     <!-- Payment Proof Button -->
-                    @if ($withdrawal->payment_proof && $withdrawal->status === 'success')
+                    {{-- @if ($withdrawal->payment_proof && $withdrawal->status === 'success')
                         <div class="mb-2">
                             <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#proofModal{{ $withdrawal->id }}">
@@ -94,30 +94,30 @@
                                 Lihat Bukti Transfer
                             </button>
                         </div>
-                    @endif
+                    @endif --}}
 
                     <!-- Notes -->
-                    @if ($withdrawal->notes)
+                    {{-- @if ($withdrawal->notes)
                         <div class="mb-2">
                             <small class="text-muted d-block">Catatan Anda</small>
                             <small class="text-white">{{ $withdrawal->notes }}</small>
                         </div>
-                    @endif
+                    @endif --}}
 
                     <!-- Admin Notes -->
-                    @if ($withdrawal->admin_notes)
+                    {{-- @if ($withdrawal->admin_notes)
                         <div class="mb-2">
                             <small class="text-muted d-block">Catatan Admin</small>
                             <small class="text-info">{{ $withdrawal->admin_notes }}</small>
                         </div>
-                    @endif
+                    @endif --}}
 
                     <!-- Rejection Reason -->
-                    @if ($withdrawal->status === 'failed' && $withdrawal->rejection_reason)
+                    {{-- @if ($withdrawal->status === 'failed' && $withdrawal->rejection_reason)
                         <div class="alert alert-danger alert-sm p-2 mb-2">
                             <small><strong>Alasan Penolakan:</strong><br>{{ $withdrawal->rejection_reason }}</small>
                         </div>
-                    @endif
+                    @endif --}}
 
                     <!-- Timestamp -->
                     <div class="d-flex justify-content-between align-items-center">
@@ -130,7 +130,7 @@
             </div>
 
             <!-- Payment Proof Modal - MOVED INSIDE THE LOOP -->
-            @if ($withdrawal->payment_proof && $withdrawal->status === 'success')
+            {{-- @if ($withdrawal->payment_proof && $withdrawal->status === 'success')
                 <div class="modal fade" id="proofModal{{ $withdrawal->id }}" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered modal-sm">
                         <div class="modal-content bg-dark border-secondary">
@@ -164,7 +164,7 @@
                         </div>
                     </div>
                 </div>
-            @endif
+            @endif --}}
         @empty
             <div class="text-center py-5">
                 <i class="bi bi-receipt text-muted display-1 mb-3"></i>
