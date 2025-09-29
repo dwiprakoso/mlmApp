@@ -90,6 +90,10 @@
                                             {{ number_format($product->profit, 0, ',', '.') }}</h6>
                                     </div>
                                 </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Deskripsi</small>
+                                    <p class="text-white mb-0">{{ $product->description }}</p>
+                                </div>
                             </div>
 
                             <hr style="border-color: var(--border-color);">
