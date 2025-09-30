@@ -110,7 +110,7 @@
                     <!--end::Card toolbar-->
                 </div>
                 <!--end::Card header-->
-                !--begin::Card body - GANTI BAGIAN INI-->
+                <!--begin::Card body - GANTI BAGIAN INI-->
                 <div class="card-body py-4">
                     <!--begin::Table-->
                     <div class="table-responsive">
