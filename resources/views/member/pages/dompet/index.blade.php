@@ -20,8 +20,7 @@
                     </a>
                 </div>
                 <div class="col-6">
-                    <a href="{{ route('member.withdraw.index') }}"
-                        class="btn btn-warning w-100 d-flex align-items-center justify-content-center">
+                    <a href="#" class="btn btn-warning w-100 d-flex align-items-center justify-content-center">
                         <i class="bi bi-download me-2"></i>
                         <span>Penarikan</span>
                     </a>
