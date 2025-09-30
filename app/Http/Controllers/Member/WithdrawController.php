@@ -226,7 +226,51 @@ class WithdrawController extends Controller
             ->where('type', 'withdraw')
             ->with('wallet')
             ->orderByDesc('created_at')
-            ->paginate(15);
+            ->get()
+            ->groupBy(function ($transaction) {
+                if (preg_match('/^(WD-\d+)/', $transaction->reference, $matches)) {
+                    return $matches[1];
+                }
+                return $transaction->reference;
+            })
+            ->map(function ($group) {
+                $mainTransaction = $group->first();
+
+                // ✅ Override amount langsung biar view gak perlu ubah
+                $mainTransaction->amount = $group->sum('amount');
+                $mainTransaction->withdrawal_fee = $group->sum('withdrawal_fee');
+                $mainTransaction->net_amount = $mainTransaction->amount - $mainTransaction->withdrawal_fee;
+
+                // Simpan main reference
+                if (preg_match('/^(WD-\d+)/', $mainTransaction->reference, $matches)) {
+                    $mainTransaction->main_reference = $matches[1];
+                }
+
+                // Allocation details (opsional)
+                $mainTransaction->allocation_details = $group->map(function ($t) {
+                    return [
+                        'source' => $t->source_balance_type,
+                        'amount' => $t->amount
+                    ];
+                })->filter(fn($a) => $a['amount'] > 0);
+
+                return $mainTransaction;
+            })
+            ->sortByDesc('created_at')
+            ->values();
+
+        // Manual pagination
+        $perPage = 15;
+        $currentPage = request()->get('page', 1);
+        $pagedData = $withdrawals->slice(($currentPage - 1) * $perPage, $perPage)->all();
+
+        $withdrawals = new \Illuminate\Pagination\LengthAwarePaginator(
+            $pagedData,
+            $withdrawals->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
 
         return view('member.pages.withdraw.log', compact('withdrawals'));
     }
