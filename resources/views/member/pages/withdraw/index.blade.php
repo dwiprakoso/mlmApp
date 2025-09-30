@@ -95,7 +95,7 @@
                 </div>
 
                 <!-- Balance Breakdown -->
-                @if ($withdrawableBalance > 0)
+                {{-- @if ($withdrawableBalance > 0)
                     <div class="mt-2">
                         <small class="text-muted d-block mb-1">Detail Saldo:</small>
                         <div class="d-flex flex-wrap gap-2">
@@ -116,7 +116,7 @@
                             @endif
                         </div>
                     </div>
-                @endif
+                @endif --}}
 
                 @if ($withdrawableBalance <= 0)
                     <small class="text-danger">Saldo tidak mencukupi untuk penarikan</small>

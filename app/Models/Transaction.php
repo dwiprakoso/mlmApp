@@ -77,26 +77,22 @@ class Transaction extends Model
      */
     public static function getDepositBalance($userId)
     {
-        // Total deposit income
         $deposit = self::where('user_id', $userId)
             ->where('status', 'success')
             ->where('type', 'deposit')
             ->sum('amount');
 
-        // Purchase (always from deposit)
         $purchase = self::where('user_id', $userId)
             ->where('status', 'success')
             ->where('type', 'purchase')
             ->sum('amount');
 
-        // Withdraw from deposit (success + pending)
+        // ✅ HANYA withdraw dengan source_balance_type = 'deposit'
+        // TIDAK termasuk legacy (NULL)
         $withdrawFromDeposit = self::where('user_id', $userId)
-            ->where(function ($query) {
-                $query->where('status', 'success')
-                    ->orWhere('status', 'pending');
-            })
+            ->whereIn('status', ['success', 'pending'])
             ->where('type', 'withdraw')
-            ->where('source_balance_type', 'deposit')
+            ->where('source_balance_type', 'deposit') // ← Strict, no NULL
             ->sum('amount');
 
         return $deposit - $purchase - $withdrawFromDeposit;
@@ -111,20 +107,16 @@ class Transaction extends Model
      */
     public static function getRevenueBalance($userId)
     {
-        // Total revenue income
         $revenue = self::where('user_id', $userId)
             ->where('status', 'success')
             ->where('type', 'revenue')
             ->sum('amount');
 
-        // Withdraw from revenue (success + pending)
+        // ✅ HANYA withdraw dengan source_balance_type = 'revenue'
         $withdrawFromRevenue = self::where('user_id', $userId)
-            ->where(function ($query) {
-                $query->where('status', 'success')
-                    ->orWhere('status', 'pending');
-            })
+            ->whereIn('status', ['success', 'pending'])
             ->where('type', 'withdraw')
-            ->where('source_balance_type', 'revenue')
+            ->where('source_balance_type', 'revenue') // ← Strict, no NULL
             ->sum('amount');
 
         return $revenue - $withdrawFromRevenue;
@@ -139,23 +131,27 @@ class Transaction extends Model
      */
     public static function getCommissionBalance($userId)
     {
-        // Total commission income
         $commission = self::where('user_id', $userId)
             ->where('status', 'success')
             ->where('type', 'commission')
             ->sum('amount');
 
-        // Withdraw from commission (success + pending)
+        // ✅ HANYA withdraw dengan source_balance_type = 'commission'
         $withdrawFromCommission = self::where('user_id', $userId)
-            ->where(function ($query) {
-                $query->where('status', 'success')
-                    ->orWhere('status', 'pending');
-            })
+            ->whereIn('status', ['success', 'pending'])
             ->where('type', 'withdraw')
-            ->where('source_balance_type', 'commission')
+            ->where('source_balance_type', 'commission') // ← Strict, no NULL
             ->sum('amount');
 
         return $commission - $withdrawFromCommission;
+    }
+    public static function getLegacyWithdrawBalance($userId)
+    {
+        return self::where('user_id', $userId)
+            ->whereIn('status', ['success', 'pending'])
+            ->where('type', 'withdraw')
+            ->whereNull('source_balance_type') // ← Legacy withdraw ONLY
+            ->sum('amount');
     }
 
     /**
@@ -177,9 +173,18 @@ class Transaction extends Model
      */
     public static function getWithdrawableBalance($userId)
     {
-        return self::getRevenueBalance($userId)
-            + self::getCommissionBalance($userId)
-            + self::getDepositBalance($userId);
+        // Balance dari new system (belum termasuk legacy withdraw)
+        $depositBalance = self::getDepositBalance($userId);
+        $revenueBalance = self::getRevenueBalance($userId);
+        $commissionBalance = self::getCommissionBalance($userId);
+
+        $newSystemBalance = $depositBalance + $revenueBalance + $commissionBalance;
+
+        // ✅ Kurangi legacy withdraw (yang source_balance_type = NULL)
+        // Legacy withdraw ini belum ter-track di per-balance calculation
+        $legacyWithdraw = self::getLegacyWithdrawBalance($userId);
+
+        return $newSystemBalance - $legacyWithdraw;
     }
 
     /**
@@ -193,14 +198,38 @@ class Transaction extends Model
         $depositBalance = self::getDepositBalance($userId);
         $revenueBalance = self::getRevenueBalance($userId);
         $commissionBalance = self::getCommissionBalance($userId);
+        $legacyWithdraw = self::getLegacyWithdrawBalance($userId);
+
+        $withdrawableBeforeLegacy = $depositBalance + $revenueBalance + $commissionBalance;
+        $finalWithdrawable = $withdrawableBeforeLegacy - $legacyWithdraw;
 
         return [
             'deposit' => $depositBalance,
             'revenue' => $revenueBalance,
             'commission' => $commissionBalance,
             'purchasable' => $depositBalance,
-            'withdrawable' => $depositBalance + $revenueBalance + $commissionBalance,
-            'total' => $depositBalance + $revenueBalance + $commissionBalance,
+            'withdrawable' => max(0, $finalWithdrawable),
+            'total' => max(0, $finalWithdrawable),
+
+            // ✅ Info untuk debugging/display
+            'legacy_withdraw' => $legacyWithdraw,
+            'has_legacy_data' => $legacyWithdraw > 0,
+            'withdrawable_before_legacy' => $withdrawableBeforeLegacy,
+        ];
+    }
+    public static function validateBalanceCalculation($userId)
+    {
+        $legacyBalance = self::calculateUserBalance($userId);
+        $newBalance = self::getWithdrawableBalance($userId);
+
+        $breakdown = self::getBalanceBreakdown($userId);
+
+        return [
+            'legacy_method' => $legacyBalance,
+            'new_method' => $newBalance,
+            'difference' => abs($legacyBalance - $newBalance),
+            'is_equal' => abs($legacyBalance - $newBalance) < 0.01, // float comparison
+            'breakdown' => $breakdown,
         ];
     }
 

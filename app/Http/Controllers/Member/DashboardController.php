@@ -39,4 +39,17 @@ class DashboardController extends Controller
             'whatsappChannel'
         ));
     }
+    // public function index()
+    // {
+    //     $user = auth()->user();
+
+    //     // 🔍 DEBUGGING: Bandingkan kedua method
+    //     $validation = Transaction::validateBalanceCalculation($user->id);
+
+    //     dd($validation);
+    //     // Cek hasil:
+    //     // - 'is_equal' harus TRUE
+    //     // - 'difference' harus 0 atau mendekati 0
+    //     // - 'legacy_method' dan 'new_method' harus sama
+    // }
 }
