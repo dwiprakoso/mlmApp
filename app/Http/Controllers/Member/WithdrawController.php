@@ -20,11 +20,21 @@ class WithdrawController extends Controller
     {
         $wallets = Auth::user()->wallets()->orderByDesc('is_primary')->orderBy('created_at')->get();
 
-        $availableBalance = Transaction::calculateUserBalance(Auth::id());
+        // ✅ NEW: Get withdrawable balance (revenue + commission + deposit)
+        $withdrawableBalance = Transaction::getWithdrawableBalance(Auth::id());
+
+        // ✅ NEW: Get balance breakdown for display (optional)
+        $balanceBreakdown = Transaction::getBalanceBreakdown(Auth::id());
+
         $withdrawalFeeConfig = Config::where('key', 'withdrawal_fee')->first();
         $withdrawalFeePercent = $withdrawalFeeConfig ? (float) $withdrawalFeeConfig->value : 0;
 
-        return view('member.pages.withdraw.index', compact('wallets', 'availableBalance', 'withdrawalFeePercent'));
+        return view('member.pages.withdraw.index', compact(
+            'wallets',
+            'withdrawableBalance',
+            'balanceBreakdown',
+            'withdrawalFeePercent'
+        ));
     }
 
     public function store(Request $request)
@@ -60,41 +70,97 @@ class WithdrawController extends Controller
 
         // Calculate withdrawal fee
         $withdrawalFee = ($amount * $withdrawalFeePercent) / 100;
-        $withdrawalFee = round($withdrawalFee); // Round to nearest integer
+        $withdrawalFee = round($withdrawalFee);
         $netAmount = $amount - $withdrawalFee;
 
-        $availableBalance = Transaction::calculateUserBalance(Auth::id());
+        // ✅ NEW: Check withdrawable balance
+        $withdrawValidation = Transaction::canWithdraw(Auth::id(), $amount);
 
-        if ($amount > $availableBalance) {
-            return back()->with('error', 'Saldo tidak mencukupi')->withInput();
+        if (!$withdrawValidation['can_withdraw']) {
+            $balanceBreakdown = Transaction::getBalanceBreakdown(Auth::id());
+
+            $errorMessage = 'Saldo tidak mencukupi untuk penarikan. ' .
+                'Saldo tersedia: IDR ' . number_format($withdrawValidation['available'], 0, ',', '.') . ', ' .
+                'Jumlah penarikan: IDR ' . number_format($amount, 0, ',', '.') . '. ' .
+                '(Deposit: IDR ' . number_format($balanceBreakdown['deposit'], 0, ',', '.') . ', ' .
+                'Revenue: IDR ' . number_format($balanceBreakdown['revenue'], 0, ',', '.') . ', ' .
+                'Commission: IDR ' . number_format($balanceBreakdown['commission'], 0, ',', '.') . ')';
+
+            return back()->with('error', $errorMessage)->withInput();
+        }
+
+        // ✅ NEW: Calculate withdrawal allocation (priority: revenue → commission → deposit)
+        $allocation = Transaction::calculateWithdrawalAllocation(Auth::id(), $amount);
+
+        if (!$allocation['is_sufficient']) {
+            return back()->with('error', 'Terjadi kesalahan dalam menghitung alokasi penarikan')->withInput();
         }
 
         try {
             DB::beginTransaction();
 
             $reference = $this->generateWithdrawalReference();
+            $createdTransactions = [];
 
-            $transaction = Transaction::create([
-                'user_id' => Auth::id(),
-                'product_id' => null,
-                'reference' => $reference,
-                'amount' => $amount,
-                'withdrawal_fee' => $withdrawalFee,
-                'type' => 'withdraw',
-                'wallet_id' => $wallet->id,
-                'status' => 'pending',
-                'payment_method' => null,
-                'payment_proof' => null,
-                'approved_by' => null,
-            ]);
+            // ✅ NEW: Create separate transactions for each source balance type
+            foreach ($allocation['allocation'] as $sourceType => $sourceAmount) {
+                if ($sourceAmount > 0) {
+                    $transaction = Transaction::create([
+                        'user_id' => Auth::id(),
+                        'product_id' => null,
+                        'reference' => $reference,
+                        'amount' => $sourceAmount,
+                        'withdrawal_fee' => $sourceType === array_key_first(array_filter($allocation['allocation']))
+                            ? $withdrawalFee  // Apply fee to first source only
+                            : 0,
+                        'type' => 'withdraw',
+                        'source_balance_type' => $sourceType, // ✅ Track source
+                        'wallet_id' => $wallet->id,
+                        'status' => 'pending',
+                        'payment_method' => null,
+                        'payment_proof' => null,
+                        'approved_by' => null,
+                    ]);
+
+                    $createdTransactions[] = $transaction;
+
+                    Log::info('Withdrawal transaction part created', [
+                        'transaction_id' => $transaction->id,
+                        'source_type' => $sourceType,
+                        'amount' => $sourceAmount,
+                        'withdrawal_fee' => $transaction->withdrawal_fee
+                    ]);
+                }
+            }
 
             if ($request->notes) {
-                Log::info('Withdrawal notes:', ['transaction_id' => $transaction->id, 'notes' => $request->notes]);
+                Log::info('Withdrawal notes:', [
+                    'reference' => $reference,
+                    'notes' => $request->notes
+                ]);
             }
 
             // Send email notification
             try {
-                Mail::to('richkingdomltd@gmail.com')->send(new WithdrawalNotification($transaction, $withdrawalFee, $netAmount));
+                // Get the main transaction (first one) for email
+                $mainTransaction = $createdTransactions[0];
+
+                // Create allocation summary for email
+                $allocationSummary = [];
+                foreach ($allocation['allocation'] as $sourceType => $sourceAmount) {
+                    if ($sourceAmount > 0) {
+                        $allocationSummary[] = ucfirst($sourceType) . ': IDR ' . number_format($sourceAmount, 0, ',', '.');
+                    }
+                }
+
+                Mail::to('richkingdomltd@gmail.com')->send(
+                    new WithdrawalNotification(
+                        $mainTransaction,
+                        $withdrawalFee,
+                        $netAmount,
+                        $allocationSummary // Optional: pass allocation info
+                    )
+                );
                 Log::info('Withdrawal notification email sent successfully');
             } catch (\Exception $e) {
                 Log::error('Failed to send withdrawal notification email: ' . $e->getMessage());
@@ -102,14 +168,33 @@ class WithdrawController extends Controller
             }
 
             DB::commit();
-            Log::info('Withdrawal transaction created successfully:', [
-                'transaction' => $transaction->toArray(),
+
+            Log::info('Withdrawal transactions created successfully:', [
+                'reference' => $reference,
+                'total_amount' => $amount,
+                'allocation' => $allocation['allocation'],
                 'withdrawal_fee' => $withdrawalFee,
-                'net_amount' => $netAmount
+                'net_amount' => $netAmount,
+                'transactions_count' => count($createdTransactions)
             ]);
 
+            // Create success message with allocation details
+            $allocationDetails = [];
+            foreach ($allocation['allocation'] as $sourceType => $sourceAmount) {
+                if ($sourceAmount > 0) {
+                    $allocationDetails[] = ucfirst($sourceType) . ': IDR ' . number_format($sourceAmount, 0, ',', '.');
+                }
+            }
+
+            $successMessage = "Permintaan penarikan berhasil dibuat. " .
+                "ID Transaksi: {$reference}. " .
+                "Total: IDR " . number_format($amount, 0, ',', '.') . ". " .
+                "Alokasi: " . implode(', ', $allocationDetails) . ". " .
+                "Biaya admin: IDR " . number_format($withdrawalFee, 0, ',', '.') . ". " .
+                "Jumlah diterima: IDR " . number_format($netAmount, 0, ',', '.');
+
             return redirect()->route('member.withdraw.log')
-                ->with('success', "Permintaan penarikan berhasil dibuat. ID Transaksi: {$transaction->reference}. Biaya admin: IDR " . number_format($withdrawalFee, 0, ',', '.') . ". Jumlah diterima: IDR " . number_format($netAmount, 0, ',', '.'));
+                ->with('success', $successMessage);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error creating withdrawal transaction:', [
