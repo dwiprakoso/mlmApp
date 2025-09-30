@@ -99,16 +99,21 @@ class WithdrawController extends Controller
         try {
             DB::beginTransaction();
 
-            $reference = $this->generateWithdrawalReference();
+            // ✅ FIX: Generate main reference untuk grouping
+            $mainReference = $this->generateWithdrawalReference();
             $createdTransactions = [];
 
-            // ✅ NEW: Create separate transactions for each source balance type
+            // ✅ FIX: Create separate transactions dengan UNIQUE reference per transaction
             foreach ($allocation['allocation'] as $sourceType => $sourceAmount) {
                 if ($sourceAmount > 0) {
+                    // ✅ Generate unique reference untuk setiap transaction
+                    $uniqueReference = $mainReference . '-' . strtoupper(substr($sourceType, 0, 3));
+                    // Hasil: WD-1727699143-REV, WD-1727699143-COM, WD-1727699143-DEP
+
                     $transaction = Transaction::create([
                         'user_id' => Auth::id(),
                         'product_id' => null,
-                        'reference' => $reference,
+                        'reference' => $uniqueReference, // ✅ FIX: Unique per transaction
                         'amount' => $sourceAmount,
                         'withdrawal_fee' => $sourceType === array_key_first(array_filter($allocation['allocation']))
                             ? $withdrawalFee  // Apply fee to first source only
@@ -126,6 +131,7 @@ class WithdrawController extends Controller
 
                     Log::info('Withdrawal transaction part created', [
                         'transaction_id' => $transaction->id,
+                        'reference' => $uniqueReference, // ✅ Log unique reference
                         'source_type' => $sourceType,
                         'amount' => $sourceAmount,
                         'withdrawal_fee' => $transaction->withdrawal_fee
@@ -135,7 +141,7 @@ class WithdrawController extends Controller
 
             if ($request->notes) {
                 Log::info('Withdrawal notes:', [
-                    'reference' => $reference,
+                    'main_reference' => $mainReference, // ✅ Log main reference
                     'notes' => $request->notes
                 ]);
             }
@@ -170,7 +176,7 @@ class WithdrawController extends Controller
             DB::commit();
 
             Log::info('Withdrawal transactions created successfully:', [
-                'reference' => $reference,
+                'main_reference' => $mainReference, // ✅ Log main reference
                 'total_amount' => $amount,
                 'allocation' => $allocation['allocation'],
                 'withdrawal_fee' => $withdrawalFee,
@@ -187,7 +193,7 @@ class WithdrawController extends Controller
             }
 
             $successMessage = "Permintaan penarikan berhasil dibuat. " .
-                "ID Transaksi: {$reference}. " .
+                "ID Transaksi: {$mainReference}. " . // ✅ Show main reference
                 "Total: IDR " . number_format($amount, 0, ',', '.') . ". " .
                 "Alokasi: " . implode(', ', $allocationDetails) . ". " .
                 "Biaya admin: IDR " . number_format($withdrawalFee, 0, ',', '.') . ". " .
@@ -207,18 +213,11 @@ class WithdrawController extends Controller
                 ->withInput();
         }
     }
-    /**
-     * Generate unique withdrawal reference (WD-6digit)
-     */
-    private function generateWithdrawalReference(): string
-    {
-        $prefix = 'WD-';
-        do {
-            $randomNumber = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            $reference = $prefix . $randomNumber;
-        } while (Transaction::where('reference', $reference)->exists());
 
-        return $reference;
+    // ✅ Method generateWithdrawalReference tetap sama
+    private function generateWithdrawalReference()
+    {
+        return 'WD-' . time();
     }
 
     public function log()

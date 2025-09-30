@@ -30,7 +30,7 @@
         </div>
     @endif
 
-    @if ($availableBalance <= 0)
+    @if ($withdrawableBalance <= 0)
         <div class="alert alert-warning" role="alert">
             <i class="bi bi-exclamation-triangle me-2"></i>
             Saldo tidak mencukupi untuk melakukan penarikan.
@@ -47,7 +47,7 @@
             <div class="mb-3">
                 <label class="form-label text-white">Pilih Wallet untuk Penarikan</label>
                 <select name="wallet_id" class="form-select bg-dark text-white border-secondary" id="walletSelect"
-                    {{ $availableBalance <= 0 ? 'disabled' : '' }} required>
+                    {{ $withdrawableBalance <= 0 ? 'disabled' : '' }} required>
                     <option value="">-- Pilih Wallet --</option>
                     @foreach ($wallets as $wallet)
                         <option value="{{ $wallet->id }}" data-type="{{ $wallet->wallet_type }}"
@@ -86,14 +86,39 @@
 
             <hr class="border-secondary my-3" id="divider" style="display: none;">
 
-            <!-- Jumlah yang dapat ditarik -->
+            <!-- Jumlah yang dapat ditarik dengan breakdown -->
             <div class="mb-3">
                 <small class="text-muted">Jumlah yang dapat ditarik</small>
                 <div class="mt-1">
                     <small class="text-muted">IDR</small>
-                    <span class="text-gold fs-4 fw-bold">{{ number_format($availableBalance, 0, ',', '.') }}</span>
+                    <span class="text-gold fs-4 fw-bold">{{ number_format($withdrawableBalance, 0, ',', '.') }}</span>
                 </div>
-                @if ($availableBalance <= 0)
+
+                <!-- Balance Breakdown -->
+                @if ($withdrawableBalance > 0)
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-1">Detail Saldo:</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if ($balanceBreakdown['revenue'] > 0)
+                                <span class="badge bg-success bg-opacity-75">
+                                    Revenue: IDR {{ number_format($balanceBreakdown['revenue'], 0, ',', '.') }}
+                                </span>
+                            @endif
+                            @if ($balanceBreakdown['commission'] > 0)
+                                <span class="badge bg-info bg-opacity-75">
+                                    Commission: IDR {{ number_format($balanceBreakdown['commission'], 0, ',', '.') }}
+                                </span>
+                            @endif
+                            @if ($balanceBreakdown['deposit'] > 0)
+                                <span class="badge bg-primary bg-opacity-75">
+                                    Deposit: IDR {{ number_format($balanceBreakdown['deposit'], 0, ',', '.') }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
+                @if ($withdrawableBalance <= 0)
                     <small class="text-danger">Saldo tidak mencukupi untuk penarikan</small>
                 @endif
             </div>
@@ -118,11 +143,11 @@
                 <div class="form-group mt-2">
                     <input type="number" name="amount" class="form-control bg-dark text-white border-secondary"
                         placeholder="Minimal IDR 50,000" id="withdrawAmount" value="{{ old('amount') }}" min="50000"
-                        max="{{ $availableBalance > 0 ? $availableBalance : 0 }}" step="1000"
-                        {{ $availableBalance <= 0 ? 'disabled' : '' }} required>
+                        max="{{ $withdrawableBalance > 0 ? $withdrawableBalance : 0 }}" step="1000"
+                        {{ $withdrawableBalance <= 0 ? 'disabled' : '' }} required>
                     <small class="text-muted">
-                        @if ($availableBalance > 0)
-                            Maksimal: IDR {{ number_format($availableBalance, 0, ',', '.') }}
+                        @if ($withdrawableBalance > 0)
+                            Maksimal: IDR {{ number_format($withdrawableBalance, 0, ',', '.') }}
                         @else
                             Saldo tidak mencukupi untuk penarikan
                         @endif
@@ -156,9 +181,9 @@
 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-success w-100 btn-lg" id="withdrawBtn"
-                {{ $availableBalance <= 0 ? 'disabled' : '' }}>
+                {{ $withdrawableBalance <= 0 ? 'disabled' : '' }}>
                 <i class="bi bi-download me-2"></i>
-                @if ($availableBalance <= 0)
+                @if ($withdrawableBalance <= 0)
                     Saldo Tidak Mencukupi
                 @else
                     Ajukan Penarikan
@@ -184,14 +209,18 @@
             @endif
             <div class="instruction-item mb-2">
                 <span class="text-gold fw-bold">{{ $withdrawalFeePercent > 0 ? '3' : '2' }}.</span>
-                <span class="text-white ms-2">Pastikan informasi wallet sudah benar sebelum mengajukan</span>
+                <span class="text-white ms-2">Penarikan akan menggunakan prioritas: Revenue → Commission → Deposit</span>
             </div>
             <div class="instruction-item mb-2">
                 <span class="text-gold fw-bold">{{ $withdrawalFeePercent > 0 ? '4' : '3' }}.</span>
-                <span class="text-white ms-2">Penarikan akan diproses dalam 12 / 48jam</span>
+                <span class="text-white ms-2">Pastikan informasi wallet sudah benar sebelum mengajukan</span>
             </div>
             <div class="instruction-item mb-2">
                 <span class="text-gold fw-bold">{{ $withdrawalFeePercent > 0 ? '5' : '4' }}.</span>
+                <span class="text-white ms-2">Penarikan akan diproses dalam 12 / 48 jam</span>
+            </div>
+            <div class="instruction-item mb-2">
+                <span class="text-gold fw-bold">{{ $withdrawalFeePercent > 0 ? '6' : '5' }}.</span>
                 <span class="text-white ms-2">Pastikan saldo mencukupi sebelum melakukan penarikan</span>
             </div>
         </div>
@@ -210,7 +239,7 @@
             const withdrawalDisplay = document.getElementById('withdrawalDisplay');
             const feeDisplay = document.getElementById('feeDisplay');
             const netDisplay = document.getElementById('netDisplay');
-            const availableBalance = {{ $availableBalance }};
+            const withdrawableBalance = {{ $withdrawableBalance }};
             const withdrawalFeePercent = {{ $withdrawalFeePercent }};
 
             // Handle wallet selection
@@ -256,15 +285,15 @@
                     amountPreview.style.display = 'none';
                 }
 
-                // Validation dengan check available balance
-                if (amount > availableBalance) {
-                    this.setCustomValidity('Jumlah melebihi saldo yang tersedia (IDR ' + availableBalance
+                // Validation dengan check withdrawable balance
+                if (amount > withdrawableBalance) {
+                    this.setCustomValidity('Jumlah melebihi saldo yang tersedia (IDR ' + withdrawableBalance
                         .toLocaleString('id-ID') + ')');
                     withdrawBtn.disabled = true;
                 } else if (amount < 50000 && amount > 0) {
                     this.setCustomValidity('Minimal penarikan IDR 50,000');
                     withdrawBtn.disabled = true;
-                } else if (availableBalance <= 0) {
+                } else if (withdrawableBalance <= 0) {
                     this.setCustomValidity('Saldo tidak mencukupi');
                     withdrawBtn.disabled = true;
                 } else {
@@ -284,7 +313,7 @@
             }
 
             // Disable form if balance is 0 or less
-            if (availableBalance <= 0) {
+            if (withdrawableBalance <= 0) {
                 withdrawInput.disabled = true;
                 walletSelect.disabled = true;
                 withdrawBtn.disabled = true;
@@ -300,7 +329,7 @@
                     return false;
                 }
 
-                if (amount > availableBalance) {
+                if (amount > withdrawableBalance) {
                     e.preventDefault();
                     alert('Jumlah penarikan melebihi saldo yang tersedia');
                     return false;
