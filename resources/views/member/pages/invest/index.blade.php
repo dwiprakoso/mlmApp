@@ -10,6 +10,16 @@
         </div>
     </div>
 
+    <div class="card-dark p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <small class="text-muted">Saldo Deposit (Tersedia untuk Investasi)</small>
+                <h5 class="text-gold mb-0">IDR {{ number_format($purchasableBalance, 0, ',', '.') }}</h5>
+            </div>
+            <i class="bi bi-wallet2 text-gold fs-3"></i>
+        </div>
+    </div>
+
     <!-- Alert Messages -->
     @if (session('success'))
         <div class="alert alert-success mb-3" style="background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724;">
@@ -101,9 +111,17 @@
                             <!-- Action Button -->
                             <div class="d-flex justify-content-between align-items-center">
                                 @if ($product->is_active)
-                                    <button class="btn btn-gold btn-sm px-3" onclick="investNow({{ $product->id }})">
-                                        <small>Investasi Sekarang</small>
-                                    </button>
+                                    <!-- ✅ UPDATED: Check if user has sufficient balance -->
+                                    @if ($purchasableBalance >= $product->price)
+                                        <button class="btn btn-gold btn-sm px-3" onclick="investNow({{ $product->id }})">
+                                            <small>Investasi Sekarang</small>
+                                        </button>
+                                    @else
+                                        <button class="btn btn-secondary btn-sm px-3" disabled
+                                            title="Saldo deposit tidak mencukupi">
+                                            <small>Saldo Tidak Cukup</small>
+                                        </button>
+                                    @endif
                                 @else
                                     <button class="btn btn-secondary btn-sm px-3" disabled>
                                         <small>Tidak Tersedia</small>
@@ -205,7 +223,9 @@
         // Function to handle investment
         function investNow(productId) {
             // Show confirmation modal
-            if (confirm('Apakah Anda yakin ingin berinvestasi pada produk ini?')) {
+            if (confirm(
+                    'Apakah Anda yakin ingin berinvestasi pada produk ini? Investasi akan menggunakan saldo deposit Anda.'
+                )) {
                 // Show loading modal
                 const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
                 loadingModal.show();

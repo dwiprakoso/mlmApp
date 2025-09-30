@@ -21,10 +21,13 @@ class InvestController extends Controller
             ->get()
             ->groupBy('type');
 
-        // Get current user balance
-        $currentBalance = Transaction::calculateUserBalance(Auth::id());
+        // Get purchasable balance (only from deposit)
+        $purchasableBalance = Transaction::getPurchasableBalance(Auth::id());
 
-        return view('member.pages.invest.index', compact('products', 'currentBalance'));
+        // Get balance breakdown for display
+        $balanceBreakdown = Transaction::getBalanceBreakdown(Auth::id());
+
+        return view('member.pages.invest.index', compact('products', 'purchasableBalance', 'balanceBreakdown'));
     }
 
     public function store(Request $request)
@@ -64,24 +67,40 @@ class InvestController extends Controller
                 return back()->with('error', 'Anda sudah mencapai batas maksimal pembelian produk ini (3 kali). Silahkan pilih produk lain.');
             }
 
-            // Check user balance
-            $currentBalance = Transaction::calculateUserBalance(Auth::id());
+            // ✅ NEW: Check purchasable balance (only from deposit)
+            $purchaseValidation = Transaction::canPurchase(Auth::id(), $product->price);
 
-            if ($currentBalance < $product->price) {
+            if (!$purchaseValidation['can_purchase']) {
                 DB::rollBack();
-                return back()->with('error', 'Saldo tidak mencukupi. Saldo Anda: Rp ' . number_format($currentBalance, 0, ',', '.') . ', Harga produk: Rp ' . number_format($product->price, 0, ',', '.'));
+
+                $balanceBreakdown = Transaction::getBalanceBreakdown(Auth::id());
+
+                $errorMessage = 'Saldo deposit tidak mencukupi untuk pembelian ini. ' .
+                    'Saldo deposit Anda: Rp ' . number_format($purchaseValidation['available'], 0, ',', '.') . ', ' .
+                    'Harga produk: Rp ' . number_format($product->price, 0, ',', '.') . '. ' .
+                    'Pembelian hanya dapat menggunakan saldo dari deposit.';
+
+                // Optional: Show balance breakdown
+                if ($balanceBreakdown['revenue'] > 0 || $balanceBreakdown['commission'] > 0) {
+                    $errorMessage .= ' (Revenue: Rp ' . number_format($balanceBreakdown['revenue'], 0, ',', '.') .
+                        ', Commission: Rp ' . number_format($balanceBreakdown['commission'], 0, ',', '.') .
+                        ' tidak dapat digunakan untuk pembelian)';
+                }
+
+                return back()->with('error', $errorMessage);
             }
 
             // Generate unique reference number
             $reference = $this->generateReference();
 
-            // Create pending transaction (requires admin approval)
+            // ✅ NEW: Create pending transaction with source_balance_type
             $transaction = Transaction::create([
                 'user_id' => Auth::id(),
                 'product_id' => $product->id,
                 'reference' => $reference,
                 'amount' => $product->price,
                 'type' => 'purchase',
+                'source_balance_type' => 'deposit', // Always from deposit
                 'status' => 'pending', // Menunggu approval admin
                 'payment_method' => 'balance', // Dibayar dari saldo
                 'payment_proof' => null,
@@ -96,13 +115,16 @@ class InvestController extends Controller
                 'user_id' => Auth::id(),
                 'product_id' => $product->id,
                 'amount' => $product->price,
+                'type' => 'purchase',
+                'source_balance_type' => 'deposit',
                 'status' => 'pending',
-                'current_balance' => $currentBalance,
+                'purchasable_balance' => $purchaseValidation['available'],
                 'existing_purchases' => $existingPurchases,
                 'remaining_purchases' => 3 - $existingPurchases
             ]);
 
-            $successMessage = 'Transaksi pembelian berhasil dibuat untuk produk ' . $product->name . '. Transaksi Anda sedang menunggu persetujuan admin.';
+            $successMessage = 'Transaksi pembelian berhasil dibuat untuk produk ' . $product->name .
+                '. Transaksi Anda sedang menunggu persetujuan admin.';
 
             return redirect()->route('member.invest.log')
                 ->with('success', $successMessage);
