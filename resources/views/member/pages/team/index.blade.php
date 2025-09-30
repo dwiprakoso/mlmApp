@@ -24,7 +24,7 @@
         <div class="row text-center mb-4">
             <div class="col">
                 <div class="circle-icon bg-gold text-dark">
-                    <i class="bi bi-people-fill"></i>
+                    <i class="bi bi-coin"></i>
                 </div>
                 <h5 class="text-gold fw-bold mb-0">{{ $depositedMembersCount }}</h5>
                 <small class="text-muted">Point Diperoleh</small>
