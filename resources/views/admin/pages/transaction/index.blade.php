@@ -37,10 +37,33 @@
         <!--end::Toolbar container-->
     </div>
     <!--end::Toolbar-->
+
     <!--begin::Content-->
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <!--begin::Content container-->
         <div id="kt_app_content_container" class="app-container container-xxl">
+
+            <!-- Alert Messages -->
+            @if (session('success'))
+                <div class="alert alert-success d-flex align-items-center p-5 mb-10">
+                    <i class="ki-outline ki-check-circle fs-2hx text-success me-4"></i>
+                    <div class="d-flex flex-column">
+                        <h4 class="mb-1 text-dark">Success</h4>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger d-flex align-items-center p-5 mb-10">
+                    <i class="ki-outline ki-cross-circle fs-2hx text-danger me-4"></i>
+                    <div class="d-flex flex-column">
+                        <h4 class="mb-1 text-dark">Error</h4>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                </div>
+            @endif
+
             <!--begin::Products-->
             <div class="card card-flush">
                 <!--begin::Card header-->
@@ -63,11 +86,6 @@
 
                     <!--begin::Card toolbar-->
                     <div class="card-toolbar flex-column flex-sm-row justify-content-end gap-2">
-                        <!--begin::Daterangepicker-->
-                        <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range"
-                            id="kt_ecommerce_report_customer_orders_daterangepicker" />
-                        <!--end::Daterangepicker-->
-
                         <div class="d-flex gap-2 w-100 w-sm-auto">
                             <!--begin::Filter-->
                             <div class="flex-fill flex-sm-grow-0 w-sm-150px">
@@ -141,6 +159,7 @@
                                     <th class="text-end min-w-75px">Amount</th>
                                     <th class="min-w-100px d-none d-sm-table-cell">Status</th>
                                     <th class="min-w-100px d-none d-lg-table-cell">Created At</th>
+                                    <th class="text-end min-w-100px">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="fw-semibold text-gray-600">
@@ -236,10 +255,45 @@
                                             <span
                                                 class="text-gray-900">{{ $transaction->created_at->format('d M Y, h:i A') }}</span>
                                         </td>
+                                        <td class="text-end">
+                                            @if ($transaction->status === 'pending')
+                                                <div class="d-flex justify-content-end gap-2">
+                                                    <!-- Approve Button -->
+                                                    <form
+                                                        action="{{ route('admin.transaction.approve', $transaction->id) }}"
+                                                        method="POST" class="d-inline"
+                                                        onsubmit="return confirm('Apakah Anda yakin ingin menyetujui transaksi ini?')">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="btn btn-sm btn-success"
+                                                            title="Approve">
+                                                            <i class="ki-outline ki-check fs-5"></i>
+                                                            <span class="d-none d-md-inline ms-1">Approve</span>
+                                                        </button>
+                                                    </form>
+
+                                                    <!-- Reject Button -->
+                                                    <form
+                                                        action="{{ route('admin.transaction.reject', $transaction->id) }}"
+                                                        method="POST" class="d-inline"
+                                                        onsubmit="return confirm('Apakah Anda yakin ingin menolak transaksi ini?')">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                            title="Reject">
+                                                            <i class="ki-outline ki-cross fs-5"></i>
+                                                            <span class="d-none d-md-inline ms-1">Reject</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @else
+                                                <span class="text-muted fs-8">-</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center py-10">
+                                            <td colspan="8" class="text-center py-10">
                                                 <div class="text-gray-600">No purchase transactions found</div>
                                             </td>
                                         </tr>
@@ -249,9 +303,26 @@
                         </div>
                         <!--end::Table-->
                     </div>
-                    <!--end::Products-->
+                    <!--end::Card body-->
                 </div>
-                <!--end::Content container-->
+                <!--end::Products-->
             </div>
-            <!--end::Content-->
-        @endsection
+            <!--end::Content container-->
+        </div>
+        <!--end::Content-->
+
+        @push('scripts')
+            <script>
+                // Auto dismiss alerts after 5 seconds
+                document.addEventListener('DOMContentLoaded', function() {
+                    const alerts = document.querySelectorAll('.alert');
+                    alerts.forEach(alert => {
+                        setTimeout(() => {
+                            const bsAlert = new bootstrap.Alert(alert);
+                            bsAlert.close();
+                        }, 5000);
+                    });
+                });
+            </script>
+        @endpush
+    @endsection

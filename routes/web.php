@@ -81,6 +81,8 @@ Route::middleware('auth')->group(function () {
         // Transaction Routes
         Route::prefix('transaction')->name('transaction.')->group(function () {
             Route::get('/', [TransactionController::class, 'index'])->name('index');
+            Route::put('/{id}/approve', [TransactionController::class, 'approve'])->name('approve');
+            Route::put('/{id}/reject', [TransactionController::class, 'reject'])->name('reject');
         });
         // About Routes
         Route::prefix('about')->name('about.')->group(function () {
