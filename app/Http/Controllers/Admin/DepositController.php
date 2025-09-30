@@ -122,7 +122,20 @@ class DepositController extends Controller
                 'count' => $successfulDepositCount,
                 'is_first_deposit' => $successfulDepositCount == 0 ? 'yes' : 'no'
             ]);
+
             if ($successfulDepositCount == 0) {
+                // Update is_deposit di referral_usages
+                DB::table('referral_usages')
+                    ->where('used_by', $deposit->user_id)
+                    ->update([
+                        'is_deposit' => true,
+                        'updated_at' => now()
+                    ]);
+
+                Log::info('Referral usage updated - is_deposit set to true', [
+                    'user_id' => $deposit->user_id
+                ]);
+
                 $commissionRate = DB::table('configs')
                     ->where('key', 'team_invite_presentation')
                     ->value('value');
@@ -196,7 +209,6 @@ class DepositController extends Controller
 
         return redirect()->back()->with('success', 'Deposit berhasil dikonfirmasi.');
     }
-
     public function reject(Request $request, $id)
     {
         $deposit = Transaction::where('type', 'deposit')->findOrFail($id);
