@@ -19,6 +19,42 @@
                     <small class="text-muted">Saldo akun</small>
                 </div>
             </div>
+
+            <!-- ✅ Balance Breakdown untuk Debug (Bisa di-comment nanti kalau production) -->
+            {{-- @if (config('app.debug'))
+                <div class="balance-debug mt-3 p-2"
+                    style="background: rgba(0,0,0,0.3); border-radius: 8px; font-size: 0.75rem;">
+                    <div class="d-flex justify-content-between text-muted mb-1">
+                        <span>💰 Deposit:</span>
+                        <span class="text-white">{{ number_format($balanceData['deposit'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted mb-1">
+                        <span>📈 Revenue:</span>
+                        <span class="text-white">{{ number_format($balanceData['revenue'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted mb-1">
+                        <span>🤝 Commission:</span>
+                        <span class="text-white">{{ number_format($balanceData['commission'], 0, ',', '.') }}</span>
+                    </div>
+                    @if ($balanceData['has_legacy_data'])
+                        <div class="d-flex justify-content-between text-muted mb-1">
+                            <span>⚠️ Legacy Withdraw:</span>
+                            <span
+                                class="text-warning">-{{ number_format($balanceData['legacy_withdraw'], 0, ',', '.') }}</span>
+                        </div>
+                    @endif
+                    <hr style="border-color: rgba(255,255,255,0.1); my-1">
+                    <div class="d-flex justify-content-between text-gold fw-bold">
+                        <span>💸 Bisa Withdraw:</span>
+                        <span>{{ number_format($balanceData['withdrawable'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-info">
+                        <span>🛒 Bisa Purchase:</span>
+                        <span>{{ number_format($balanceData['purchasable'], 0, ',', '.') }}</span>
+                    </div>
+                </div>
+            @endif --}}
+
             <div class="d-flex gap-2 mt-3">
                 <a href="{{ route('member.deposit.index') }}" class="btn btn-gold btn-sm flex-fill">
                     <i class="bi bi-arrow-down me-1"></i>Deposit
@@ -30,7 +66,6 @@
         </div>
     </div>
 
-    <!-- Bantuan & Perawatan -->
     <!-- Bantuan & Perawatan -->
     <div class="content-section">
         <h6 class="text-white mb-3">Bantuan & Perawatan</h6>
@@ -153,13 +188,11 @@
     <script>
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function() {
-                // Bisa pakai toast notification atau alert sederhana
                 alert('Disalin ke clipboard!');
             });
         }
 
         function generateQR(url) {
-            // Buka QR generator di tab baru
             window.open(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`,
                 '_blank');
         }

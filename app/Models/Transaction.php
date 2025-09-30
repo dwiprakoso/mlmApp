@@ -64,101 +64,178 @@ class Transaction extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Balance Calculation by Type
+    | Balance Calculation (New System with Legacy Support)
     |--------------------------------------------------------------------------
     */
 
     /**
-     * Get deposit balance (available for purchase and withdraw)
-     * Formula: deposit - (purchase + withdraw from deposit)
-     *
+     * Get balance by specific type (deposit/revenue/commission)
+     * Formula: income - withdrawals from that source - legacy portion
+     * 
      * @param int $userId
+     * @param string $type (deposit|revenue|commission)
      * @return float
      */
-    public static function getDepositBalance($userId)
+    public static function getBalanceByType($userId, $type)
     {
-        $deposit = self::where('user_id', $userId)
+        // Income untuk type ini
+        $income = self::where('user_id', $userId)
+            ->where('status', 'success')
+            ->where('type', $type)
+            ->sum('amount');
+
+        // Withdrawal DARI source ini (sistem baru)
+        $withdrawal = self::where('user_id', $userId)
+            ->whereIn('status', ['success', 'pending'])
+            ->where('type', 'withdraw')
+            ->where('source_balance_type', $type)
+            ->sum('amount');
+
+        // Khusus deposit, kurangi juga purchase
+        $purchase = 0;
+        if ($type === 'deposit') {
+            $purchase = self::where('user_id', $userId)
+                ->where('status', 'success')
+                ->where('type', 'purchase')
+                ->sum('amount');
+        }
+
+        // ✅ NEW: Kurangi porsi legacy withdraw untuk type ini
+        $legacyPortion = self::calculateLegacyWithdrawPortion($userId, $type);
+
+        return $income - $withdrawal - $purchase - $legacyPortion;
+    }
+
+    /**
+     * ✅ NEW: Hitung porsi legacy withdraw untuk tipe tertentu
+     * Priority: 100% revenue → 100% commission → deposit
+     * 
+     * @param int $userId
+     * @param string $type (deposit|revenue|commission)
+     * @return float
+     */
+    public static function calculateLegacyWithdrawPortion($userId, $type)
+    {
+        // Total legacy withdraw
+        $legacyTotal = self::getLegacyWithdrawBalance($userId);
+
+        if ($legacyTotal <= 0) {
+            return 0;
+        }
+
+        // Hitung GROSS income masing-masing
+        $revenueIncome = self::where('user_id', $userId)
+            ->where('status', 'success')
+            ->where('type', 'revenue')
+            ->sum('amount');
+
+        $commissionIncome = self::where('user_id', $userId)
+            ->where('status', 'success')
+            ->where('type', 'commission')
+            ->sum('amount');
+
+        $depositIncome = self::where('user_id', $userId)
             ->where('status', 'success')
             ->where('type', 'deposit')
             ->sum('amount');
 
+        // Kurangi dengan withdraw baru yang udah ada source_balance_type
+        $revenueNewWithdraw = self::where('user_id', $userId)
+            ->whereIn('status', ['success', 'pending'])
+            ->where('type', 'withdraw')
+            ->where('source_balance_type', 'revenue')
+            ->sum('amount');
+
+        $commissionNewWithdraw = self::where('user_id', $userId)
+            ->whereIn('status', ['success', 'pending'])
+            ->where('type', 'withdraw')
+            ->where('source_balance_type', 'commission')
+            ->sum('amount');
+
+        $depositNewWithdraw = self::where('user_id', $userId)
+            ->whereIn('status', ['success', 'pending'])
+            ->where('type', 'withdraw')
+            ->where('source_balance_type', 'deposit')
+            ->sum('amount');
+
+        // Kurangi purchase untuk deposit
         $purchase = self::where('user_id', $userId)
             ->where('status', 'success')
             ->where('type', 'purchase')
             ->sum('amount');
 
-        // ✅ HANYA withdraw dengan source_balance_type = 'deposit'
-        // TIDAK termasuk legacy (NULL)
-        $withdrawFromDeposit = self::where('user_id', $userId)
-            ->whereIn('status', ['success', 'pending'])
-            ->where('type', 'withdraw')
-            ->where('source_balance_type', 'deposit') // ← Strict, no NULL
-            ->sum('amount');
+        // Available balance untuk legacy allocation
+        $revenueAvailable = $revenueIncome - $revenueNewWithdraw;
+        $commissionAvailable = $commissionIncome - $commissionNewWithdraw;
+        $depositAvailable = $depositIncome - $depositNewWithdraw - $purchase;
 
-        return $deposit - $purchase - $withdrawFromDeposit;
+        // ✅ Distribusi 100% habis dulu revenue → commission → deposit
+        $remaining = $legacyTotal;
+        $portions = ['revenue' => 0, 'commission' => 0, 'deposit' => 0];
+
+        // 1. 100% Revenue dulu sampai habis
+        if ($remaining > 0 && $revenueAvailable > 0) {
+            $allocated = min($remaining, $revenueAvailable);
+            $portions['revenue'] = $allocated;
+            $remaining -= $allocated;
+        }
+
+        // 2. 100% Commission sampai habis
+        if ($remaining > 0 && $commissionAvailable > 0) {
+            $allocated = min($remaining, $commissionAvailable);
+            $portions['commission'] = $allocated;
+            $remaining -= $allocated;
+        }
+
+        // 3. Sisanya baru dari Deposit
+        if ($remaining > 0 && $depositAvailable > 0) {
+            $allocated = min($remaining, $depositAvailable);
+            $portions['deposit'] = $allocated;
+            $remaining -= $allocated;
+        }
+
+        return $portions[$type] ?? 0;
     }
 
     /**
-     * Get revenue balance (available for withdraw only)
-     * Formula: revenue - withdraw from revenue
-     *
-     * @param int $userId
-     * @return float
+     * Get deposit balance (bisa untuk purchase & withdraw)
+     */
+    public static function getDepositBalance($userId)
+    {
+        return self::getBalanceByType($userId, 'deposit');
+    }
+
+    /**
+     * Get revenue balance (hanya untuk withdraw)
      */
     public static function getRevenueBalance($userId)
     {
-        $revenue = self::where('user_id', $userId)
-            ->where('status', 'success')
-            ->where('type', 'revenue')
-            ->sum('amount');
-
-        // ✅ HANYA withdraw dengan source_balance_type = 'revenue'
-        $withdrawFromRevenue = self::where('user_id', $userId)
-            ->whereIn('status', ['success', 'pending'])
-            ->where('type', 'withdraw')
-            ->where('source_balance_type', 'revenue') // ← Strict, no NULL
-            ->sum('amount');
-
-        return $revenue - $withdrawFromRevenue;
+        return self::getBalanceByType($userId, 'revenue');
     }
 
     /**
-     * Get commission balance (available for withdraw only)
-     * Formula: commission - withdraw from commission
-     *
-     * @param int $userId
-     * @return float
+     * Get commission balance (hanya untuk withdraw)
      */
     public static function getCommissionBalance($userId)
     {
-        $commission = self::where('user_id', $userId)
-            ->where('status', 'success')
-            ->where('type', 'commission')
-            ->sum('amount');
-
-        // ✅ HANYA withdraw dengan source_balance_type = 'commission'
-        $withdrawFromCommission = self::where('user_id', $userId)
-            ->whereIn('status', ['success', 'pending'])
-            ->where('type', 'withdraw')
-            ->where('source_balance_type', 'commission') // ← Strict, no NULL
-            ->sum('amount');
-
-        return $commission - $withdrawFromCommission;
+        return self::getBalanceByType($userId, 'commission');
     }
+
+    /**
+     * Get legacy withdraw (yang belum punya source_balance_type)
+     */
     public static function getLegacyWithdrawBalance($userId)
     {
         return self::where('user_id', $userId)
             ->whereIn('status', ['success', 'pending'])
             ->where('type', 'withdraw')
-            ->whereNull('source_balance_type') // ← Legacy withdraw ONLY
+            ->whereNull('source_balance_type')
             ->sum('amount');
     }
 
     /**
-     * Get purchasable balance (only from deposit)
-     *
-     * @param int $userId
-     * @return float
+     * Get purchasable balance (hanya dari deposit)
+     * ✅ UPDATED: Sekarang udah include legacy withdraw portion
      */
     public static function getPurchasableBalance($userId)
     {
@@ -166,157 +243,110 @@ class Transaction extends Model
     }
 
     /**
-     * Get withdrawable balance (revenue + commission + deposit)
-     *
-     * @param int $userId
-     * @return float
+     * Get withdrawable balance (deposit + revenue + commission)
+     * ✅ UPDATED: Legacy portion udah dihitung di masing-masing balance
      */
     public static function getWithdrawableBalance($userId)
     {
-        // Balance dari new system (belum termasuk legacy withdraw)
-        $depositBalance = self::getDepositBalance($userId);
-        $revenueBalance = self::getRevenueBalance($userId);
-        $commissionBalance = self::getCommissionBalance($userId);
-
-        $newSystemBalance = $depositBalance + $revenueBalance + $commissionBalance;
-
-        // ✅ Kurangi legacy withdraw (yang source_balance_type = NULL)
-        // Legacy withdraw ini belum ter-track di per-balance calculation
-        $legacyWithdraw = self::getLegacyWithdrawBalance($userId);
-
-        return $newSystemBalance - $legacyWithdraw;
+        return self::getDepositBalance($userId)
+            + self::getRevenueBalance($userId)
+            + self::getCommissionBalance($userId);
     }
 
     /**
-     * Get detailed balance breakdown by source type
-     *
-     * @param int $userId
-     * @return array
+     * Get complete balance breakdown
+     * ✅ UPDATED: Tambah info legacy distribution
      */
     public static function getBalanceBreakdown($userId)
     {
-        $depositBalance = self::getDepositBalance($userId);
-        $revenueBalance = self::getRevenueBalance($userId);
-        $commissionBalance = self::getCommissionBalance($userId);
-        $legacyWithdraw = self::getLegacyWithdrawBalance($userId);
+        $deposit = self::getDepositBalance($userId);
+        $revenue = self::getRevenueBalance($userId);
+        $commission = self::getCommissionBalance($userId);
+        $legacy = self::getLegacyWithdrawBalance($userId);
 
-        $withdrawableBeforeLegacy = $depositBalance + $revenueBalance + $commissionBalance;
-        $finalWithdrawable = $withdrawableBeforeLegacy - $legacyWithdraw;
+        $withdrawable = $deposit + $revenue + $commission;
+
+        // Legacy distribution untuk debugging
+        $legacyDistribution = [
+            'revenue' => self::calculateLegacyWithdrawPortion($userId, 'revenue'),
+            'commission' => self::calculateLegacyWithdrawPortion($userId, 'commission'),
+            'deposit' => self::calculateLegacyWithdrawPortion($userId, 'deposit'),
+        ];
 
         return [
-            'deposit' => $depositBalance,
-            'revenue' => $revenueBalance,
-            'commission' => $commissionBalance,
-            'purchasable' => $depositBalance,
-            'withdrawable' => max(0, $finalWithdrawable),
-            'total' => max(0, $finalWithdrawable),
-
-            // ✅ Info untuk debugging/display
-            'legacy_withdraw' => $legacyWithdraw,
-            'has_legacy_data' => $legacyWithdraw > 0,
-            'withdrawable_before_legacy' => $withdrawableBeforeLegacy,
+            'deposit' => $deposit,
+            'revenue' => $revenue,
+            'commission' => $commission,
+            'purchasable' => $deposit,
+            'withdrawable' => max(0, $withdrawable),
+            'total' => max(0, $withdrawable),
+            'legacy_withdraw' => $legacy,
+            'has_legacy_data' => $legacy > 0,
+            'legacy_distribution' => $legacyDistribution, // ✅ NEW: Info distribusi legacy
         ];
     }
-    public static function validateBalanceCalculation($userId)
-    {
-        $legacyBalance = self::calculateUserBalance($userId);
-        $newBalance = self::getWithdrawableBalance($userId);
 
-        $breakdown = self::getBalanceBreakdown($userId);
-
-        return [
-            'legacy_method' => $legacyBalance,
-            'new_method' => $newBalance,
-            'difference' => abs($legacyBalance - $newBalance),
-            'is_equal' => abs($legacyBalance - $newBalance) < 0.01, // float comparison
-            'breakdown' => $breakdown,
-        ];
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Validation Methods
+    |--------------------------------------------------------------------------
+    */
 
     /**
-     * Validate if user can make a purchase
-     *
-     * @param int $userId
-     * @param float $amount
-     * @return array ['can_purchase' => bool, 'message' => string, 'available' => float]
+     * Check if user can purchase
      */
     public static function canPurchase($userId, $amount)
     {
-        $availableBalance = self::getPurchasableBalance($userId);
+        $available = self::getPurchasableBalance($userId);
+        $canPurchase = $available >= $amount;
 
         return [
-            'can_purchase' => $availableBalance >= $amount,
-            'message' => $availableBalance >= $amount
-                ? 'Sufficient balance'
-                : 'Insufficient deposit balance',
-            'available' => $availableBalance,
+            'can_purchase' => $canPurchase,
+            'message' => $canPurchase ? 'Sufficient balance' : 'Insufficient deposit balance',
+            'available' => $available,
             'required' => $amount,
-            'shortage' => max(0, $amount - $availableBalance),
+            'shortage' => max(0, $amount - $available),
         ];
     }
 
     /**
-     * Validate if user can make a withdrawal
-     *
-     * @param int $userId
-     * @param float $amount
-     * @return array ['can_withdraw' => bool, 'message' => string, 'available' => float]
+     * Check if user can withdraw
      */
     public static function canWithdraw($userId, $amount)
     {
-        $availableBalance = self::getWithdrawableBalance($userId);
+        $available = self::getWithdrawableBalance($userId);
+        $canWithdraw = $available >= $amount;
 
         return [
-            'can_withdraw' => $availableBalance >= $amount,
-            'message' => $availableBalance >= $amount
-                ? 'Sufficient balance'
-                : 'Insufficient balance',
-            'available' => $availableBalance,
+            'can_withdraw' => $canWithdraw,
+            'message' => $canWithdraw ? 'Sufficient balance' : 'Insufficient balance',
+            'available' => $available,
             'required' => $amount,
-            'shortage' => max(0, $amount - $availableBalance),
+            'shortage' => max(0, $amount - $available),
         ];
     }
 
     /**
      * Calculate withdrawal allocation (priority: revenue -> commission -> deposit)
-     *
-     * @param int $userId
-     * @param float $amount
-     * @return array
      */
     public static function calculateWithdrawalAllocation($userId, $amount)
     {
-        $revenueBalance = self::getRevenueBalance($userId);
-        $commissionBalance = self::getCommissionBalance($userId);
-        $depositBalance = self::getDepositBalance($userId);
-
-        $allocation = [
-            'revenue' => 0,
-            'commission' => 0,
-            'deposit' => 0,
+        $balances = [
+            'revenue' => self::getRevenueBalance($userId),
+            'commission' => self::getCommissionBalance($userId),
+            'deposit' => self::getDepositBalance($userId),
         ];
 
+        $allocation = ['revenue' => 0, 'commission' => 0, 'deposit' => 0];
         $remaining = $amount;
 
-        // Priority 1: Revenue
-        if ($remaining > 0 && $revenueBalance > 0) {
-            $fromRevenue = min($remaining, $revenueBalance);
-            $allocation['revenue'] = $fromRevenue;
-            $remaining -= $fromRevenue;
-        }
-
-        // Priority 2: Commission
-        if ($remaining > 0 && $commissionBalance > 0) {
-            $fromCommission = min($remaining, $commissionBalance);
-            $allocation['commission'] = $fromCommission;
-            $remaining -= $fromCommission;
-        }
-
-        // Priority 3: Deposit
-        if ($remaining > 0 && $depositBalance > 0) {
-            $fromDeposit = min($remaining, $depositBalance);
-            $allocation['deposit'] = $fromDeposit;
-            $remaining -= $fromDeposit;
+        // Allocate berdasarkan priority
+        foreach ($balances as $type => $balance) {
+            if ($remaining > 0 && $balance > 0) {
+                $allocated = min($remaining, $balance);
+                $allocation[$type] = $allocated;
+                $remaining -= $allocated;
+            }
         }
 
         return [
@@ -329,32 +359,26 @@ class Transaction extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Legacy Helper Methods (kept for backward compatibility)
+    | Legacy Methods (Backward Compatibility)
     |--------------------------------------------------------------------------
     */
 
     /**
-     * Calculate user balance based on successful transactions
+     * Legacy balance calculation (untuk validasi/migration)
      * Formula: (deposit + revenue + commission) - (purchase + withdraw)
-     *
-     * @param int $userId
-     * @return float
      */
     public static function calculateUserBalance($userId)
     {
-        // Calculate income (deposit + revenue + commission) - only success
         $income = self::where('user_id', $userId)
             ->where('status', 'success')
             ->whereIn('type', ['deposit', 'revenue', 'commission'])
             ->sum('amount');
 
-        // Calculate expenses (purchase + withdraw) - include pending withdrawals
         $expenses = self::where('user_id', $userId)
             ->where(function ($query) {
                 $query->where('status', 'success')
-                    ->orWhere(function ($subQuery) {
-                        $subQuery->where('status', 'pending')
-                            ->where('type', 'withdraw');
+                    ->orWhere(function ($q) {
+                        $q->where('status', 'pending')->where('type', 'withdraw');
                     });
             })
             ->whereIn('type', ['purchase', 'withdraw'])
@@ -364,162 +388,181 @@ class Transaction extends Model
     }
 
     /**
-     * Get user balance breakdown
-     *
-     * @param int $userId
-     * @return array
+     * Validate bahwa new system = legacy system
+     * ✅ UPDATED: Sekarang harus sama karena legacy portion udah dihitung
      */
-    public static function getUserBalanceBreakdown($userId)
+    public static function validateBalanceCalculation($userId)
     {
-        // Get successful transactions breakdown
-        $successTransactions = self::where('user_id', $userId)
-            ->where('status', 'success')
-            ->selectRaw('type, SUM(amount) as total')
-            ->groupBy('type')
-            ->pluck('total', 'type');
-
-        // Get pending withdrawals
-        $pendingWithdrawals = self::where('user_id', $userId)
-            ->where('status', 'pending')
-            ->where('type', 'withdraw')
-            ->sum('amount');
-
-        $deposit = $successTransactions['deposit'] ?? 0;
-        $revenue = $successTransactions['revenue'] ?? 0;
-        $commission = $successTransactions['commission'] ?? 0;
-        $successPurchase = $successTransactions['purchase'] ?? 0;
-        $successWithdraw = $successTransactions['withdraw'] ?? 0;
-
-        $totalIncome = $deposit + $revenue + $commission;
-        $totalExpenses = $successPurchase + $successWithdraw + $pendingWithdrawals;
-        $balance = $totalIncome - $totalExpenses;
+        $legacy = self::calculateUserBalance($userId);
+        $newSystem = self::getWithdrawableBalance($userId);
+        $difference = abs($legacy - $newSystem);
 
         return [
-            'income' => [
-                'deposit' => $deposit,
-                'revenue' => $revenue,
-                'commission' => $commission,
-                'total' => $totalIncome
-            ],
-            'expenses' => [
-                'purchase' => $successPurchase,
-                'withdraw' => [
-                    'success' => $successWithdraw,
-                    'pending' => $pendingWithdrawals,
-                    'total' => $successWithdraw + $pendingWithdrawals
-                ],
-                'total' => $totalExpenses
-            ],
-            'balance' => $balance
+            'legacy_method' => $legacy,
+            'new_method' => $newSystem,
+            'difference' => $difference,
+            'is_equal' => $difference < 0.01,
+            'breakdown' => self::getBalanceBreakdown($userId),
         ];
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Transaction Total Methods
+    |--------------------------------------------------------------------------
+    */
+
     /**
-     * Get available balance (excluding pending withdrawals)
-     *
+     * Get total deposit transactions
+     * 
      * @param int $userId
+     * @param string|null $status Filter by status (default: 'success')
      * @return float
      */
-    public static function getAvailableBalance($userId)
+    public static function getTotalDeposit($userId, $status = 'success')
     {
-        return self::calculateUserBalance($userId);
-    }
+        $query = self::where('user_id', $userId)->where('type', 'deposit');
 
-    /**
-     * Scope for successful transactions only
-     */
-    public function scopeSuccess($query)
-    {
-        return $query->where('status', 'success');
-    }
-
-    /**
-     * Scope for income transactions (deposit, revenue, commission)
-     */
-    public function scopeIncome($query)
-    {
-        return $query->whereIn('type', ['deposit', 'revenue', 'commission']);
-    }
-
-    /**
-     * Scope for expense transactions (purchase, withdraw)
-     */
-    public function scopeExpense($query)
-    {
-        return $query->whereIn('type', ['purchase', 'withdraw']);
-    }
-
-    /**
-     * Get sum of each transaction type with success status
-     *
-     * @param int|null $userId Optional - filter by user_id
-     * @return array
-     */
-    public static function getTransactionSummary($userId = null)
-    {
-        $query = self::where('status', 'success');
-
-        if ($userId) {
-            $query->where('user_id', $userId);
-        }
-
-        $summary = $query->selectRaw('type, SUM(amount) as total')
-            ->groupBy('type')
-            ->pluck('total', 'type');
-
-        return [
-            'deposit' => $summary['deposit'] ?? 0,
-            'withdraw' => $summary['withdraw'] ?? 0,
-            'purchase' => $summary['purchase'] ?? 0,
-            'revenue' => $summary['revenue'] ?? 0,
-            'commission' => $summary['commission'] ?? 0,
-        ];
-    }
-
-    /**
-     * Get total for specific transaction type with success status
-     *
-     * @param string $type
-     * @param int|null $userId
-     * @return float
-     */
-    public static function getTotalByType($type, $userId = null)
-    {
-        $query = self::where('status', 'success')
-            ->where('type', $type);
-
-        if ($userId) {
-            $query->where('user_id', $userId);
+        if ($status) {
+            $query->where('status', $status);
         }
 
         return $query->sum('amount');
     }
 
     /**
-     * Get individual totals
+     * Get total revenue transactions
+     * 
+     * @param int $userId
+     * @param string|null $status Filter by status (default: 'success')
+     * @return float
      */
-    public static function getTotalDeposit($userId = null)
+    public static function getTotalRevenue($userId, $status = 'success')
     {
-        return self::getTotalByType('deposit', $userId);
+        $query = self::where('user_id', $userId)->where('type', 'revenue');
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        return $query->sum('amount');
     }
 
-    public static function getTotalWithdraw($userId = null)
+    /**
+     * Get total commission transactions
+     * 
+     * @param int $userId
+     * @param string|null $status Filter by status (default: 'success')
+     * @return float
+     */
+    public static function getTotalCommission($userId, $status = 'success')
     {
-        return self::getTotalByType('withdraw', $userId);
+        $query = self::where('user_id', $userId)->where('type', 'commission');
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        return $query->sum('amount');
     }
 
-    public static function getTotalPurchase($userId = null)
+    /**
+     * Get total purchase transactions
+     * 
+     * @param int $userId
+     * @param string|null $status Filter by status (default: 'success')
+     * @return float
+     */
+    public static function getTotalPurchase($userId, $status = 'success')
     {
-        return self::getTotalByType('purchase', $userId);
+        $query = self::where('user_id', $userId)->where('type', 'purchase');
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        return $query->sum('amount');
     }
 
-    public static function getTotalRevenue($userId = null)
+    /**
+     * Get total withdraw transactions
+     * 
+     * @param int $userId
+     * @param string|null $status Filter by status (default: ['success', 'pending'])
+     * @return float
+     */
+    public static function getTotalWithdraw($userId, $status = null)
     {
-        return self::getTotalByType('revenue', $userId);
+        $query = self::where('user_id', $userId)->where('type', 'withdraw');
+
+        if ($status === null) {
+            // Default: count both success and pending
+            $query->whereIn('status', ['success', 'pending']);
+        } elseif (is_array($status)) {
+            $query->whereIn('status', $status);
+        } else {
+            $query->where('status', $status);
+        }
+
+        return $query->sum('amount');
     }
 
-    public static function getTotalCommission($userId = null)
+    /**
+     * Get all transaction totals breakdown
+     * 
+     * @param int $userId
+     * @return array
+     */
+    public static function getTransactionTotals($userId)
     {
-        return self::getTotalByType('commission', $userId);
+        return [
+            'deposit' => [
+                'success' => self::getTotalDeposit($userId, 'success'),
+                'pending' => self::getTotalDeposit($userId, 'pending'),
+                'failed' => self::getTotalDeposit($userId, 'failed'),
+                'total' => self::getTotalDeposit($userId, null),
+            ],
+            'revenue' => [
+                'success' => self::getTotalRevenue($userId, 'success'),
+                'total' => self::getTotalRevenue($userId, null),
+            ],
+            'commission' => [
+                'success' => self::getTotalCommission($userId, 'success'),
+                'total' => self::getTotalCommission($userId, null),
+            ],
+            'purchase' => [
+                'success' => self::getTotalPurchase($userId, 'success'),
+                'pending' => self::getTotalPurchase($userId, 'pending'),
+                'failed' => self::getTotalPurchase($userId, 'failed'),
+                'total' => self::getTotalPurchase($userId, null),
+            ],
+            'withdraw' => [
+                'success' => self::getTotalWithdraw($userId, 'success'),
+                'pending' => self::getTotalWithdraw($userId, 'pending'),
+                'failed' => self::getTotalWithdraw($userId, 'failed'),
+                'total' => self::getTotalWithdraw($userId, null),
+            ],
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Query Scopes
+    |--------------------------------------------------------------------------
+    */
+
+    public function scopeSuccess($query)
+    {
+        return $query->where('status', 'success');
+    }
+
+    public function scopeIncome($query)
+    {
+        return $query->whereIn('type', ['deposit', 'revenue', 'commission']);
+    }
+
+    public function scopeExpense($query)
+    {
+        return $query->whereIn('type', ['purchase', 'withdraw']);
     }
 }
