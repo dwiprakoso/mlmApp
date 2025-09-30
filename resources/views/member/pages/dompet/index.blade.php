@@ -86,7 +86,7 @@
             </div>
 
             <!-- Total Deposit -->
-            <div class="col-6">
+            {{-- <div class="col-6">
                 <div class="card-dark p-3 h-100">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
@@ -100,10 +100,10 @@
                     <h6 class="text-gold mb-1">IDR {{ number_format($totalDeposit, 0, ',', '.') }}</h6>
                     <small class="text-muted">Total deposit</small>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Total Withdrawal -->
-            <div class="col-6">
+            {{-- <div class="col-6">
                 <div class="card-dark p-3 h-100">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
@@ -117,10 +117,10 @@
                     <h6 class="text-gold mb-1">IDR {{ number_format($totalWithdraw, 0, ',', '.') }}</h6>
                     <small class="text-muted">Total penarikan</small>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Total Reward -->
-            <div class="col-6">
+            {{-- <div class="col-6">
                 <div class="card-dark p-3 h-100">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
@@ -134,10 +134,10 @@
                     <h6 class="text-gold mb-1">IDR {{ number_format($totalRevenue, 0, ',', '.') }}</h6>
                     <small class="text-muted">Total Profit Harian</small>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Total Commission -->
-            <div class="col-6">
+            {{-- <div class="col-6">
                 <div class="card-dark p-3 h-100">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
@@ -151,7 +151,7 @@
                     <h6 class="text-gold mb-1">IDR {{ number_format($totalCommission, 0, ',', '.') }}</h6>
                     <small class="text-muted">Total Komisi</small>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 @endsection

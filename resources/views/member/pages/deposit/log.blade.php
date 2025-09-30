@@ -144,11 +144,11 @@
     @endforelse
 
     <!-- Pagination -->
-    @if ($deposits->hasPages())
+    {{-- @if ($deposits->hasPages())
         <div class="d-flex justify-content-center mt-4">
             {{ $deposits->links() }}
         </div>
-    @endif
+    @endif --}}
 
     <div class="mt-4" style="padding-bottom: 100px;"></div>
 
