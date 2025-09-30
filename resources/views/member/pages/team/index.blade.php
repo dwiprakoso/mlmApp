@@ -20,8 +20,6 @@
                 <h5 class="text-gold fw-bold mb-0">{{ $referralUsages->count() }}</h5>
                 <small class="text-muted">Total Anggota</small>
             </div>
-        </div>
-        <div class="row text-center mb-4">
             <div class="col">
                 <div class="circle-icon bg-gold text-dark">
                     <i class="bi bi-coin"></i>
@@ -46,6 +44,15 @@
                         <div class="d-flex align-items-center">
                             <div>
                                 <h6 class="text-white mb-1">{{ $usage->referee->phone ?? 'Phone not available' }}</h6>
+                                @if ($usage->is_deposit)
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle-fill"></i> Deposit
+                                    </span>
+                                @else
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-clock-fill"></i> Belum Deposit
+                                    </span>
+                                @endif
                             </div>
                         </div>
                         <div class="text-end">
@@ -53,15 +60,7 @@
                             <br>
                             <small class="text-muted">{{ $usage->created_at->format('H:i') }}</small>
                         </div>
-                        @if ($usage->is_deposit)
-                            <span class="badge bg-success">
-                                <i class="bi bi-check-circle-fill"></i> Deposit
-                            </span>
-                        @else
-                            <span class="badge bg-secondary">
-                                <i class="bi bi-clock-fill"></i> Belum Deposit
-                            </span>
-                        @endif
+
                     </div>
                 </div>
             @endforeach
