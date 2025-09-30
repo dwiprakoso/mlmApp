@@ -26,7 +26,7 @@
                     </div>
 
                     <!-- Amount Breakdown -->
-                    @if ($withdrawal->withdrawal_fee > 0)
+                    {{-- @if ($withdrawal->withdrawal_fee > 0)
                         <div class="mb-2">
                             <div class="bg-secondary bg-opacity-25 p-2 rounded">
                                 <div class="d-flex justify-content-between mb-1">
@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         </div>
-                    @endif
+                    @endif --}}
 
                     <!-- Wallet Info -->
                     <div class="mb-2">
