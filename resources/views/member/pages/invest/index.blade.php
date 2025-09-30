@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <div class="card-dark p-3 mb-3">
+    {{-- <div class="card-dark p-3 mb-3">
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <small class="text-muted">Saldo Deposit (Tersedia untuk Investasi)</small>
@@ -18,7 +18,7 @@
             </div>
             <i class="bi bi-wallet2 text-gold fs-3"></i>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Alert Messages -->
     @if (session('success'))
