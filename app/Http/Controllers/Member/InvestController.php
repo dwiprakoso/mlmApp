@@ -75,41 +75,34 @@ class InvestController extends Controller
             // Generate unique reference number
             $reference = $this->generateReference();
 
-            // Create successful purchase transaction
+            // Create pending transaction (requires admin approval)
             $transaction = Transaction::create([
                 'user_id' => Auth::id(),
                 'product_id' => $product->id,
                 'reference' => $reference,
                 'amount' => $product->price,
                 'type' => 'purchase',
-                'status' => 'success',
-                'payment_method' => 'balance',
+                'status' => 'pending', // Menunggu approval admin
+                'payment_method' => 'balance', // Dibayar dari saldo
                 'payment_proof' => null,
                 'approved_by' => null,
             ]);
 
             DB::commit();
 
-            Log::info('Investment Transaction Created Successfully', [
+            Log::info('Investment Transaction Created as Pending', [
                 'transaction_id' => $transaction->id,
                 'reference' => $reference,
                 'user_id' => Auth::id(),
                 'product_id' => $product->id,
                 'amount' => $product->price,
-                'previous_balance' => $currentBalance,
-                'new_balance' => $currentBalance - $product->price,
-                'existing_purchases' => $existingPurchases + 1,
-                'remaining_purchases' => 3 - ($existingPurchases + 1)
+                'status' => 'pending',
+                'current_balance' => $currentBalance,
+                'existing_purchases' => $existingPurchases,
+                'remaining_purchases' => 3 - $existingPurchases
             ]);
 
-            $remainingPurchases = 3 - ($existingPurchases + 1);
-            $successMessage = 'Pembelian berhasil! Produk ' . $product->name . ' telah ditambahkan ke portofolio Anda.';
-
-            if ($remainingPurchases > 0) {
-                $successMessage .= ' Anda masih dapat membeli produk ini ' . $remainingPurchases . ' kali lagi.';
-            } else {
-                $successMessage .= ' Anda telah mencapai batas maksimal pembelian untuk produk ini.';
-            }
+            $successMessage = 'Transaksi pembelian berhasil dibuat untuk produk ' . $product->name . '. Transaksi Anda sedang menunggu persetujuan admin.';
 
             return redirect()->route('member.invest.log')
                 ->with('success', $successMessage);
@@ -127,7 +120,6 @@ class InvestController extends Controller
         }
     }
 
-    // Method show masih bisa dipakai kalau ada case khusus yang butuh
     public function show($id)
     {
         $transaction = Transaction::with(['product', 'user'])

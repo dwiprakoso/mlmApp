@@ -50,7 +50,7 @@
             <div>
                 <strong>Status:
                     @if ($transaction->status === 'pending')
-                        Menunggu Pembayaran
+                        Menunggu Konfirmasi Admin
                     @elseif($transaction->status === 'waiting_confirmation')
                         Menunggu Konfirmasi
                     @elseif($transaction->status === 'success')
@@ -59,18 +59,6 @@
                         Gagal
                     @endif
                 </strong>
-                <br>
-                <small>
-                    @if ($transaction->status === 'pending')
-                        Silakan lakukan pembayaran sesuai dengan nominal yang tertera
-                    @elseif($transaction->status === 'waiting_confirmation')
-                        Pembayaran Anda sedang dalam proses verifikasi
-                    @elseif($transaction->status === 'success')
-                        Investasi Anda telah berhasil diproses
-                    @elseif($transaction->status === 'failed')
-                        Terjadi kesalahan dalam proses pembayaran
-                    @endif
-                </small>
             </div>
         </div>
     </div>
@@ -135,139 +123,6 @@
             @endif
         @endif
     </div>
-
-    <!-- Payment Information -->
-    @if ($transaction->status === 'pending')
-        <div class="card-dark p-4 mb-3">
-            <h6 class="text-white mb-3">
-                <i class="bi bi-credit-card me-2"></i>
-                Informasi Pembayaran
-            </h6>
-
-            <div class="alert alert-info mb-3"
-                style="background-color: var(--info-bg, #cce7ff); color: var(--info-text, #0066cc);">
-                <small>
-                    <i class="bi bi-info-circle me-1"></i>
-                    Silakan transfer sesuai nominal yang tertera ke rekening berikut:
-                </small>
-            </div>
-
-            <!-- Bank Information -->
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="p-3 rounded" style="background-color: var(--tertiary-dark, #1a1a1a);">
-                        <div class="row">
-                            <div class="col-6">
-                                <small class="text-muted">Bank</small>
-                                <h6 class="text-white mb-0">BCA</h6>
-                            </div>
-                            <div class="col-6">
-                                <small class="text-muted">No. Rekening</small>
-                                <h6 class="text-gold mb-0" id="bankAccount">1234567890</h6>
-                                <button class="btn btn-sm btn-outline-gold" onclick="copyBankAccount()">
-                                    <i class="bi bi-copy"></i> Copy
-                                </button>
-                            </div>
-                        </div>
-                        <hr style="border-color: var(--border-color); margin: 1rem 0;">
-                        <div class="row">
-                            <div class="col-6">
-                                <small class="text-muted">Atas Nama</small>
-                                <h6 class="text-white mb-0">JAGAKEUANGAN</h6>
-                            </div>
-                            <div class="col-6">
-                                <small class="text-muted">Nominal Transfer</small>
-                                <h6 class="text-gold mb-0" id="transferAmount">IDR
-                                    {{ number_format($transaction->amount, 0, ',', '.') }}</h6>
-                                <button class="btn btn-sm btn-outline-gold" onclick="copyAmount()">
-                                    <i class="bi bi-copy"></i> Copy
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Upload Payment Proof -->
-            <div class="row">
-                <div class="col-12">
-                    <form action="{{ route('member.invest.upload_payment_proof') }}" method="POST"
-                        enctype="multipart/form-data" id="paymentForm">
-                        @csrf
-                        <input type="hidden" name="transaction_id" value="{{ $transaction->id }}">
-
-                        <div class="mb-3">
-                            <label for="payment_proof" class="form-label text-white">
-                                <i class="bi bi-upload me-1"></i>
-                                Upload Bukti Transfer
-                            </label>
-                            <input type="file" class="form-control" id="payment_proof" name="payment_proof"
-                                accept="image/*" required>
-                            <small class="text-muted">Format: JPG, PNG, JPEG. Maksimal 5MB</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="payment_method" class="form-label text-white">Metode Pembayaran</label>
-                            <select class="form-select" id="payment_method" name="payment_method" required>
-                                <option value="">Pilih Metode Pembayaran</option>
-                                <option value="bank_transfer">Transfer Bank</option>
-                                <option value="mobile_banking">Mobile Banking</option>
-                                <option value="atm">ATM</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-gold w-100" id="submitBtn">
-                            <i class="bi bi-check-circle me-2"></i>
-                            Konfirmasi Pembayaran
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    <!-- Payment Proof Display -->
-    @if ($transaction->payment_proof)
-        <div class="card-dark p-4 mb-3">
-            <h6 class="text-white mb-3">
-                <i class="bi bi-image me-2"></i>
-                Bukti Pembayaran
-            </h6>
-
-            <div class="text-center">
-                @php
-                    $imagePath = $transaction->payment_proof;
-                    // Debug path
-                    $fullPath = storage_path('app/public/' . $imagePath);
-                    $publicUrl = asset('storage/' . $imagePath);
-                @endphp
-
-                @if (file_exists($fullPath))
-                    <img src="{{ $publicUrl }}" alt="Bukti Pembayaran" class="img-fluid rounded payment-proof-image"
-                        style="max-height: 300px; cursor: pointer;" onclick="showImageModal(this.src)"
-                        onError="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.style.filter='grayscale(100%)'; this.nextElementSibling.style.display='block';">
-                    <div style="display: none;" class="mt-2">
-                        <small class="text-danger">⚠️ Gambar tidak dapat dimuat</small>
-                    </div>
-                @else
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        <small>File bukti pembayaran tidak ditemukan</small>
-                        <br>
-                        <small class="text-muted">Path: {{ $imagePath }}</small>
-                    </div>
-                @endif
-
-                <br>
-                <small class="text-muted mt-2 d-block">
-                    Metode: {{ ucwords(str_replace('_', ' ', $transaction->payment_method ?? 'N/A')) }}
-                </small>
-                <small class="text-muted">
-                    Upload: {{ $transaction->updated_at->format('d M Y, H:i') }}
-                </small>
-            </div>
-        </div>
-    @endif
 
     <!-- Action Buttons -->
     <div class="row g-2">

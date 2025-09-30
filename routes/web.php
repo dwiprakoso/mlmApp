@@ -112,7 +112,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [MemberInvestController::class, 'index'])->name('index');
             Route::post('/store', [MemberInvestController::class, 'store'])->name('store');
             Route::get('/show/{id}', [MemberInvestController::class, 'show'])->name('show');
-            Route::post('/upload-payment-proof', [MemberInvestController::class, 'uploadPaymentProof'])->name('upload_payment_proof');
             Route::get('/log', [MemberInvestController::class, 'log'])->name('log');
         });
         // Team Routes

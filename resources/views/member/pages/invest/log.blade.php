@@ -88,7 +88,7 @@
                                 @elseif($transaction->status === 'waiting_confirmation') bg-warning text-dark
                                 @else bg-info @endif">
                                 @if ($transaction->status === 'pending')
-                                    Menunggu
+                                    Menunggu Konfirmasi Admin
                                 @elseif($transaction->status === 'waiting_confirmation')
                                     Konfirmasi
                                 @elseif($transaction->status === 'success')
@@ -105,10 +105,6 @@
                         <div class="row mb-3">
                             <div class="col-8">
                                 <div class="d-flex align-items-center">
-                                    <div class="bg-gold circle-icon me-2"
-                                        style="width: 25px; height: 25px; font-size: 12px;">
-                                        <i class="bi bi-gem text-dark"></i>
-                                    </div>
                                     <div>
                                         <small class="text-white fw-bold">{{ $transaction->product->name }}</small>
                                         <br>
@@ -143,8 +139,7 @@
                                 @elseif($transaction->status === 'waiting_confirmation') bg-warning
                                 @else bg-info @endif"
                                 style="width: 
-                                    @if ($transaction->status === 'pending') 25%
-                                    @elseif($transaction->status === 'waiting_confirmation') 75%
+                                    @if ($transaction->status === 'pending') 50%
                                     @elseif($transaction->status === 'success') 100%
                                     @elseif($transaction->status === 'failed') 100% @endif">
                             </div>
@@ -153,9 +148,7 @@
                             <small class="text-muted">Dibuat</small>
                             <small class="text-muted">
                                 @if ($transaction->status === 'pending')
-                                    Menunggu Pembayaran
-                                @elseif($transaction->status === 'waiting_confirmation')
-                                    Menunggu Konfirmasi
+                                    Menunggu Konfirmasi Admin
                                 @elseif($transaction->status === 'success')
                                     Selesai
                                 @elseif($transaction->status === 'failed')
@@ -166,7 +159,7 @@
                     </div>
 
                     <!-- Action Buttons for Pending -->
-                    @if ($transaction->status === 'pending')
+                    {{-- @if ($transaction->status === 'pending')
                         <hr style="border-color: var(--border-color);">
                         <div class="d-flex gap-2">
                             <button class="btn btn-gold btn-sm flex-fill"
@@ -179,7 +172,7 @@
                                 <i class="bi bi-x-circle"></i>
                             </button>
                         </div>
-                    @endif
+                    @endif --}}
                 </div>
             @endforeach
 
