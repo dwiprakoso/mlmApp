@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 
 class WithdrawController extends Controller
 {
@@ -99,7 +98,7 @@ class WithdrawController extends Controller
         return view('admin.pages.withdraw.detail', compact('withdraw'));
     }
 
-    public function confirm(Request $request, $id)
+    public function confirm($id)
     {
         $withdraw = Transaction::where('type', 'withdraw')
             ->findOrFail($id);
@@ -108,16 +107,6 @@ class WithdrawController extends Controller
         if (!in_array($withdraw->status, ['pending', 'waiting_confirmation'])) {
             return redirect()->back()->with('error', 'Withdraw cannot be confirmed. Invalid status.');
         }
-
-        // Validasi upload bukti transfer (WAJIB)
-        $request->validate([
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ], [
-            'payment_proof.required' => 'Bukti transfer wajib diupload untuk konfirmasi withdraw.',
-            'payment_proof.image' => 'File harus berupa gambar.',
-            'payment_proof.mimes' => 'Format file harus: JPEG, PNG, JPG, atau GIF.',
-            'payment_proof.max' => 'Ukuran file maksimal 2MB.'
-        ]);
 
         try {
             DB::beginTransaction();
@@ -136,19 +125,10 @@ class WithdrawController extends Controller
                     ->get();
             }
 
-            // Delete old payment proof if exists
-            if ($withdraw->payment_proof && Storage::exists($withdraw->payment_proof)) {
-                Storage::delete($withdraw->payment_proof);
-            }
-
-            // Store new payment proof
-            $paymentProofPath = $request->file('payment_proof')->store('payment-proofs/withdraws', 'public');
-
             // ✅ Update ALL transactions in the group
             foreach ($relatedTransactions as $transaction) {
                 $transaction->update([
                     'status' => 'success',
-                    'payment_proof' => $paymentProofPath, // Same proof for all
                     'approved_by' => auth()->id(),
                     'approved_at' => now(),
                     'updated_at' => now()
@@ -172,7 +152,7 @@ class WithdrawController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Withdraw berhasil dikonfirmasi dengan bukti transfer. (' . $relatedTransactions->count() . ' transaksi diupdate)');
+            return redirect()->back()->with('success', 'Withdraw berhasil dikonfirmasi. (' . $relatedTransactions->count() . ' transaksi diupdate)');
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error confirming withdrawal', [
