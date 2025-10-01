@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/store', [DepositController::class, 'store'])->name('store');
             Route::post('/confirm/{id}', [DepositController::class, 'confirm'])->name('confirm');
             Route::post('/reject/{id}', [DepositController::class, 'reject'])->name('reject');
+            Route::delete('/delete/{id}', [DepositController::class, 'destroy'])->name('destroy');
         });
         // Withdraw Routes
         Route::prefix('withdraw')->name('withdraw.')->group(function () {

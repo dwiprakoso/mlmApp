@@ -234,4 +234,32 @@ class DepositController extends Controller
 
         return redirect()->back()->with('success', 'Deposit berhasil ditolak.');
     }
+    public function destroy($id)
+    {
+        try {
+            $deposit = Transaction::where('type', 'deposit')->findOrFail($id);
+
+            // Optional: Tambahkan validasi jika deposit sudah dikonfirmasi tidak bisa dihapus
+            if ($deposit->status == 'success') {
+                return redirect()->back()->with('error', 'Deposit yang sudah dikonfirmasi tidak dapat dihapus.');
+            }
+
+            $deposit->delete();
+
+            Log::info('Deposit deleted', [
+                'deposit_id' => $id,
+                'user_id' => $deposit->user_id,
+                'deleted_by' => auth()->id()
+            ]);
+
+            return redirect()->back()->with('success', 'Deposit berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('Failed to delete deposit', [
+                'deposit_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->back()->with('error', 'Gagal menghapus deposit.');
+        }
+    }
 }

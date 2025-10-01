@@ -310,10 +310,20 @@
                                                 </div>
                                                 <!--end::Menu item-->
                                                 <!--begin::Menu item-->
+                                                <!--begin::Menu item-->
                                                 <div class="menu-item px-3">
-                                                    <a href="#" class="menu-link px-3"
-                                                        data-kt-customer-table-filter="delete_row">Delete</a>
+                                                    <a href="#" class="menu-link px-3 text-danger"
+                                                        onclick="event.preventDefault(); if(confirm('Apakah Anda yakin ingin menghapus deposit ini?')) { document.getElementById('delete-form-{{ $deposit->id }}').submit(); }">
+                                                        Delete
+                                                    </a>
+                                                    <form id="delete-form-{{ $deposit->id }}"
+                                                        action="{{ route('admin.deposit.destroy', $deposit->id) }}"
+                                                        method="POST" style="display: none;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                    </form>
                                                 </div>
+                                                <!--end::Menu item-->
                                                 <!--end::Menu item-->
                                             </div>
                                             <!--end::Menu-->
