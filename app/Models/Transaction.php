@@ -25,7 +25,6 @@ class Transaction extends Model
         'payment_proof',
         'approved_by',
     ];
-
     /*
     |--------------------------------------------------------------------------
     | Relationships

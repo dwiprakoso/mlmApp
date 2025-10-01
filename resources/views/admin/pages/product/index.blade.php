@@ -87,9 +87,7 @@
                             <!--begin::Add product-->
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#kt_modal_add_product">
-                                <i class="ki-outline ki-plus fs-2 d-none d-sm-inline"></i>
-                                <span class="d-sm-none">+</span>
-                                <span class="d-none d-sm-inline">Add Product</span>
+                                <span class="d-none d-sm-inline">Tambah Product</span>
                             </button>
                             <!--end::Add product-->
                         </div>

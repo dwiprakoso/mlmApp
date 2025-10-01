@@ -84,127 +84,15 @@
                         <!--begin::Toolbar-->
                         <div class="d-flex flex-column flex-sm-row justify-content-end gap-2"
                             data-kt-customer-table-toolbar="base">
-                            <!--begin::Filter-->
-                            <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
-                                data-kt-menu-placement="bottom-end">
-                                <i class="ki-outline ki-filter fs-2 d-none d-sm-inline"></i>
-                                <span class="d-sm-none">Filter</span>
-                                <span class="d-none d-sm-inline">Filter</span>
-                            </button>
-                            <!--begin::Menu 1-->
-                            <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true"
-                                id="kt-toolbar-filter">
-                                <!--begin::Header-->
-                                <div class="px-7 py-5">
-                                    <div class="fs-4 text-gray-900 fw-bold">Filter Options</div>
-                                </div>
-                                <!--end::Header-->
-                                <!--begin::Separator-->
-                                <div class="separator border-gray-200"></div>
-                                <!--end::Separator-->
-                                <!--begin::Content-->
-                                <div class="px-7 py-5">
-                                    <!--begin::Input group-->
-                                    <div class="mb-10">
-                                        <!--begin::Label-->
-                                        <label class="form-label fs-5 fw-semibold mb-3">Month:</label>
-                                        <!--end::Label-->
-                                        <!--begin::Input-->
-                                        <select class="form-select form-select-solid fw-bold" data-kt-select2="true"
-                                            data-placeholder="Select option" data-allow-clear="true"
-                                            data-kt-customer-table-filter="month" data-dropdown-parent="#kt-toolbar-filter">
-                                            <option></option>
-                                            <option value="aug">August</option>
-                                            <option value="sep">September</option>
-                                            <option value="oct">October</option>
-                                            <option value="nov">November</option>
-                                            <option value="dec">December</option>
-                                        </select>
-                                        <!--end::Input-->
-                                    </div>
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
-                                    <div class="mb-10">
-                                        <!--begin::Label-->
-                                        <label class="form-label fs-5 fw-semibold mb-3">Payment Type:</label>
-                                        <!--end::Label-->
-                                        <!--begin::Options-->
-                                        <div class="d-flex flex-column flex-wrap fw-semibold"
-                                            data-kt-customer-table-filter="payment_type">
-                                            <!--begin::Option-->
-                                            <label
-                                                class="form-check form-check-sm form-check-custom form-check-solid mb-3 me-5">
-                                                <input class="form-check-input" type="radio" name="payment_type"
-                                                    value="all" checked="checked" />
-                                                <span class="form-check-label text-gray-600">All</span>
-                                            </label>
-                                            <!--end::Option-->
-                                            <!--begin::Option-->
-                                            <label
-                                                class="form-check form-check-sm form-check-custom form-check-solid mb-3 me-5">
-                                                <input class="form-check-input" type="radio" name="payment_type"
-                                                    value="visa" />
-                                                <span class="form-check-label text-gray-600">Visa</span>
-                                            </label>
-                                            <!--end::Option-->
-                                            <!--begin::Option-->
-                                            <label class="form-check form-check-sm form-check-custom form-check-solid mb-3">
-                                                <input class="form-check-input" type="radio" name="payment_type"
-                                                    value="mastercard" />
-                                                <span class="form-check-label text-gray-600">Mastercard</span>
-                                            </label>
-                                            <!--end::Option-->
-                                            <!--begin::Option-->
-                                            <label class="form-check form-check-sm form-check-custom form-check-solid">
-                                                <input class="form-check-input" type="radio" name="payment_type"
-                                                    value="american_express" />
-                                                <span class="form-check-label text-gray-600">American Express</span>
-                                            </label>
-                                            <!--end::Option-->
-                                        </div>
-                                        <!--end::Options-->
-                                    </div>
-                                    <!--end::Input group-->
-                                    <!--begin::Actions-->
-                                    <div class="d-flex justify-content-end">
-                                        <button type="reset" class="btn btn-light btn-active-light-primary me-2"
-                                            data-kt-menu-dismiss="true" data-kt-customer-table-filter="reset">Reset</button>
-                                        <button type="submit" class="btn btn-primary" data-kt-menu-dismiss="true"
-                                            data-kt-customer-table-filter="filter">Apply</button>
-                                    </div>
-                                    <!--end::Actions-->
-                                </div>
-                                <!--end::Content-->
-                            </div>
-                            <!--end::Menu 1-->
-                            <!--end::Filter-->
-                            <!--begin::Export-->
-                            <button type="button" class="btn btn-light-primary" data-bs-toggle="modal"
-                                data-bs-target="#kt_customers_export_modal">
-                                <i class="ki-outline ki-exit-up fs-2 d-none d-sm-inline"></i>
-                                <span class="d-sm-none">Export</span>
-                                <span class="d-none d-sm-inline">Export</span>
-                            </button>
-                            <!--end::Export-->
                             <!--begin::Add deposit-->
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#kt_modal_add_deposit">
-                                <span class="d-sm-none">+ Deposit</span>
                                 <span class="d-none d-sm-inline">Tambah Deposit</span>
                             </button>
                             <!--end::Add deposit-->
                         </div>
                         <!--end::Toolbar-->
-                        <!--begin::Group actions-->
-                        <div class="d-flex justify-content-end align-items-center d-none"
-                            data-kt-customer-table-toolbar="selected">
-                            <div class="fw-bold me-5">
-                                <span class="me-2" data-kt-customer-table-select="selected_count"></span>Selected
-                            </div>
-                            <button type="button" class="btn btn-danger"
-                                data-kt-customer-table-select="delete_selected">Delete Selected</button>
-                        </div>
-                        <!--end::Group actions-->
+
                     </div>
                     <!--end::Card toolbar-->
                 </div>
@@ -216,7 +104,7 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_customers_table">
                             <thead>
                                 <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                                    <th class="min-w-125px">Nama</th>
+                                    <th class="min-w-125px">Refference</th>
                                     <th class="min-w-125px d-none d-sm-table-cell">No Hp</th>
                                     <th class="min-w-125px">Jumlah</th>
                                     <th class="min-w-125px d-none d-lg-table-cell">Metode Pembayaran</th>
@@ -231,35 +119,7 @@
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <div class="text-gray-800 text-hover-primary mb-1 fw-bold">
-                                                    {{ $deposit->user->name }}</div>
-
-                                                <!-- Mobile-only info -->
-                                                <div class="d-sm-none">
-                                                    <div class="text-muted fs-8 mb-1">{{ $deposit->user->phone }}</div>
-                                                </div>
-
-                                                <!-- Mobile status and method -->
-                                                <div class="d-md-none mt-1">
-                                                    <div class="d-flex flex-wrap gap-1 mb-1">
-                                                        @if ($deposit->status == 'success')
-                                                            <span class="badge badge-light-success fs-8">Confirmed</span>
-                                                        @elseif($deposit->status == 'waiting_confirmation' || $deposit->status == 'pending')
-                                                            <span class="badge badge-light-warning fs-8">Waiting</span>
-                                                        @elseif($deposit->status == 'failed')
-                                                            <span class="badge badge-light-danger fs-8">Rejected</span>
-                                                        @else
-                                                            <span
-                                                                class="badge badge-light-secondary fs-8">{{ $deposit->status }}</span>
-                                                        @endif
-                                                    </div>
-
-                                                    <!-- Mobile payment method and time -->
-                                                    <div class="d-lg-none text-muted fs-8">{{ $deposit->payment_method }}
-                                                    </div>
-                                                    <div class="d-xl-none text-muted fs-8">
-                                                        {{ $deposit->created_at instanceof \Carbon\Carbon ? $deposit->created_at->format('d/m/Y H:i') : \Carbon\Carbon::parse($deposit->created_at)->format('d/m/Y H:i') }}
-                                                    </div>
-                                                </div>
+                                                    {{ $deposit->reference }}</div>
                                             </div>
                                         </td>
                                         <td class="d-none d-sm-table-cell">
@@ -289,7 +149,7 @@
                                         </td>
                                         <td class="d-none d-xl-table-cell">
                                             <div class="text-gray-800 text-hover-primary mb-1">
-                                                {{ $deposit->created_at instanceof \Carbon\Carbon ? $deposit->created_at->format('d/m/Y H:i') : \Carbon\Carbon::parse($deposit->created_at)->format('d/m/Y H:i') }}
+                                                {{ $deposit->created_at->format('d M Y, H:i') }}
                                             </div>
                                         </td>
                                         <td class="text-end">

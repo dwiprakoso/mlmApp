@@ -81,13 +81,12 @@
                     <!--begin::Card toolbar-->
                     <div class="card-toolbar">
                         <!--begin::Toolbar-->
-                        <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
+                        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2"
+                            data-kt-user-table-toolbar="base">
                             <!--begin::Add user-->
-                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#kt_modal_add_user">
-                                <i class="ki-outline ki-plus fs-2 d-none d-md-inline"></i>
-                                <span class="d-none d-md-inline">Add User</span>
-                                <span class="d-md-none">Add</span>
+                                <span class="d-none d-sm-inline">Tambah User</span>
                             </button>
                             <!--end::Add user-->
                         </div>
@@ -103,43 +102,37 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_users">
                             <thead>
                                 <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                    <th class="w-25 ps-4">User</th>
-                                    <th class="w-15 d-none d-md-table-cell">Status</th>
-                                    <th class="w-30 d-none d-lg-table-cell">Joined Date</th>
-                                    <th class="text-end w-15 pe-4">Actions</th>
+                                    <th class="min-w-200px">User</th>
+                                    <th class="min-w-125px d-none d-md-table-cell">Status</th>
+                                    <th class="min-w-150px d-none d-lg-table-cell">Joined Date</th>
+                                    <th class="text-end min-w-100px">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-600 fw-semibold">
-                                @foreach ($users as $user)
+                                @forelse($users as $user)
                                     <tr>
-                                        <td class="ps-4">
+                                        <td>
+                                            <!--begin::User details-->
                                             <div class="d-flex flex-column">
                                                 <div class="text-gray-800 text-hover-primary mb-1 fw-bold">
                                                     {{ $user->phone }}</div>
-                                                <div class="d-md-none">
-                                                    <span
-                                                        class="badge badge-light-{{ $user->status_badge_color }} fw-bold me-2">
-                                                        {{ ucfirst($user->status) }}
-                                                    </span>
-                                                    <small
-                                                        class="text-muted">{{ $user->created_at->format('d M Y') }}</small>
-                                                </div>
                                             </div>
+                                            <!--end::User details-->
                                         </td>
                                         <td class="d-none d-md-table-cell">
-                                            <div class="badge badge-light-{{ $user->status_badge_color }} fw-bold">
+                                            <span class="badge badge-light-{{ $user->status_badge_color }} fw-bold">
                                                 {{ ucfirst($user->status) }}
-                                            </div>
+                                            </span>
                                         </td>
-                                        <td class="d-none d-lg-table-cell">{{ $user->created_at->format('d M Y, g:i a') }}
+                                        <td class="d-none d-lg-table-cell">
+                                            <span class="fw-bold">{{ $user->created_at->format('d M Y, H:i') }}</span>
                                         </td>
-                                        <td class="text-end pe-4">
+                                        <td class="text-end">
                                             <a href="#"
                                                 class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
                                                 data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                                                <span class="d-none d-sm-inline">Actions</span>
-                                                <i class="ki-outline ki-dots-vertical d-sm-none fs-5"></i>
-                                                <i class="ki-outline ki-down fs-5 ms-1 d-none d-sm-inline"></i>
+                                                <span class="d-none d-md-inline">Actions</span>
+                                                <i class="ki-outline ki-down fs-5 ms-1"></i>
                                             </a>
                                             <!--begin::Menu-->
                                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
@@ -167,7 +160,13 @@
                                             <!--end::Menu-->
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <span class="text-muted">No users found</span>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -183,7 +182,7 @@
 
     {{-- Add User Modal --}}
     <div class="modal fade" id="kt_modal_add_user" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered mw-650px modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered mw-650px">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="fw-bold">Add User</h2>
@@ -192,7 +191,7 @@
                         <i class="ki-outline ki-cross fs-1"></i>
                     </button>
                 </div>
-                <div class="modal-body scroll-y mx-2 mx-xl-15 my-7">
+                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
                     <form action="{{ route('admin.user-management.store') }}" method="POST"
                         id="kt_modal_add_user_form">
                         @csrf
@@ -238,9 +237,9 @@
                             </div>
                         </div>
                         <div class="text-center pt-15">
-                            <button type="reset" class="btn btn-light me-3 btn-sm" data-bs-dismiss="modal"
+                            <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal"
                                 aria-label="Close">Cancel</button>
-                            <button type="submit" class="btn btn-primary btn-sm">
+                            <button type="submit" class="btn btn-primary">
                                 <span class="indicator-label">Submit</span>
                             </button>
                         </div>
@@ -252,7 +251,7 @@
 
     {{-- Edit User Modal --}}
     <div class="modal fade" id="kt_modal_edit_user" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered mw-650px modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered mw-650px">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="fw-bold">Edit User</h2>
@@ -261,7 +260,7 @@
                         <i class="ki-outline ki-cross fs-1"></i>
                     </button>
                 </div>
-                <div class="modal-body scroll-y mx-2 mx-xl-15 my-7">
+                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
                     <form action="" method="POST" id="kt_modal_edit_user_form">
                         @csrf
                         @method('PUT')
@@ -306,9 +305,9 @@
                             </div>
                         </div>
                         <div class="text-center pt-15">
-                            <button type="reset" class="btn btn-light me-3 btn-sm" data-bs-dismiss="modal"
+                            <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal"
                                 aria-label="Close">Cancel</button>
-                            <button type="submit" class="btn btn-primary btn-sm">
+                            <button type="submit" class="btn btn-primary">
                                 <span class="indicator-label">Update</span>
                             </button>
                         </div>
@@ -320,7 +319,7 @@
 
     {{-- Delete User Modal --}}
     <div class="modal fade" id="kt_modal_delete_user" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered mw-550px modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered mw-550px">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="fw-bold">Delete User</h2>
@@ -340,68 +339,14 @@
                         @csrf
                         @method('DELETE')
                         <div class="text-center pt-5">
-                            <button type="button" class="btn btn-light me-3 btn-sm"
-                                data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Delete</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-    @push('styles')
-        <style>
-            @media (max-width: 768px) {
-                .app-toolbar-wrapper {
-                    flex-direction: column;
-                    align-items: flex-start !important;
-                }
-
-                .page-title {
-                    margin-bottom: 1rem;
-                }
-
-                .card-header {
-                    flex-direction: column;
-                    align-items: flex-start !important;
-                }
-
-                .card-title {
-                    width: 100%;
-                    margin-bottom: 1rem;
-                }
-
-                .card-toolbar {
-                    width: 100%;
-                }
-
-                .table-responsive {
-                    border: none;
-                }
-
-                .modal-body .form-control {
-                    font-size: 16px;
-                    /* Prevent zoom on iOS */
-                }
-            }
-
-            @media (max-width: 576px) {
-                .app-container {
-                    padding-left: 1rem;
-                    padding-right: 1rem;
-                }
-
-                .modal-content {
-                    margin: 0.5rem;
-                }
-
-                .modal-body {
-                    padding: 1rem;
-                }
-            }
-        </style>
-    @endpush
 
     @push('scripts')
         <script>
@@ -414,16 +359,17 @@
                 const searchTerm = e.target.value.toLowerCase();
 
                 tableRows.forEach(row => {
-                    const phoneNumber = row.querySelector('td:first-child .text-gray-800').textContent
-                        .toLowerCase();
-                    const status = row.querySelector('td:nth-child(2) .badge')?.textContent.toLowerCase() ||
-                        '';
-                    const date = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+                    // Skip if this is the empty state row (has colspan)
+                    if (row.querySelector('td[colspan]')) {
+                        return;
+                    }
 
-                    // Search in phone, status, and date
-                    if (phoneNumber.includes(searchTerm) ||
-                        status.includes(searchTerm) ||
-                        date.includes(searchTerm)) {
+                    // Get user phone only
+                    const userPhone = row.querySelector('td:first-child .text-gray-800')?.textContent
+                        .toLowerCase() || '';
+
+                    // Search in user phone only
+                    if (userPhone.includes(searchTerm)) {
                         row.style.display = '';
                     } else {
                         row.style.display = 'none';
@@ -431,7 +377,9 @@
                 });
 
                 // Show "No matching records found" message if all rows are hidden
-                const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+                const visibleRows = Array.from(tableRows).filter(row => {
+                    return row.style.display !== 'none' && !row.querySelector('td[colspan]');
+                });
                 const noDataRow = tableBody.querySelector('.no-data-row');
 
                 if (visibleRows.length === 0 && !noDataRow) {
@@ -449,39 +397,43 @@
             // Edit User Modal
             document.addEventListener('DOMContentLoaded', function() {
                 const editModal = document.getElementById('kt_modal_edit_user');
-                editModal.addEventListener('show.bs.modal', function(event) {
-                    const button = event.relatedTarget;
-                    const userId = button.getAttribute('data-user-id');
-                    const userName = button.getAttribute('data-user-name');
-                    const userEmail = button.getAttribute('data-user-email');
-                    const userPhone = button.getAttribute('data-user-phone');
-                    const userStatus = button.getAttribute('data-user-status');
+                if (editModal) {
+                    editModal.addEventListener('show.bs.modal', function(event) {
+                        const button = event.relatedTarget;
+                        const userId = button.getAttribute('data-user-id');
+                        const userName = button.getAttribute('data-user-name');
+                        const userEmail = button.getAttribute('data-user-email');
+                        const userPhone = button.getAttribute('data-user-phone');
+                        const userStatus = button.getAttribute('data-user-status');
 
-                    // Update form action
-                    const form = document.getElementById('kt_modal_edit_user_form');
-                    form.action = `{{ route('admin.user-management.index') }}/${userId}`;
+                        // Update form action
+                        const form = document.getElementById('kt_modal_edit_user_form');
+                        form.action = `{{ route('admin.user-management.index') }}/${userId}`;
 
-                    // Fill form fields
-                    document.getElementById('edit_name').value = userName;
-                    document.getElementById('edit_email').value = userEmail;
-                    document.getElementById('edit_phone').value = userPhone;
-                    document.getElementById('edit_status').value = userStatus;
-                });
+                        // Fill form fields
+                        document.getElementById('edit_name').value = userName;
+                        document.getElementById('edit_email').value = userEmail;
+                        document.getElementById('edit_phone').value = userPhone;
+                        document.getElementById('edit_status').value = userStatus;
+                    });
+                }
 
                 // Delete User Modal
                 const deleteModal = document.getElementById('kt_modal_delete_user');
-                deleteModal.addEventListener('show.bs.modal', function(event) {
-                    const button = event.relatedTarget;
-                    const userId = button.getAttribute('data-user-id');
-                    const userName = button.getAttribute('data-user-name');
+                if (deleteModal) {
+                    deleteModal.addEventListener('show.bs.modal', function(event) {
+                        const button = event.relatedTarget;
+                        const userId = button.getAttribute('data-user-id');
+                        const userName = button.getAttribute('data-user-name');
 
-                    // Update form action
-                    const form = document.getElementById('kt_modal_delete_user_form');
-                    form.action = `{{ route('admin.user-management.index') }}/${userId}`;
+                        // Update form action
+                        const form = document.getElementById('kt_modal_delete_user_form');
+                        form.action = `{{ route('admin.user-management.index') }}/${userId}`;
 
-                    // Update user name in modal
-                    document.getElementById('delete_user_name').textContent = userName;
-                });
+                        // Update user name in modal
+                        document.getElementById('delete_user_name').textContent = userName;
+                    });
+                }
             });
         </script>
     @endpush
