@@ -57,109 +57,6 @@
                         <!--end::Search-->
                     </div>
                     <!--begin::Card title-->
-                    <!--begin::Card toolbar-->
-                    <div class="card-toolbar">
-                        <!--begin::Toolbar-->
-                        <div class="d-flex justify-content-end flex-wrap gap-2" data-kt-withdraw-table-toolbar="base">
-                            <!--begin::Filter-->
-                            <button type="button" class="btn btn-light-primary btn-sm" data-kt-menu-trigger="click"
-                                data-kt-menu-placement="bottom-end">
-                                <i class="ki-outline ki-filter fs-2 d-none d-sm-inline"></i>
-                                <span class="d-none d-sm-inline">Filter</span>
-                                <span class="d-sm-none">Filter</span>
-                            </button>
-                            <!--begin::Menu 1-->
-                            <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true"
-                                id="kt-toolbar-filter">
-                                <!--begin::Header-->
-                                <div class="px-7 py-5">
-                                    <div class="fs-4 text-gray-900 fw-bold">Filter Options</div>
-                                </div>
-                                <!--end::Header-->
-                                <!--begin::Separator-->
-                                <div class="separator border-gray-200"></div>
-                                <!--end::Separator-->
-                                <!--begin::Content-->
-                                <div class="px-7 py-5">
-                                    <!--begin::Input group-->
-                                    <div class="mb-10">
-                                        <!--begin::Label-->
-                                        <label class="form-label fs-5 fw-semibold mb-3">Status:</label>
-                                        <!--end::Label-->
-                                        <!--begin::Input-->
-                                        <select class="form-select form-select-solid fw-bold" data-kt-select2="true"
-                                            data-placeholder="Select option" data-allow-clear="true"
-                                            data-kt-withdraw-table-filter="status"
-                                            data-dropdown-parent="#kt-toolbar-filter">
-                                            <option></option>
-                                            <option value="pending">Pending</option>
-                                            <option value="success">Success</option>
-                                            <option value="failed">Failed</option>
-                                            <option value="waiting_confirmation">Waiting Confirmation</option>
-                                        </select>
-                                        <!--end::Input-->
-                                    </div>
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
-                                    <div class="mb-10">
-                                        <!--begin::Label-->
-                                        <label class="form-label fs-5 fw-semibold mb-3">Payment Method:</label>
-                                        <!--end::Label-->
-                                        <!--begin::Options-->
-                                        <div class="d-flex flex-column flex-wrap fw-semibold"
-                                            data-kt-withdraw-table-filter="payment_method">
-                                            <!--begin::Option-->
-                                            <label
-                                                class="form-check form-check-sm form-check-custom form-check-solid mb-3 me-5">
-                                                <input class="form-check-input" type="radio" name="payment_method"
-                                                    value="all" checked="checked" />
-                                                <span class="form-check-label text-gray-600">All</span>
-                                            </label>
-                                            <!--end::Option-->
-                                            <!--begin::Option-->
-                                            <label
-                                                class="form-check form-check-sm form-check-custom form-check-solid mb-3 me-5">
-                                                <input class="form-check-input" type="radio" name="payment_method"
-                                                    value="bank_transfer" />
-                                                <span class="form-check-label text-gray-600">Bank Transfer</span>
-                                            </label>
-                                            <!--end::Option-->
-                                            <!--begin::Option-->
-                                            <label class="form-check form-check-sm form-check-custom form-check-solid mb-3">
-                                                <input class="form-check-input" type="radio" name="payment_method"
-                                                    value="wallet_qris" />
-                                                <span class="form-check-label text-gray-600">Wallet QRIS</span>
-                                            </label>
-                                            <!--end::Option-->
-                                        </div>
-                                        <!--end::Options-->
-                                    </div>
-                                    <!--end::Input group-->
-                                    <!--begin::Actions-->
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button type="reset" class="btn btn-light btn-active-light-primary btn-sm"
-                                            data-kt-menu-dismiss="true" data-kt-withdraw-table-filter="reset">Reset</button>
-                                        <button type="submit" class="btn btn-primary btn-sm" data-kt-menu-dismiss="true"
-                                            data-kt-withdraw-table-filter="filter">Apply</button>
-                                    </div>
-                                    <!--end::Actions-->
-                                </div>
-                                <!--end::Content-->
-                            </div>
-                            <!--end::Menu 1-->
-                            <!--end::Filter-->
-                            <!--begin::Export-->
-                            <button type="button" class="btn btn-light-primary btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#kt_withdraw_export_modal">
-                                <i class="ki-outline ki-exit-up fs-2 d-none d-sm-inline"></i>
-                                <span class="d-none d-sm-inline">Export</span>
-                                <span class="d-sm-none">Export</span>
-                            </button>
-                            <!--end::Export-->
-                        </div>
-                        <!--end::Toolbar-->
-                    </div>
-                    <!--end::Card toolbar-->
                 </div>
                 <!--end::Card header-->
                 <!--begin::Card body-->
@@ -169,7 +66,8 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_customers_table">
                             <thead>
                                 <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                                    <th class="min-w-100px">Transaction</th>
+                                    <th class="min-w-100px">Refference</th>
+                                    <th class="min-w-125px d-none d-lg-table-cell">User</th>
                                     <th class="min-w-125px d-none d-lg-table-cell">Amount</th>
                                     <th class="min-w-125px d-none d-xl-table-cell">Wallet</th>
                                     <th class="min-w-100px d-none d-md-table-cell">Status</th>
@@ -185,33 +83,21 @@
                                                 <div class="text-gray-800 text-hover-primary fw-bold mb-1">
                                                     {{ $transaction->reference }}
                                                 </div>
-                                                <div class="text-gray-600 fs-7">
-                                                    <strong>{{ $transaction->user->name ?? 'N/A' }}</strong>
-                                                </div>
-                                                <div class="text-muted fs-8">
-                                                    {{ $transaction->user->phone ?? '-' }}
-                                                </div>
-                                                <!-- Mobile Info -->
-                                                <div class="d-lg-none mt-2">
-                                                    <div class="badge badge-light-primary fw-bold mb-1">
-                                                        {{ $transaction->amount }}
-                                                    </div>
-                                                    <div class="d-md-none">
-                                                        <span
-                                                            class="badge badge-light-{{ $transaction->status == 'success' ? 'success' : ($transaction->status == 'pending' ? 'warning' : 'danger') }} fw-bold me-1">
-                                                            {{ ucfirst($transaction->status) }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="text-muted fs-8 mt-1">
-                                                        {{ $transaction->created_at->format('d M Y, H:i') }}
-                                                    </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <div class="text-gray-800 text-hover-primary fw-bold mb-1">
+                                                    {{ $transaction->user->phone }}
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="d-none d-lg-table-cell">
-                                            <span class="badge badge-light-primary fw-bold">
-                                                {{ $transaction->amount }}
-                                            </span>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <div class="text-gray-800 text-hover-primary fw-bold mb-1">
+                                                    Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="d-none d-xl-table-cell">
                                             @if ($transaction->wallet)
@@ -390,4 +276,63 @@
             }
         }
     </style>
+@endpush
+@push('scripts')
+    <script>
+        // Search functionality untuk withdraw transactions
+        const searchInput = document.querySelector('[data-kt-withdraw-table-filter="search"]');
+        const tableBody = document.querySelector('#kt_customers_table tbody');
+        const tableRows = tableBody.querySelectorAll('tr');
+
+        searchInput.addEventListener('keyup', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+
+            tableRows.forEach(row => {
+                // Skip jika ini adalah empty state row (punya colspan)
+                if (row.querySelector('td[colspan]')) {
+                    return;
+                }
+
+                // Ambil reference (kolom pertama)
+                const reference = row.querySelector('td:first-child .text-gray-800')?.textContent
+                    .toLowerCase().trim() || '';
+
+                // Ambil user phone (kolom kedua)
+                const userPhone = row.querySelector('td:nth-child(2) .text-gray-800')?.textContent
+                    .toLowerCase().trim() || '';
+
+                // Search hanya di reference dan user phone
+                if (reference.includes(searchTerm) || userPhone.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Tampilkan pesan "No matching records found" jika semua row tersembunyi
+            const visibleRows = Array.from(tableRows).filter(row => {
+                return row.style.display !== 'none' && !row.querySelector('td[colspan]');
+            });
+
+            const noDataRow = tableBody.querySelector('.no-data-row');
+
+            if (visibleRows.length === 0 && !noDataRow) {
+                const colspan = tableBody.closest('table').querySelectorAll('thead th').length;
+                const emptyRow = document.createElement('tr');
+                emptyRow.className = 'no-data-row';
+                emptyRow.innerHTML = `
+            <td colspan="${colspan}" class="text-center py-10">
+                <div class="d-flex flex-column align-items-center">
+                    <i class="ki-outline ki-file-deleted fs-3x text-muted mb-3"></i>
+                    <div class="text-gray-800 fw-bold mb-1">No matching records found</div>
+                    <div class="text-muted">Try adjusting your search criteria</div>
+                </div>
+            </td>
+        `;
+                tableBody.appendChild(emptyRow);
+            } else if (visibleRows.length > 0 && noDataRow) {
+                noDataRow.remove();
+            }
+        });
+    </script>
 @endpush
