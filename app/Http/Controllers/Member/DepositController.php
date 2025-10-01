@@ -10,22 +10,65 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Config; // Add this import
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class DepositController extends Controller
 {
     public function index()
     {
-        return view('member.pages.deposit.index');
+        // Generate unique token untuk form
+        $token = Str::random(32);
+        session(['deposit_token' => $token]);
+
+        return view('member.pages.deposit.index', compact('token'));
     }
 
     public function store(Request $request)
     {
+        // 1. Rate Limiting - Cegah request terlalu cepat
+        $rateLimitKey = 'deposit:' . auth()->id();
+
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 1)) {
+            $seconds = RateLimiter::availableIn($rateLimitKey);
+            return back()
+                ->withInput()
+                ->with('error', "Mohon tunggu {$seconds} detik sebelum melakukan deposit lagi.");
+        }
+
+        // 2. Validasi Token - Cegah duplicate submission
+        if ($request->input('_token_deposit') !== session('deposit_token')) {
+            return back()
+                ->withInput()
+                ->with('error', 'Form sudah pernah disubmit. Silakan refresh halaman dan coba lagi.');
+        }
+
+        // 3. Validasi Input
         $request->validate([
             'amount' => 'required|numeric|min:50000|max:50000000',
             'payment_method' => 'required|string'
         ]);
 
-        // Generate reference dengan format DEP-6 digit random
+        // 4. Cek Duplicate Transaction (dalam 1 menit terakhir dengan amount sama)
+        $recentTransaction = Transaction::where('user_id', Auth::id())
+            ->where('type', 'deposit')
+            ->where('amount', $request->amount)
+            ->where('created_at', '>=', now()->subMinute())
+            ->first();
+
+        if ($recentTransaction) {
+            return back()
+                ->withInput()
+                ->with('error', 'Anda baru saja membuat deposit dengan jumlah yang sama. Silakan tunggu sebentar.');
+        }
+
+        // 5. Hapus token setelah validasi berhasil
+        session()->forget('deposit_token');
+
+        // 6. Set rate limit (10 detik)
+        RateLimiter::hit($rateLimitKey, 10);
+
+        // 7. Generate reference dengan format DEP-6 digit random
         $reference = 'DEP-' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT);
 
         // Pastikan reference unik
@@ -33,7 +76,7 @@ class DepositController extends Controller
             $reference = 'DEP-' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT);
         }
 
-        // Buat transaksi deposit
+        // 8. Buat transaksi deposit
         $transaction = Transaction::create([
             'user_id' => Auth::id(),
             'product_id' => null,
@@ -46,12 +89,18 @@ class DepositController extends Controller
             'approved_by' => null,
         ]);
 
-        // Send email notification
+        // 9. Send email notification
         try {
             Mail::to('richkingdomltd@gmail.com')->send(new DepositNotification($transaction));
-            Log::info('Deposit notification email sent successfully');
+            Log::info('Deposit notification email sent successfully', [
+                'transaction_id' => $transaction->id,
+                'reference' => $reference
+            ]);
         } catch (\Exception $e) {
-            Log::error('Failed to send deposit notification email: ' . $e->getMessage());
+            Log::error('Failed to send deposit notification email: ' . $e->getMessage(), [
+                'transaction_id' => $transaction->id,
+                'reference' => $reference
+            ]);
             // Don't fail the transaction if email fails
         }
 
