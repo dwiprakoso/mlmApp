@@ -121,6 +121,7 @@ License: For each use you must have a valid license purchased only from above li
     <script src="assets/js/custom/authentication/sign-up/general.js"></script>
     <!--end::Custom Javascript-->
     <!--end::Javascript-->
+    @stack('scripts')
 </body>
 <!--end::Body-->
 

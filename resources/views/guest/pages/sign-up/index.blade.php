@@ -10,7 +10,7 @@
                 <div class="d-flex flex-center flex-column flex-column-fluid pb-15 pb-lg-20">
 
                     @if ($errors->any())
-                        <div class="alert alert-danger mb-8">
+                        <div class="alert alert-danger mb-10">
                             @foreach ($errors->all() as $error)
                                 <div>{{ $error }}</div>
                             @endforeach
@@ -18,7 +18,7 @@
                     @endif
 
                     @if ($referrer ?? false)
-                        <div class="alert alert-info mb-8">
+                        <div class="alert alert-info mb-10">
                             <i class="ki-outline ki-information fs-2 me-2"></i>
                             Anda diundang oleh: <strong>{{ $referrer->name }}</strong>
                         </div>
@@ -34,7 +34,7 @@
                         @endif
 
                         <!--begin::Heading-->
-                        <div class="text-center mb-11">
+                        <div class="text-center mb-13">
                             <!--begin::Title-->
                             <h1 class="text-gray-900 fw-bolder mb-3">Sign Up</h1>
                             <!--end::Title-->
@@ -45,41 +45,57 @@
                         <!--begin::Heading-->
 
                         <!--begin::Input group - Name-->
-                        <div class="fv-row mb-8">
-                            <input type="text" placeholder="Nama *" name="name" value="{{ old('name') }}"
-                                autocomplete="off"
-                                class="form-control bg-transparent @error('name') is-invalid @enderror" />
+                        <div class="fv-row mb-10">
+                            <label class="form-label fs-6 fw-semibold text-gray-900 mb-3">Nama Lengkap</label>
+                            <input type="text" placeholder="Masukkan nama lengkap" name="name"
+                                value="{{ old('name') }}" autocomplete="off"
+                                class="form-control form-control-lg bg-transparent @error('name') is-invalid @enderror" />
                         </div>
                         <!--end::Input group-->
 
                         <!--begin::Input group - Phone-->
-                        <div class="fv-row mb-8">
-                            <input type="text" placeholder="No HP *" name="phone" value="{{ old('phone') }}"
+                        <div class="fv-row mb-10">
+                            <label class="form-label fs-6 fw-semibold text-gray-900 mb-3">Nomor HP</label>
+                            <input type="text" placeholder="Masukkan nomor HP" name="phone" value="{{ old('phone') }}"
                                 autocomplete="off"
-                                class="form-control bg-transparent @error('phone') is-invalid @enderror" />
+                                class="form-control form-control-lg bg-transparent @error('phone') is-invalid @enderror" />
                         </div>
                         <!--end::Input group-->
 
                         <!--begin::Input group - Email-->
-                        <div class="fv-row mb-8">
-                            <input type="email" placeholder="Email (Opsional)" name="email" value="{{ old('email') }}"
+                        <div class="fv-row mb-10">
+                            <label class="form-label fs-6 fw-semibold text-gray-900 mb-3">Email <span
+                                    class="text-muted">(Opsional)</span></label>
+                            <input type="email" placeholder="Masukkan email" name="email" value="{{ old('email') }}"
                                 autocomplete="off"
-                                class="form-control bg-transparent @error('email') is-invalid @enderror" />
+                                class="form-control form-control-lg bg-transparent @error('email') is-invalid @enderror" />
                         </div>
                         <!--end::Input group-->
 
                         <!--begin::Input group - Password-->
-                        <div class="fv-row mb-8" data-kt-password-meter="true">
+                        <div class="fv-row mb-10" data-kt-password-meter="true">
+                            <label class="form-label fs-6 fw-semibold text-gray-900 mb-3">Password</label>
                             <!--begin::Wrapper-->
                             <div class="mb-1">
                                 <!--begin::Input wrapper-->
                                 <div class="position-relative mb-3">
-                                    <input class="form-control bg-transparent @error('password') is-invalid @enderror"
-                                        type="password" placeholder="Password *" name="password" autocomplete="off" />
+                                    <input
+                                        class="form-control form-control-lg bg-transparent @error('password') is-invalid @enderror"
+                                        type="password" placeholder="Masukkan password" name="password" autocomplete="off"
+                                        id="password-field" />
                                     <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2"
-                                        data-kt-password-meter-control="visibility">
-                                        <i class="ki-outline ki-eye-slash fs-2"></i>
-                                        <i class="ki-outline ki-eye fs-2 d-none"></i>
+                                        id="toggle-password" style="cursor: pointer;">
+                                        <i class="ki-duotone ki-eye fs-2" id="eye-icon">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        <i class="ki-duotone ki-eye-slash fs-2 d-none" id="eye-slash-icon">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                        </i>
                                     </span>
                                 </div>
                                 <!--end::Input wrapper-->
@@ -94,40 +110,59 @@
                             </div>
                             <!--end::Wrapper-->
                             <!--begin::Hint-->
-                            <div class="text-muted">Gunakan minimal 8 karakter dengan kombinasi huruf, angka & simbol</div>
+                            <div class="text-muted fs-7">Gunakan minimal 8 karakter dengan kombinasi huruf, angka & simbol
+                            </div>
                             <!--end::Hint-->
                         </div>
                         <!--end::Input group-->
 
                         <!--begin::Input group - Confirm Password-->
-                        <div class="fv-row mb-8">
-                            <input placeholder="Konfirmasi Password *" name="password_confirmation" type="password"
-                                autocomplete="off"
-                                class="form-control bg-transparent @error('password_confirmation') is-invalid @enderror" />
+                        <div class="fv-row mb-10">
+                            <label class="form-label fs-6 fw-semibold text-gray-900 mb-3">Konfirmasi Password</label>
+                            <div class="position-relative">
+                                <input placeholder="Masukkan kembali password" name="password_confirmation" type="password"
+                                    autocomplete="off" id="password-confirm-field"
+                                    class="form-control form-control-lg bg-transparent @error('password_confirmation') is-invalid @enderror" />
+                                <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2"
+                                    id="toggle-password-confirm" style="cursor: pointer;">
+                                    <i class="ki-duotone ki-eye fs-2" id="eye-icon-confirm">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    <i class="ki-duotone ki-eye-slash fs-2 d-none" id="eye-slash-icon-confirm">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                    </i>
+                                </span>
+                            </div>
                         </div>
                         <!--end::Input group-->
 
                         <!--begin::Accept-->
-                        <div class="fv-row mb-8">
+                        <div class="fv-row mb-10">
                             <label class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" name="toc" value="1" required />
-                                <span class="form-check-label fw-semibold text-gray-700 fs-base ms-1">Saya menyetujui
-                                    <a href="#" class="ms-1 link-primary">Syarat & Ketentuan</a></span>
+                                <span class="form-check-label fw-semibold text-gray-700 fs-6 ms-1">Saya menyetujui
+                                    <a href="#" class="link-primary">Syarat & Ketentuan</a></span>
                             </label>
                         </div>
                         <!--end::Accept-->
 
                         <!--begin::Submit button-->
                         <div class="d-grid mb-10">
-                            <button type="submit" class="btn btn-primary">
-                                Sign up
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <span class="indicator-label">Sign Up</span>
                             </button>
                         </div>
                         <!--end::Submit button-->
 
                         <!--begin::Sign in-->
-                        <div class="text-gray-500 text-center fw-semibold fs-6">Sudah punya akun?
-                            <a href="{{ route('login') }}" class="link-primary fw-semibold">Sign in</a>
+                        <div class="text-gray-500 text-center fw-semibold fs-6">
+                            Sudah punya akun?
+                            <a href="{{ route('login') }}" class="link-primary fw-bold">Sign in</a>
                         </div>
                         <!--end::Sign in-->
                     </form>
@@ -140,4 +175,41 @@
         <!--end::Wrapper-->
     </div>
     <!--end::Body-->
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Toggle untuk password
+                const togglePassword = document.getElementById('toggle-password');
+                const passwordField = document.getElementById('password-field');
+                const eyeIcon = document.getElementById('eye-icon');
+                const eyeSlashIcon = document.getElementById('eye-slash-icon');
+
+                if (togglePassword) {
+                    togglePassword.addEventListener('click', function() {
+                        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                        passwordField.setAttribute('type', type);
+                        eyeIcon.classList.toggle('d-none');
+                        eyeSlashIcon.classList.toggle('d-none');
+                    });
+                }
+
+                // Toggle untuk confirm password
+                const togglePasswordConfirm = document.getElementById('toggle-password-confirm');
+                const passwordConfirmField = document.getElementById('password-confirm-field');
+                const eyeIconConfirm = document.getElementById('eye-icon-confirm');
+                const eyeSlashIconConfirm = document.getElementById('eye-slash-icon-confirm');
+
+                if (togglePasswordConfirm) {
+                    togglePasswordConfirm.addEventListener('click', function() {
+                        const type = passwordConfirmField.getAttribute('type') === 'password' ? 'text' :
+                            'password';
+                        passwordConfirmField.setAttribute('type', type);
+                        eyeIconConfirm.classList.toggle('d-none');
+                        eyeSlashIconConfirm.classList.toggle('d-none');
+                    });
+                }
+            });
+        </script>
+    @endpush
 @endsection
