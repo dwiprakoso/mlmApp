@@ -103,16 +103,16 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_users">
                             <thead>
                                 <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                    <th class="min-w-125px">User</th>
-                                    <th class="min-w-100px d-none d-md-table-cell">Status</th>
-                                    <th class="min-w-125px d-none d-lg-table-cell">Joined Date</th>
-                                    <th class="text-end min-w-100px">Actions</th>
+                                    <th class="w-25 ps-4">User</th>
+                                    <th class="w-15 d-none d-md-table-cell">Status</th>
+                                    <th class="w-30 d-none d-lg-table-cell">Joined Date</th>
+                                    <th class="text-end w-15 pe-4">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-600 fw-semibold">
                                 @foreach ($users as $user)
                                     <tr>
-                                        <td>
+                                        <td class="ps-4">
                                             <div class="d-flex flex-column">
                                                 <div class="text-gray-800 text-hover-primary mb-1 fw-bold">
                                                     {{ $user->phone }}</div>
@@ -133,7 +133,7 @@
                                         </td>
                                         <td class="d-none d-lg-table-cell">{{ $user->created_at->format('d M Y, g:i a') }}
                                         </td>
-                                        <td class="text-end">
+                                        <td class="text-end pe-4">
                                             <a href="#"
                                                 class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
                                                 data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
@@ -334,6 +334,7 @@
             </div>
         </div>
     </div>
+
     @push('styles')
         <style>
             @media (max-width: 768px) {
@@ -386,8 +387,50 @@
             }
         </style>
     @endpush
+
     @push('scripts')
         <script>
+            // Search functionality
+            const searchInput = document.querySelector('[data-kt-user-table-filter="search"]');
+            const tableBody = document.querySelector('#kt_table_users tbody');
+            const tableRows = tableBody.querySelectorAll('tr');
+
+            searchInput.addEventListener('keyup', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+
+                tableRows.forEach(row => {
+                    const phoneNumber = row.querySelector('td:first-child .text-gray-800').textContent
+                        .toLowerCase();
+                    const status = row.querySelector('td:nth-child(2) .badge')?.textContent.toLowerCase() ||
+                        '';
+                    const date = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+
+                    // Search in phone, status, and date
+                    if (phoneNumber.includes(searchTerm) ||
+                        status.includes(searchTerm) ||
+                        date.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show "No matching records found" message if all rows are hidden
+                const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+                const noDataRow = tableBody.querySelector('.no-data-row');
+
+                if (visibleRows.length === 0 && !noDataRow) {
+                    const colspan = tableBody.closest('table').querySelectorAll('thead th').length;
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.className = 'no-data-row';
+                    emptyRow.innerHTML =
+                        `<td colspan="${colspan}" class="text-center py-10 text-muted">No matching records found</td>`;
+                    tableBody.appendChild(emptyRow);
+                } else if (visibleRows.length > 0 && noDataRow) {
+                    noDataRow.remove();
+                }
+            });
+
             // Edit User Modal
             document.addEventListener('DOMContentLoaded', function() {
                 const editModal = document.getElementById('kt_modal_edit_user');
