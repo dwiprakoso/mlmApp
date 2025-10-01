@@ -84,24 +84,12 @@
                         <!--begin::Toolbar-->
                         <div class="d-flex flex-column flex-sm-row justify-content-end gap-2"
                             data-kt-product-table-toolbar="base">
-                            <!--begin::Filter-->
-                            <div class="w-150px">
-                                <select class="form-select form-select-solid" data-control="select2" data-hide-search="true"
-                                    data-placeholder="Status" data-kt-product-filter="status">
-                                    <option></option>
-                                    <option value="all">All</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
-                            </div>
-                            <!--end::Filter-->
                             <!--begin::Add product-->
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#kt_modal_add_product">
                                 <i class="ki-outline ki-plus fs-2 d-none d-sm-inline"></i>
                                 <span class="d-sm-none">+</span>
                                 <span class="d-none d-sm-inline">Add Product</span>
-                                <span class="d-sm-none">Add</span>
                             </button>
                             <!--end::Add product-->
                         </div>
@@ -110,7 +98,7 @@
                     <!--end::Card toolbar-->
                 </div>
                 <!--end::Card header-->
-                <!--begin::Card body - GANTI BAGIAN INI-->
+                <!--begin::Card body -->
                 <div class="card-body py-4">
                     <!--begin::Table-->
                     <div class="table-responsive">
@@ -502,48 +490,96 @@
 
             @push('scripts')
                 <script>
+                    // Search functionality for products
+                    const searchInput = document.querySelector('[data-kt-product-table-filter="search"]');
+                    const tableBody = document.querySelector('#kt_table_products tbody');
+                    const tableRows = tableBody.querySelectorAll('tr');
+
+                    searchInput.addEventListener('keyup', function(e) {
+                        const searchTerm = e.target.value.toLowerCase();
+
+                        tableRows.forEach(row => {
+                            // Skip if this is the empty state row (has colspan)
+                            if (row.querySelector('td[colspan]')) {
+                                return;
+                            }
+
+                            // Get product name only
+                            const productName = row.querySelector('td:first-child .text-gray-800')?.textContent
+                                .toLowerCase() || '';
+
+                            // Search in product name only
+                            if (productName.includes(searchTerm)) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+
+                        // Show "No matching records found" message if all rows are hidden
+                        const visibleRows = Array.from(tableRows).filter(row => {
+                            return row.style.display !== 'none' && !row.querySelector('td[colspan]');
+                        });
+                        const noDataRow = tableBody.querySelector('.no-data-row');
+
+                        if (visibleRows.length === 0 && !noDataRow) {
+                            const colspan = tableBody.closest('table').querySelectorAll('thead th').length;
+                            const emptyRow = document.createElement('tr');
+                            emptyRow.className = 'no-data-row';
+                            emptyRow.innerHTML =
+                                `<td colspan="${colspan}" class="text-center py-10 text-muted">No matching records found</td>`;
+                            tableBody.appendChild(emptyRow);
+                        } else if (visibleRows.length > 0 && noDataRow) {
+                            noDataRow.remove();
+                        }
+                    });
+
                     // Edit Product Modal
                     document.addEventListener('DOMContentLoaded', function() {
                         const editModal = document.getElementById('kt_modal_edit_product');
-                        editModal.addEventListener('show.bs.modal', function(event) {
-                            const button = event.relatedTarget;
-                            const productId = button.getAttribute('data-product-id');
-                            const productName = button.getAttribute('data-product-name');
-                            const productDescription = button.getAttribute('data-product-description');
-                            const productDuration = button.getAttribute('data-product-duration');
-                            const productPrice = button.getAttribute('data-product-price');
-                            const productType = button.getAttribute('data-product-type');
-                            const productPresentase = button.getAttribute('data-product-presentase');
-                            const productStatus = button.getAttribute('data-product-status');
+                        if (editModal) {
+                            editModal.addEventListener('show.bs.modal', function(event) {
+                                const button = event.relatedTarget;
+                                const productId = button.getAttribute('data-product-id');
+                                const productName = button.getAttribute('data-product-name');
+                                const productDescription = button.getAttribute('data-product-description');
+                                const productDuration = button.getAttribute('data-product-duration');
+                                const productPrice = button.getAttribute('data-product-price');
+                                const productType = button.getAttribute('data-product-type');
+                                const productPresentase = button.getAttribute('data-product-presentase');
+                                const productStatus = button.getAttribute('data-product-status');
 
-                            // Update form action
-                            const form = document.getElementById('kt_modal_edit_product_form');
-                            form.action = `{{ route('admin.product.index') }}/${productId}`;
+                                // Update form action
+                                const form = document.getElementById('kt_modal_edit_product_form');
+                                form.action = `{{ route('admin.product.index') }}/${productId}`;
 
-                            // Fill form fields
-                            document.getElementById('edit_name').value = productName;
-                            document.getElementById('edit_description').value = productDescription || '';
-                            document.getElementById('edit_duration').value = productDuration || '';
-                            document.getElementById('edit_price').value = productPrice;
-                            document.getElementById('edit_type').value = productType || '';
-                            document.getElementById('edit_presentase').value = productPresentase || '';
-                            document.getElementById('edit_status').value = productStatus;
-                        });
+                                // Fill form fields
+                                document.getElementById('edit_name').value = productName;
+                                document.getElementById('edit_description').value = productDescription || '';
+                                document.getElementById('edit_duration').value = productDuration || '';
+                                document.getElementById('edit_price').value = productPrice;
+                                document.getElementById('edit_type').value = productType || '';
+                                document.getElementById('edit_presentase').value = productPresentase || '';
+                                document.getElementById('edit_status').value = productStatus;
+                            });
+                        }
 
                         // Delete Product Modal
                         const deleteModal = document.getElementById('kt_modal_delete_product');
-                        deleteModal.addEventListener('show.bs.modal', function(event) {
-                            const button = event.relatedTarget;
-                            const productId = button.getAttribute('data-product-id');
-                            const productName = button.getAttribute('data-product-name');
+                        if (deleteModal) {
+                            deleteModal.addEventListener('show.bs.modal', function(event) {
+                                const button = event.relatedTarget;
+                                const productId = button.getAttribute('data-product-id');
+                                const productName = button.getAttribute('data-product-name');
 
-                            // Update form action
-                            const form = document.getElementById('kt_modal_delete_product_form');
-                            form.action = `{{ route('admin.product.index') }}/${productId}`;
+                                // Update form action
+                                const form = document.getElementById('kt_modal_delete_product_form');
+                                form.action = `{{ route('admin.product.index') }}/${productId}`;
 
-                            // Update product name in modal
-                            document.getElementById('delete_product_name').textContent = productName;
-                        });
+                                // Update product name in modal
+                                document.getElementById('delete_product_name').textContent = productName;
+                            });
+                        }
                     });
                 </script>
             @endpush
