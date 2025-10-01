@@ -151,6 +151,7 @@
                                                         data-user-id="{{ $user->id }}"
                                                         data-user-name="{{ $user->name }}"
                                                         data-user-email="{{ $user->email }}"
+                                                        data-user-phone="{{ $user->phone }}"
                                                         data-user-status="{{ $user->status }}">Edit</a>
                                                 </div>
                                                 <!--end::Menu item-->
@@ -207,6 +208,13 @@
                                 <label class="required fw-semibold fs-6 mb-2">Email</label>
                                 <input type="email" name="email" class="form-control form-control-solid mb-3 mb-lg-0"
                                     placeholder="example@domain.com" value="{{ old('email') }}" required />
+                            </div>
+                            {{-- Phone --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Phone Number</label>
+                                <input type="text" name="phone" class="form-control form-control-solid mb-3 mb-lg-0"
+                                    placeholder="0812345678" value="{{ old('phone') }}" required />
+                                <div class="form-text">Enter phone number with country code (e.g., 0812345678)</div>
                             </div>
                             {{-- Password --}}
                             <div class="fv-row mb-7">
@@ -269,6 +277,13 @@
                                 <label class="required fw-semibold fs-6 mb-2">Email</label>
                                 <input type="email" name="email" class="form-control form-control-solid mb-3 mb-lg-0"
                                     placeholder="example@domain.com" id="edit_email" required />
+                            </div>
+                            {{-- Phone --}}
+                            <div class="fv-row mb-7">
+                                <label class="required fw-semibold fs-6 mb-2">Phone Number</label>
+                                <input type="text" name="phone" class="form-control form-control-solid mb-3 mb-lg-0"
+                                    placeholder="0812345678" id="edit_phone" required />
+                                <div class="form-text">Enter phone number with country code (e.g., 0812345678)</div>
                             </div>
                             {{-- Password --}}
                             <div class="fv-row mb-7">
@@ -439,6 +454,7 @@
                     const userId = button.getAttribute('data-user-id');
                     const userName = button.getAttribute('data-user-name');
                     const userEmail = button.getAttribute('data-user-email');
+                    const userPhone = button.getAttribute('data-user-phone');
                     const userStatus = button.getAttribute('data-user-status');
 
                     // Update form action
@@ -448,6 +464,7 @@
                     // Fill form fields
                     document.getElementById('edit_name').value = userName;
                     document.getElementById('edit_email').value = userEmail;
+                    document.getElementById('edit_phone').value = userPhone;
                     document.getElementById('edit_status').value = userStatus;
                 });
 

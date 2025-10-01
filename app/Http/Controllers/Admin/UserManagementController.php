@@ -21,6 +21,7 @@ class UserManagementController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'required|string|max:20|unique:users',
             'password' => 'required|string|min:8',
             'status' => 'required|in:active,inactive,suspended',
         ]);
@@ -28,6 +29,7 @@ class UserManagementController extends Controller
         User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'status' => $request->status,
         ]);
@@ -40,6 +42,7 @@ class UserManagementController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone' => ['required', 'string', 'max:20', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:8',
             'status' => 'required|in:active,inactive,suspended',
         ]);
@@ -47,6 +50,7 @@ class UserManagementController extends Controller
         $updateData = [
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'status' => $request->status,
         ];
 
