@@ -16,8 +16,6 @@
     <!-- Main Content Card -->
     <form action="{{ route('member.deposit.store') }}" method="POST" id="depositForm">
         @csrf
-        <input type="hidden" name="_token_deposit" value="{{ $token }}">
-
         <div class="card-dark p-3">
             <!-- Success Message -->
             @if (session('success'))
@@ -28,13 +26,6 @@
             @endif
 
             <!-- Error Messages -->
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">
@@ -134,8 +125,7 @@
                         <div>
                             <h6 class="text-white mb-1">Bank Transfer</h6>
                             <small class="text-muted">
-                                Rentang Jumlah: <span class="text-gold">IDR</span> 50 K - <span
-                                    class="text-gold">IDR</span>
+                                Rentang Jumlah: <span class="text-gold">IDR</span> 50 K - <span class="text-gold">IDR</span>
                                 50,000 K
                             </small>
                         </div>
@@ -148,7 +138,7 @@
 
             <!-- Konfirmasi Button -->
             <div class="mt-4" style="padding-bottom: 100px;">
-                <button type="submit" class="btn btn-gold w-100 btn-lg" id="submitBtn">
+                <button type="submit" class="btn btn-gold w-100 btn-lg">
                     Konfirmasi
                 </button>
             </div>
@@ -162,15 +152,10 @@
             const rawAmountInput = document.getElementById('rawAmount');
             const paymentMethods = document.querySelectorAll('.payment-method');
             const form = document.getElementById('depositForm');
-            const submitBtn = document.getElementById('submitBtn');
-
-            let isSubmitting = false;
 
             // Handle amount button clicks
             amountButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    if (isSubmitting) return;
-
                     const amount = this.dataset.amount;
                     depositInput.value = new Intl.NumberFormat('id-ID').format(amount);
                     rawAmountInput.value = amount;
@@ -188,8 +173,6 @@
             // Handle payment method selection
             paymentMethods.forEach(method => {
                 method.addEventListener('click', function() {
-                    if (isSubmitting) return;
-
                     paymentMethods.forEach(m => {
                         m.classList.remove('selected');
                         m.querySelector('input[type="radio"]').checked = false;
@@ -201,8 +184,6 @@
 
             // Format number input
             depositInput.addEventListener('input', function() {
-                if (isSubmitting) return;
-
                 let value = this.value.replace(/[^0-9]/g, '');
                 if (value) {
                     this.value = new Intl.NumberFormat('id-ID').format(value);
@@ -214,77 +195,11 @@
 
             // Form submission validation
             form.addEventListener('submit', function(e) {
-                // Cek apakah sedang submit
-                if (isSubmitting) {
-                    e.preventDefault();
-                    return false;
-                }
-
                 const rawValue = rawAmountInput.value;
-
-                // Validasi amount
                 if (!rawValue || rawValue < 50000 || rawValue > 50000000) {
                     e.preventDefault();
                     alert('Jumlah deposit harus antara Rp 50.000 - Rp 50.000.000');
-                    return false;
-                }
-
-                // Set flag submitting
-                isSubmitting = true;
-
-                // Disable submit button
-                submitBtn.disabled = true;
-                submitBtn.innerHTML =
-                    '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
-
-                // Disable semua input dan button
-                const allInputs = form.querySelectorAll('input, button');
-                allInputs.forEach(input => {
-                    if (input !== submitBtn) {
-                        input.disabled = true;
-                    }
-                });
-
-                // Disable amount buttons
-                amountButtons.forEach(btn => {
-                    btn.disabled = true;
-                    btn.style.opacity = '0.6';
-                });
-
-                // Disable payment methods
-                paymentMethods.forEach(method => {
-                    method.style.pointerEvents = 'none';
-                    method.style.opacity = '0.6';
-                });
-
-                return true;
-            });
-
-            // Prevent back button resubmission
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
-
-            // Detect browser back/forward
-            window.addEventListener('pageshow', function(event) {
-                if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-                    // Reset form state jika user kembali dengan back button
-                    isSubmitting = false;
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Konfirmasi';
-
-                    const allInputs = form.querySelectorAll('input, button');
-                    allInputs.forEach(input => input.disabled = false);
-
-                    amountButtons.forEach(btn => {
-                        btn.disabled = false;
-                        btn.style.opacity = '1';
-                    });
-
-                    paymentMethods.forEach(method => {
-                        method.style.pointerEvents = 'auto';
-                        method.style.opacity = '1';
-                    });
+                    return;
                 }
             });
         });
