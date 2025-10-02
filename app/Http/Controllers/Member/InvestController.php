@@ -59,10 +59,9 @@ class InvestController extends Controller
             $existingPurchases = Transaction::where('user_id', Auth::id())
                 ->where('product_id', $product->id)
                 ->where('type', 'purchase')
-                ->where('status', 'success')
                 ->count();
 
-            if ($existingPurchases >= 3) {
+            if ($existingPurchases >= 2) {
                 DB::rollBack();
                 return back()->with('error', 'Anda sudah mencapai batas maksimal pembelian produk ini (3 kali). Silahkan pilih produk lain.');
             }
