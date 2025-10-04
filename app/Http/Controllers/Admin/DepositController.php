@@ -112,19 +112,21 @@ class DepositController extends Controller
         ]);
 
         if ($referralUsage) {
+            // Cek apakah ini first deposit untuk update is_deposit flag
             $successfulDepositCount = Transaction::where('user_id', $deposit->user_id)
                 ->where('type', 'deposit')
                 ->where('status', 'success')
                 ->where('id', '!=', $deposit->id)
                 ->count();
+
             Log::info('Successful deposit count', [
                 'user_id' => $deposit->user_id,
                 'count' => $successfulDepositCount,
                 'is_first_deposit' => $successfulDepositCount == 0 ? 'yes' : 'no'
             ]);
 
+            // Update is_deposit flag hanya di first deposit
             if ($successfulDepositCount == 0) {
-                // Update is_deposit di referral_usages
                 DB::table('referral_usages')
                     ->where('used_by', $deposit->user_id)
                     ->update([
@@ -135,136 +137,134 @@ class DepositController extends Controller
                 Log::info('Referral usage updated - is_deposit set to true', [
                     'user_id' => $deposit->user_id
                 ]);
+            }
 
-                $commissionRate = DB::table('configs')
-                    ->where('key', 'team_invite_presentation')
-                    ->value('value');
-                Log::info('Commission rate check', [
-                    'raw_commission_rate' => $commissionRate,
-                    'commission_rate_type' => gettype($commissionRate)
+            // PROSES KOMISI UNTUK SETIAP DEPOSIT (tidak hanya first deposit)
+            $commissionRate = DB::table('configs')
+                ->where('key', 'team_invite_presentation')
+                ->value('value');
+
+            Log::info('Commission rate check', [
+                'raw_commission_rate' => $commissionRate,
+                'commission_rate_type' => gettype($commissionRate)
+            ]);
+
+            if ($commissionRate) {
+                $commissionRate = json_decode($commissionRate, true) ?? $commissionRate;
+                $commissionRate = (float) $commissionRate;
+
+                Log::info('Commission rate converted', [
+                    'converted_rate' => $commissionRate,
+                    'is_valid_percentage' => ($commissionRate > 0 && $commissionRate <= 100) ? 'yes' : 'no'
                 ]);
 
-                if ($commissionRate) {
-                    $commissionRate = json_decode($commissionRate, true) ?? $commissionRate;
-                    $commissionRate = (float) $commissionRate;
+                if ($commissionRate > 0 && $commissionRate <= 100) {
+                    // ========== MULTI-LEVEL COMMISSION SYSTEM ==========
+                    $currentUserId = $deposit->user_id;
+                    $currentCommissionAmount = $deposit->amount * ($commissionRate / 100);
+                    $level = 1;
+                    $maxLevel = 10;
 
-                    Log::info('Commission rate converted', [
-                        'converted_rate' => $commissionRate,
-                        'is_valid_percentage' => ($commissionRate > 0 && $commissionRate <= 100) ? 'yes' : 'no'
+                    Log::info('Starting multi-level commission calculation', [
+                        'initial_deposit_amount' => $deposit->amount,
+                        'commission_rate' => $commissionRate,
+                        'depositor_user_id' => $currentUserId,
+                        'deposit_number' => $successfulDepositCount + 1
                     ]);
 
-                    if ($commissionRate > 0 && $commissionRate <= 100) {
-                        // ========== MULTI-LEVEL COMMISSION SYSTEM ==========
-                        $currentUserId = $deposit->user_id;
-                        $currentCommissionAmount = $deposit->amount * ($commissionRate / 100);
-                        $level = 1;
-                        $maxLevel = 10;
+                    // Loop untuk distribusi komisi ke upline hierarchy
+                    while ($level <= $maxLevel) {
+                        // Cari siapa yang punya referral code yang dipakai oleh currentUserId
+                        $referralUsageData = DB::table('referral_usages')
+                            ->where('used_by', $currentUserId)
+                            ->first();
 
-                        Log::info('Starting multi-level commission calculation', [
-                            'initial_deposit_amount' => $deposit->amount,
-                            'commission_rate' => $commissionRate,
-                            'depositor_user_id' => $currentUserId
+                        if (!$referralUsageData) {
+                            Log::info('No more upline found, stopping commission distribution', [
+                                'level' => $level,
+                                'last_user_id' => $currentUserId
+                            ]);
+                            break;
+                        }
+
+                        $uplineUserId = $referralUsageData->user_referral;
+
+                        // Hitung komisi untuk upline ini
+                        $commissionForUpline = $currentCommissionAmount;
+
+                        Log::info('Commission calculation for level', [
+                            'level' => $level,
+                            'upline_user_id' => $uplineUserId,
+                            'downline_user_id' => $currentUserId,
+                            'commission_amount' => $commissionForUpline,
+                            'base_amount' => $level == 1 ? $deposit->amount : $currentCommissionAmount
                         ]);
 
-                        // Loop untuk distribusi komisi ke upline hierarchy
-                        while ($level <= $maxLevel) {
-                            // Cari siapa yang punya referral code yang dipakai oleh currentUserId
-                            $referralUsageData = DB::table('referral_usages')
-                                ->where('used_by', $currentUserId)
-                                ->first();
+                        // Buat transaction komisi untuk upline
+                        try {
+                            $commissionTransaction = Transaction::create([
+                                'user_id' => $uplineUserId,
+                                'wallet_id' => null,
+                                'product_id' => null,
+                                'reference' => 'COM-L' . $level . '-' . time() . '-' . $deposit->user_id,
+                                'amount' => $commissionForUpline,
+                                'type' => 'commission',
+                                'withdrawal_fee' => 0,
+                                'status' => 'success',
+                                'payment_method' => 'referral_commission',
+                                'payment_proof' => null,
+                            ]);
 
-                            if (!$referralUsageData) {
-                                Log::info('No more upline found, stopping commission distribution', [
-                                    'level' => $level,
-                                    'last_user_id' => $currentUserId
-                                ]);
-                                break;
-                            }
-
-                            $uplineUserId = $referralUsageData->user_referral;
-
-                            // Hitung komisi untuk upline ini
-                            $commissionForUpline = $currentCommissionAmount;
-
-                            Log::info('Commission calculation for level', [
+                            Log::info('Commission transaction created successfully', [
+                                'level' => $level,
+                                'commission_transaction_id' => $commissionTransaction->id,
+                                'amount' => $commissionForUpline,
+                                'for_user_id' => $uplineUserId,
+                                'from_user_id' => $currentUserId
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Failed to create commission transaction', [
                                 'level' => $level,
                                 'upline_user_id' => $uplineUserId,
-                                'downline_user_id' => $currentUserId,
-                                'commission_amount' => $commissionForUpline,
-                                'base_amount' => $level == 1 ? $deposit->amount : $currentCommissionAmount
-                            ]);
-
-                            // Buat transaction komisi untuk upline
-                            try {
-                                $commissionTransaction = Transaction::create([
-                                    'user_id' => $uplineUserId,
-                                    'wallet_id' => null,
-                                    'product_id' => null,
-                                    'reference' => 'COM-L' . $level . '-' . time() . '-' . $deposit->user_id,
-                                    'amount' => $commissionForUpline,
-                                    'type' => 'commission',
-                                    'withdrawal_fee' => 0,
-                                    'status' => 'success',
-                                    'payment_method' => 'referral_commission',
-                                    'payment_proof' => null,
-                                ]);
-
-                                Log::info('Commission transaction created successfully', [
-                                    'level' => $level,
-                                    'commission_transaction_id' => $commissionTransaction->id,
-                                    'amount' => $commissionForUpline,
-                                    'for_user_id' => $uplineUserId,
-                                    'from_user_id' => $currentUserId
-                                ]);
-                            } catch (\Exception $e) {
-                                Log::error('Failed to create commission transaction', [
-                                    'level' => $level,
-                                    'upline_user_id' => $uplineUserId,
-                                    'error' => $e->getMessage(),
-                                    'trace' => $e->getTraceAsString()
-                                ]);
-                            }
-
-                            // Untuk level berikutnya, komisnya adalah persentase dari komisi level ini
-                            $currentCommissionAmount = $commissionForUpline * ($commissionRate / 100);
-                            $currentUserId = $uplineUserId;
-                            $level++;
-
-                            // Stop jika komisi sudah terlalu kecil (opsional, untuk optimasi)
-                            if ($currentCommissionAmount < 1) {
-                                Log::info('Commission amount too small, stopping', [
-                                    'level' => $level,
-                                    'amount' => $currentCommissionAmount
-                                ]);
-                                break;
-                            }
-                        }
-
-                        if ($level > $maxLevel) {
-                            Log::warning('Reached maximum level limit', [
-                                'max_level' => $maxLevel
+                                'error' => $e->getMessage(),
+                                'trace' => $e->getTraceAsString()
                             ]);
                         }
 
-                        Log::info('Multi-level commission distribution completed', [
-                            'total_levels_processed' => $level - 1,
-                            'initial_deposit' => $deposit->amount
-                        ]);
-                        // ========== END MULTI-LEVEL COMMISSION SYSTEM ==========
+                        // Untuk level berikutnya, komisnya adalah persentase dari komisi level ini
+                        $currentCommissionAmount = $commissionForUpline * ($commissionRate / 100);
+                        $currentUserId = $uplineUserId;
+                        $level++;
 
-                    } else {
-                        Log::warning('Invalid commission rate', [
-                            'commission_rate' => $commissionRate
+                        // Stop jika komisi sudah terlalu kecil (opsional, untuk optimasi)
+                        if ($currentCommissionAmount < 1) {
+                            Log::info('Commission amount too small, stopping', [
+                                'level' => $level,
+                                'amount' => $currentCommissionAmount
+                            ]);
+                            break;
+                        }
+                    }
+
+                    if ($level > $maxLevel) {
+                        Log::warning('Reached maximum level limit', [
+                            'max_level' => $maxLevel
                         ]);
                     }
+
+                    Log::info('Multi-level commission distribution completed', [
+                        'total_levels_processed' => $level - 1,
+                        'initial_deposit' => $deposit->amount
+                    ]);
+                    // ========== END MULTI-LEVEL COMMISSION SYSTEM ==========
+
                 } else {
-                    Log::warning('No commission rate found in config');
+                    Log::warning('Invalid commission rate', [
+                        'commission_rate' => $commissionRate
+                    ]);
                 }
             } else {
-                Log::info('Not first deposit, skipping commission', [
-                    'user_id' => $deposit->user_id,
-                    'previous_successful_deposits' => $successfulDepositCount
-                ]);
+                Log::warning('No commission rate found in config');
             }
         } else {
             Log::info('No referral usage found for user', [
