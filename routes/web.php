@@ -1,23 +1,24 @@
 <?php
 
-use App\Http\Controllers\Admin\AboutController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Guest\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AboutController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\DepositController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\ReportController;
-use App\Http\Controllers\Admin\TransactionController;
-use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\WithdrawController;
+use App\Http\Controllers\Member\RevenueController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Member\CommissionController;
-use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Guest\ResetPasswordController;
+use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Member\TeamController as MemberTeamController;
+use App\Http\Controllers\Member\DompetController as MemberDompetController;
+use App\Http\Controllers\Member\InvestController as MemberInvestController;
 use App\Http\Controllers\Member\DepositController as MemberDepositController;
 use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
-use App\Http\Controllers\Member\InvestController as MemberInvestController;
-use App\Http\Controllers\Member\DompetController as MemberDompetController;
-use App\Http\Controllers\Member\RevenueController;
-use App\Http\Controllers\Member\TeamController as MemberTeamController;
+use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -34,6 +35,16 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/sign-up', [AuthController::class, 'signUp'])->name('guest.sign-up');
     Route::post('/sign-up', [AuthController::class, 'processSignUp'])->name('guest.process-sign-up');
+    
+    Route::prefix('reset-password')->name('reset-password.')->group(function () {
+        Route::get('/', [ResetPasswordController::class, 'showRequestForm'])->name('request');
+        Route::post('/send-otp', [ResetPasswordController::class, 'sendOtp'])->name('send-otp');
+        Route::get('/verify-otp', [ResetPasswordController::class, 'showVerifyOtpForm'])->name('verify-otp');
+        Route::post('/verify-otp', [ResetPasswordController::class, 'verifyOtp'])->name('verify-otp.process');
+        Route::get('/reset', [ResetPasswordController::class, 'showResetForm'])->name('reset');
+        Route::post('/reset', [ResetPasswordController::class, 'resetPassword'])->name('reset.process');
+        Route::post('/resend-otp', [ResetPasswordController::class, 'resendOtp'])->name('resend-otp');
+    });
 });
 
 
