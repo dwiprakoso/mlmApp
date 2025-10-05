@@ -68,66 +68,53 @@
                 @if ($typeProducts->count() > 0)
                     @foreach ($typeProducts as $product)
                         <div class="card-dark p-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
+                            <!-- Header dengan Badge -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="text-white mb-0">{{ $product->name }}</h6>
                                 <span class="badge {{ $product->is_active ? 'bg-success' : 'bg-secondary' }}">
                                     {{ $product->is_active ? 'Aktif' : 'Tidak Aktif' }}
                                 </span>
                             </div>
 
-                            <!-- Informasi Utama -->
-                            <div class="row mb-3">
+                            <!-- Informasi Utama - Compact Grid -->
+                            <div class="row g-2 mb-2">
                                 <div class="col-6">
-                                    <div class="mb-3">
-                                        <small class="text-muted">Modal Investasi</small>
-                                        <h6 class="text-gold mb-0">IDR {{ number_format($product->price, 0, ',', '.') }}
-                                        </h6>
-                                    </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">Durasi</small>
-                                        <h6 class="text-white mb-0">{{ $product->duration }} Hari</h6>
-                                    </div>
+                                    <small class="text-muted d-block">Modal Investasi</small>
+                                    <h6 class="text-gold mb-0">IDR {{ number_format($product->price, 0, ',', '.') }}</h6>
                                 </div>
                                 <div class="col-6">
-                                    <div class="mb-3">
-                                        <small class="text-muted">Total Profit</small>
-                                        <h6 class="text-white mb-0">IDR
-                                            {{ number_format($product->total_profit, 0, ',', '.') }}</h6>
-                                    </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">Profit Harian</small>
-                                        <h6 class="text-warning mb-0">IDR
-                                            {{ number_format($product->profit, 0, ',', '.') }}</h6>
-                                    </div>
+                                    <small class="text-muted d-block">Total Profit</small>
+                                    <h6 class="text-white mb-0">IDR
+                                        {{ number_format($product->total_profit, 0, ',', '.') }}</h6>
                                 </div>
                                 <div class="col-6">
-                                    <small class="text-muted">Deskripsi</small>
-                                    <p class="text-white mb-0">{{ $product->description }}</p>
+                                    <small class="text-muted d-block">Durasi</small>
+                                    <h6 class="text-white mb-0">{{ $product->duration }} Hari</h6>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Profit Harian</small>
+                                    <h6 class="text-warning mb-0">IDR {{ number_format($product->profit, 0, ',', '.') }}
+                                    </h6>
                                 </div>
                             </div>
-
-                            <hr style="border-color: var(--border-color);">
 
                             <!-- Action Button -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                @if ($product->is_active)
-                                    <!-- ✅ UPDATED: Check if user has sufficient balance -->
-                                    @if ($purchasableBalance >= $product->price)
-                                        <button class="btn btn-gold btn-sm px-3" onclick="investNow({{ $product->id }})">
-                                            <small>Investasi Sekarang</small>
-                                        </button>
-                                    @else
-                                        <button class="btn btn-secondary btn-sm px-3" disabled
-                                            title="Saldo deposit tidak mencukupi">
-                                            <small>Saldo Tidak Cukup</small>
-                                        </button>
-                                    @endif
+                            @if ($product->is_active)
+                                @if ($purchasableBalance >= $product->price)
+                                    <button class="btn btn-gold btn-sm w-100" onclick="investNow({{ $product->id }})">
+                                        <small>Investasi Sekarang</small>
+                                    </button>
                                 @else
-                                    <button class="btn btn-secondary btn-sm px-3" disabled>
-                                        <small>Tidak Tersedia</small>
+                                    <button class="btn btn-secondary btn-sm w-100" disabled
+                                        title="Saldo deposit tidak mencukupi">
+                                        <small>Saldo Tidak Cukup</small>
                                     </button>
                                 @endif
-                            </div>
+                            @else
+                                <button class="btn btn-secondary btn-sm w-100" disabled>
+                                    <small>Tidak Tersedia</small>
+                                </button>
+                            @endif
                         </div>
                     @endforeach
                 @else
