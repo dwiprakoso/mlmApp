@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guest;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\OtpPassword;
+use App\Services\WhatsAppOtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -53,12 +54,19 @@ class ResetPasswordController extends Controller
             ]
         );
 
-        // TODO: Kirim OTP ke WhatsApp/SMS
-        // Contoh: $this->sendOtpToPhone($request->phone, $otp);
+        // Kirim OTP ke WhatsApp
+        $whatsappService = new WhatsAppOtpService();
+        $result = $whatsappService->sendOtp($request->phone, $otp);
+
+        if (!$result['success']) {
+            return back()->withErrors([
+                'phone' => 'Gagal mengirim OTP: ' . $result['message']
+            ])->withInput();
+        }
 
         return redirect()
             ->route('reset-password.verify-otp', ['phone' => $request->phone])
-            ->with('success', 'Kode OTP telah dikirim ke nomor Anda');
+            ->with('success', 'Kode OTP telah dikirim ke nomor WhatsApp Anda');
     }
 
     // 3. Tampilkan form verifikasi OTP
@@ -208,7 +216,15 @@ class ResetPasswordController extends Controller
             ]
         );
 
-        // TODO: Kirim OTP ke WhatsApp/SMS
+        // Kirim OTP ke WhatsApp
+        $whatsappService = new WhatsAppOtpService();
+        $result = $whatsappService->sendOtp($request->phone, $otp);
+
+        if (!$result['success']) {
+            return back()->withErrors([
+                'error' => 'Gagal mengirim OTP: ' . $result['message']
+            ]);
+        }
 
         return back()->with('success', 'Kode OTP baru telah dikirim');
     }

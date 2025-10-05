@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'whatsapp' => [
+        'url' => env('WHATSAPP_URL', 'https://wagw.techareadev.biz.id/send-message'),
+        'api_key' => env('WHATSAPP_API_KEY'),
+        'sender' => env('WHATSAPP_SENDER'),
+    ],
 
 ];
