@@ -6,9 +6,18 @@
             <img src="{{ $appLogo ?? 'https://via.placeholder.com/40' }}" class="rounded-circle" alt="User"
                 style="width: 40px; height: 40px; object-fit: cover;">
         </div>
-        <div class="d-flex align-items-center">
-            <span
-                style="color: var(--gold-color); font-size: 16px; font-weight: 500;">{{ $legalName ?? 'My Application' }}</span>
+        <div>
+            <div class="d-flex align-items-center">
+                <span style="color: var(--gold-color); font-size: 16px; font-weight: 500;">
+                    {{ $legalName ?? 'My Application' }}
+                </span>
+            </div>
+            <!-- ✅ Info User Login -->
+            @if ($currentUser)
+                <small class="text-muted d-block" style="font-size: 12px;">
+                    {{ $userPhone ?? ($userEmail ?? 'No Contact Info') }}
+                </small>
+            @endif
         </div>
     </div>
 
