@@ -77,7 +77,7 @@
                             </thead>
                             <tbody class="fw-semibold text-gray-600">
                                 @forelse($withdrawTransactions as $transaction)
-                                    <tr>
+                                    <tr data-transaction-id="{{ $transaction->id }}">
                                         <td>
                                             <div class="text-gray-800 text-hover-primary fw-bold">
                                                 {{ $transaction->reference }}
@@ -502,6 +502,56 @@
                     noDataMobile.remove();
                 }
             }
+        });
+
+        // Delete functionality
+        document.querySelectorAll('[data-kt-customer-table-filter="delete_row"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const card = this.closest('.mobile-withdraw-card');
+                const row = this.closest('tr');
+                const transactionId = card ? card.dataset.transactionId : row.dataset.transactionId;
+
+                if (!transactionId) {
+                    console.error('Transaction ID not found');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Withdraw transaction akan dihapus permanen beserta semua transaksi terkait!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Create form and submit
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/admin/withdraw/${transactionId}`;
+
+                        const csrfToken = document.createElement('input');
+                        csrfToken.type = 'hidden';
+                        csrfToken.name = '_token';
+                        csrfToken.value = '{{ csrf_token() }}';
+
+                        const methodField = document.createElement('input');
+                        methodField.type = 'hidden';
+                        methodField.name = '_method';
+                        methodField.value = 'DELETE';
+
+                        form.appendChild(csrfToken);
+                        form.appendChild(methodField);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
         });
     </script>
 @endpush

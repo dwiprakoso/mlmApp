@@ -35,7 +35,7 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/sign-up', [AuthController::class, 'signUp'])->name('guest.sign-up');
     Route::post('/sign-up', [AuthController::class, 'processSignUp'])->name('guest.process-sign-up');
-    
+
     Route::prefix('reset-password')->name('reset-password.')->group(function () {
         Route::get('/', [ResetPasswordController::class, 'showRequestForm'])->name('request');
         Route::post('/send-otp', [ResetPasswordController::class, 'sendOtp'])->name('send-otp');
@@ -77,7 +77,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{id}', [WithdrawController::class, 'show'])->name('show');
             Route::post('/{id}/confirm', [WithdrawController::class, 'confirm'])->name('confirm');
             Route::post('/{id}/reject', [WithdrawController::class, 'reject'])->name('reject');
-            Route::post('/{id}/update-payment-proof', [WithdrawController::class, 'updatePaymentProof'])->name('update-payment-proof');
+            Route::delete('/{id}', [WithdrawController::class, 'destroy'])->name('destroy');
         });
         // Product Routes
         Route::prefix('product')->name('product.')->group(function () {

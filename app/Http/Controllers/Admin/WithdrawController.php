@@ -228,4 +228,58 @@ class WithdrawController extends Controller
             return redirect()->back()->with('error', 'Gagal menolak withdraw: ' . $e->getMessage());
         }
     }
+    public function destroy($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Find the transaction
+            $withdraw = Transaction::where('type', 'withdraw')
+                ->findOrFail($id);
+
+            // ✅ Get all transactions in the same group
+            $mainReference = null;
+            if (preg_match('/^(WD-\d+)/', $withdraw->reference, $matches)) {
+                $mainReference = $matches[1];
+            }
+
+            // Get all related transactions
+            $relatedTransactions = collect([$withdraw]);
+            if ($mainReference) {
+                $relatedTransactions = Transaction::where('type', 'withdraw')
+                    ->where('reference', 'LIKE', $mainReference . '%')
+                    ->get();
+            }
+
+            // Store info for logging before deletion
+            $transactionCount = $relatedTransactions->count();
+            $userEmail = $withdraw->user->email ?? 'N/A';
+
+            // ✅ Delete ALL transactions in the group
+            foreach ($relatedTransactions as $transaction) {
+                $transaction->delete();
+            }
+
+            DB::commit();
+
+            Log::info('Withdraw transactions deleted', [
+                'main_reference' => $mainReference ?? $withdraw->reference,
+                'user_email' => $userEmail,
+                'transactions_deleted' => $transactionCount,
+                'deleted_by' => auth()->id()
+            ]);
+
+            return redirect()->route('admin.withdraw.index')
+                ->with('success', 'Withdraw berhasil dihapus. (' . $transactionCount . ' transaksi dihapus)');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error deleting withdrawal', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus withdraw: ' . $e->getMessage());
+        }
+    }
 }

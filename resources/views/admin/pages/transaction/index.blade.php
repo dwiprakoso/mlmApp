@@ -313,8 +313,8 @@
 
         @push('scripts')
             <script>
-                // Auto dismiss alerts after 5 seconds
                 document.addEventListener('DOMContentLoaded', function() {
+                    // Auto dismiss alerts after 5 seconds
                     const alerts = document.querySelectorAll('.alert');
                     alerts.forEach(alert => {
                         setTimeout(() => {
@@ -322,6 +322,104 @@
                             bsAlert.close();
                         }, 5000);
                     });
+
+                    // Search functionality
+                    const searchInput = document.querySelector('[data-kt-ecommerce-order-filter="search"]');
+                    const statusFilter = document.querySelector('[data-kt-ecommerce-order-filter="status"]');
+                    const tableBody = document.querySelector('#kt_ecommerce_report_customer_orders_table tbody');
+                    const tableRows = tableBody.querySelectorAll('tr:not([class*="no-data"])');
+
+                    // Search function
+                    function performSearch() {
+                        const searchTerm = searchInput.value.toLowerCase().trim();
+                        const selectedStatus = statusFilter ? statusFilter.value.toLowerCase() : 'all';
+                        let visibleCount = 0;
+
+                        tableRows.forEach(row => {
+                            // Skip empty state row
+                            if (row.querySelector('td[colspan]')) {
+                                return;
+                            }
+
+                            // Get all searchable content
+                            const productName = row.querySelector('td:first-child .text-gray-900')?.textContent
+                                .toLowerCase().trim() || '';
+                            const reference = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase().trim() ||
+                                row.querySelector('.d-lg-none .text-muted.fs-8')?.textContent.toLowerCase().replace('ref:',
+                                    '').trim() || '';
+                            const customerName = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase().trim() ||
+                                row.querySelector('.d-md-none .text-muted.fs-8')?.textContent.toLowerCase().trim() || '';
+                            const phone = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase().trim() ||
+                                row.querySelector('.d-xl-none .text-muted.fs-8')?.textContent.toLowerCase().trim() || '';
+
+                            // Get status
+                            const statusBadge = row.querySelector('.badge');
+                            const rowStatus = statusBadge ? statusBadge.textContent.toLowerCase().trim() : '';
+
+                            // Check search match
+                            const matchesSearch = searchTerm === '' ||
+                                productName.includes(searchTerm) ||
+                                reference.includes(searchTerm) ||
+                                customerName.includes(searchTerm) ||
+                                phone.includes(searchTerm);
+
+                            // Check status match
+                            const matchesStatus = selectedStatus === '' ||
+                                selectedStatus === 'all' ||
+                                rowStatus === selectedStatus;
+
+                            // Show/hide row
+                            if (matchesSearch && matchesStatus) {
+                                row.style.display = '';
+                                visibleCount++;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+
+                        // Show/hide "no data" message
+                        updateNoDataMessage(visibleCount);
+                    }
+
+                    // Update no data message
+                    function updateNoDataMessage(visibleCount) {
+                        const existingNoDataRow = tableBody.querySelector('.no-data-row');
+
+                        if (visibleCount === 0) {
+                            if (!existingNoDataRow) {
+                                const colspan = document.querySelectorAll(
+                                    '#kt_ecommerce_report_customer_orders_table thead th').length;
+                                const noDataRow = document.createElement('tr');
+                                noDataRow.className = 'no-data-row';
+                                noDataRow.innerHTML = `
+                                    <td colspan="${colspan}" class="text-center py-10">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="ki-outline ki-file-deleted fs-3x text-muted mb-3"></i>
+                                            <div class="text-gray-800 fw-bold mb-1">No matching records found</div>
+                                            <div class="text-muted">Try adjusting your search or filter criteria</div>
+                                        </div>
+                                    </td>
+                                `;
+                                tableBody.appendChild(noDataRow);
+                            }
+                        } else if (existingNoDataRow) {
+                            existingNoDataRow.remove();
+                        }
+                    }
+
+                    // Event listeners
+                    if (searchInput) {
+                        searchInput.addEventListener('keyup', performSearch);
+                    }
+
+                    if (statusFilter) {
+                        // Initialize Select2 if available
+                        if (typeof $(statusFilter).select2 === 'function') {
+                            $(statusFilter).on('change', performSearch);
+                        } else {
+                            statusFilter.addEventListener('change', performSearch);
+                        }
+                    }
                 });
             </script>
         @endpush
