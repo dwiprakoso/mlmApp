@@ -16,6 +16,7 @@
     <!-- Main Content Card -->
     <form action="{{ route('member.deposit.store') }}" method="POST" id="depositForm">
         @csrf
+        <input type="hidden" name="form_token" value="{{ $formToken }}">
         <div class="card-dark p-3">
             <!-- Success Message -->
             @if (session('success'))
@@ -152,6 +153,7 @@
             const rawAmountInput = document.getElementById('rawAmount');
             const paymentMethods = document.querySelectorAll('.payment-method');
             const form = document.getElementById('depositForm');
+            let isSubmitting = false; // Flag untuk prevent multiple submission
 
             // Handle amount button clicks
             amountButtons.forEach(button => {
@@ -193,15 +195,58 @@
                 }
             });
 
-            // Form submission validation
+            // Form submission validation dengan multiple submission prevention
             form.addEventListener('submit', function(e) {
+                // Prevent jika sudah submit
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return false;
+                }
+
                 const rawValue = rawAmountInput.value;
                 if (!rawValue || rawValue < 50000 || rawValue > 50000000) {
                     e.preventDefault();
                     alert('Jumlah deposit harus antara Rp 50.000 - Rp 50.000.000');
-                    return;
+                    return false;
                 }
+
+                // Set flag dan disable button
+                isSubmitting = true;
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+
+                // Disable semua input juga
+                depositInput.disabled = true;
+                amountButtons.forEach(btn => btn.disabled = true);
+                paymentMethods.forEach(method => {
+                    method.style.pointerEvents = 'none';
+                    method.style.opacity = '0.6';
+                });
+
+                // Timeout fallback jika request gagal
+                setTimeout(function() {
+                    if (isSubmitting) {
+                        isSubmitting = false;
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                        depositInput.disabled = false;
+                        amountButtons.forEach(btn => btn.disabled = false);
+                        paymentMethods.forEach(method => {
+                            method.style.pointerEvents = '';
+                            method.style.opacity = '';
+                        });
+                    }
+                }, 30000); // 30 detik timeout
             });
+
+            // Prevent back/forward button resubmission
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
         });
     </script>
 @endsection

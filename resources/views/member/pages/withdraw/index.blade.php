@@ -241,6 +241,7 @@
             const netDisplay = document.getElementById('netDisplay');
             const withdrawableBalance = {{ $withdrawableBalance }};
             const withdrawalFeePercent = {{ $withdrawalFeePercent }};
+            let isSubmitting = false;
 
             // Handle wallet selection
             walletSelect.addEventListener('change', function() {
@@ -321,6 +322,11 @@
 
             // Form submission validation
             document.getElementById('withdrawalForm').addEventListener('submit', function(e) {
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return false;
+                }
+
                 const amount = parseFloat(withdrawInput.value) || 0;
 
                 if (amount <= 0) {
@@ -366,6 +372,11 @@
                     e.preventDefault();
                     return false;
                 }
+
+                isSubmitting = true;
+                withdrawBtn.disabled = true;
+                withdrawBtn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
             });
         });
     </script>
