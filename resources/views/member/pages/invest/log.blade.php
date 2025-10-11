@@ -130,6 +130,18 @@
                         </div>
                     @endif
 
+                    <!-- ✅ NEW: Expired At Info -->
+                    @if ($transaction->expired_at)
+                        <div class="mb-3 p-2 rounded" style="background-color: rgba(68, 68, 68, 0.3);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar-event me-1"></i>
+                                    Berakhir {{ \Carbon\Carbon::parse($transaction->expired_at)->format('d M Y') }}
+                                </small>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Progress Indicator -->
                     <div class="progress-container">
                         <div class="progress-bar">
@@ -157,22 +169,6 @@
                             </small>
                         </div>
                     </div>
-
-                    <!-- Action Buttons for Pending -->
-                    {{-- @if ($transaction->status === 'pending')
-                        <hr style="border-color: var(--border-color);">
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-gold btn-sm flex-fill"
-                                onclick="event.stopPropagation(); payNow('{{ $transaction->id }}')">
-                                <i class="bi bi-credit-card me-1"></i>
-                                <small>Bayar Sekarang</small>
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm"
-                                onclick="event.stopPropagation(); cancelTransaction('{{ $transaction->id }}')">
-                                <i class="bi bi-x-circle"></i>
-                            </button>
-                        </div>
-                    @endif --}}
                 </div>
             @endforeach
 
@@ -253,20 +249,6 @@
             window.location.href = url;
         }
 
-        // Pay now function
-        function payNow(transactionId) {
-            window.location.href = `/member/invest/show/${transactionId}`;
-        }
-
-        // Cancel transaction function
-        function cancelTransaction(transactionId) {
-            if (confirm('Apakah Anda yakin ingin membatalkan transaksi ini?')) {
-                // Add cancel transaction logic here
-                // You can create a new route and method for canceling transactions
-                alert('Fitur pembatalan akan segera tersedia.');
-            }
-        }
-
         // Refresh page function
         function refreshTransactions() {
             location.reload();
@@ -311,6 +293,14 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
+        }
+
+        .expired-info {
+            transition: all 0.3s ease;
+        }
+
+        .expired-info:hover {
+            background-color: rgba(255, 215, 0, 0.15) !important;
         }
 
         .progress-container {

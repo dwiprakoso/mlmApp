@@ -24,6 +24,7 @@ class Transaction extends Model
         'payment_method',
         'payment_proof',
         'approved_by',
+        'expired_at',
     ];
     /*
     |--------------------------------------------------------------------------

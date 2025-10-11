@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Member;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Config;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\ReferralUsage;
-use App\Models\User;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class TeamController extends Controller
@@ -20,13 +21,27 @@ class TeamController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Hitung total deposit dari semua anggota
-        $totalDepositCount = ReferralUsage::where('user_referral', $currentUser->id)
+        // Hitung total deposit dari ReferralUsage (logic lama)
+        $totalDepositFromReferral = ReferralUsage::where('user_referral', $currentUser->id)
             ->sum('deposit_count');
+
+        // Hitung total deposit sukses dari Transaction user sendiri (logic baru)
+        $totalDepositFromTransaction = Transaction::where('user_id', $currentUser->id)
+            ->where('type', 'deposit')
+            ->where('status', 'success')
+            ->count();
+
+        // Total gabungan
+        $totalDepositCount = $totalDepositFromReferral + $totalDepositFromTransaction;
 
         $commissionRate = Config::where('key', 'team_invite_presentation')
             ->value('value') ?? '35';
 
-        return view('member.pages.team.index', compact('referralUsages', 'currentUser', 'commissionRate', 'totalDepositCount'));
+        return view('member.pages.team.index', compact(
+            'referralUsages',
+            'currentUser',
+            'commissionRate',
+            'totalDepositCount'
+        ));
     }
 }
