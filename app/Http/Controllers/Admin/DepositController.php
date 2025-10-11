@@ -105,6 +105,7 @@ class DepositController extends Controller
         $referralUsage = DB::table('referral_usages')
             ->where('used_by', $deposit->user_id)
             ->first();
+
         Log::info('Referral usage check', [
             'user_id' => $deposit->user_id,
             'referral_usage_found' => $referralUsage ? 'yes' : 'no',
@@ -112,34 +113,21 @@ class DepositController extends Controller
         ]);
 
         if ($referralUsage) {
-            // Cek apakah ini first deposit untuk update is_deposit flag
-            $successfulDepositCount = Transaction::where('user_id', $deposit->user_id)
-                ->where('type', 'deposit')
-                ->where('status', 'success')
-                ->where('id', '!=', $deposit->id)
-                ->count();
+            // Increment deposit_count setiap kali user deposit
+            DB::table('referral_usages')
+                ->where('used_by', $deposit->user_id)
+                ->increment('deposit_count');
 
-            Log::info('Successful deposit count', [
+            $newDepositCount = DB::table('referral_usages')
+                ->where('used_by', $deposit->user_id)
+                ->value('deposit_count');
+
+            Log::info('Referral usage updated - deposit_count incremented', [
                 'user_id' => $deposit->user_id,
-                'count' => $successfulDepositCount,
-                'is_first_deposit' => $successfulDepositCount == 0 ? 'yes' : 'no'
+                'new_deposit_count' => $newDepositCount
             ]);
 
-            // Update is_deposit flag hanya di first deposit
-            if ($successfulDepositCount == 0) {
-                DB::table('referral_usages')
-                    ->where('used_by', $deposit->user_id)
-                    ->update([
-                        'is_deposit' => true,
-                        'updated_at' => now()
-                    ]);
-
-                Log::info('Referral usage updated - is_deposit set to true', [
-                    'user_id' => $deposit->user_id
-                ]);
-            }
-
-            // PROSES KOMISI UNTUK SETIAP DEPOSIT (tidak hanya first deposit)
+            // PROSES KOMISI UNTUK SETIAP DEPOSIT
             $commissionRate = DB::table('configs')
                 ->where('key', 'team_invite_presentation')
                 ->value('value');
@@ -169,7 +157,7 @@ class DepositController extends Controller
                         'initial_deposit_amount' => $deposit->amount,
                         'commission_rate' => $commissionRate,
                         'depositor_user_id' => $currentUserId,
-                        'deposit_number' => $successfulDepositCount + 1
+                        'deposit_count' => $newDepositCount
                     ]);
 
                     // Loop untuk distribusi komisi ke upline hierarchy
