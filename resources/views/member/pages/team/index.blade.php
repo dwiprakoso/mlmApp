@@ -24,7 +24,7 @@
                 <div class="circle-icon bg-gold text-dark">
                     <i class="bi bi-coin"></i>
                 </div>
-                <h5 class="text-gold fw-bold mb-0">{{ $depositedMembersCount }}</h5>
+                <h5 class="text-gold fw-bold mb-0">{{ $totalDepositCount }}</h5>
                 <small class="text-muted">Point Diperoleh</small>
             </div>
         </div>
@@ -44,9 +44,9 @@
                         <div class="d-flex align-items-center">
                             <div>
                                 <h6 class="text-white mb-1">{{ $usage->referee->phone ?? 'Phone not available' }}</h6>
-                                @if ($usage->is_deposit)
+                                @if ($usage->deposit_count > 0)
                                     <span class="badge bg-success">
-                                        <i class="bi bi-check-circle-fill"></i> Deposit
+                                        <i class="bi bi-check-circle-fill"></i> {{ $usage->deposit_count }}x Deposit
                                     </span>
                                 @else
                                     <span class="badge bg-secondary">

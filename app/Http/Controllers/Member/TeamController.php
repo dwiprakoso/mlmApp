@@ -20,14 +20,13 @@ class TeamController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Count anggota yang sudah deposit
-        $depositedMembersCount = ReferralUsage::where('user_referral', $currentUser->id)
-            ->where('is_deposit', true)
-            ->count();
+        // Hitung total deposit dari semua anggota
+        $totalDepositCount = ReferralUsage::where('user_referral', $currentUser->id)
+            ->sum('deposit_count');
 
         $commissionRate = Config::where('key', 'team_invite_presentation')
             ->value('value') ?? '35';
 
-        return view('member.pages.team.index', compact('referralUsages', 'currentUser', 'commissionRate', 'depositedMembersCount'));
+        return view('member.pages.team.index', compact('referralUsages', 'currentUser', 'commissionRate', 'totalDepositCount'));
     }
 }
