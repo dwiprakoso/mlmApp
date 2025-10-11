@@ -113,19 +113,25 @@ class DepositController extends Controller
         ]);
 
         if ($referralUsage) {
-            // Increment deposit_count setiap kali user deposit
-            DB::table('referral_usages')
-                ->where('used_by', $deposit->user_id)
-                ->increment('deposit_count');
+            // Cek apakah ini adalah deposit pertama kali (deposit_count masih 0)
+            $isFirstDeposit = $referralUsage->deposit_count == 0;
 
-            $newDepositCount = DB::table('referral_usages')
-                ->where('used_by', $deposit->user_id)
-                ->value('deposit_count');
+            // Hanya increment deposit_count jika ini adalah deposit pertama
+            if ($isFirstDeposit) {
+                DB::table('referral_usages')
+                    ->where('used_by', $deposit->user_id)
+                    ->increment('deposit_count');
 
-            Log::info('Referral usage updated - deposit_count incremented', [
-                'user_id' => $deposit->user_id,
-                'new_deposit_count' => $newDepositCount
-            ]);
+                Log::info('Referral usage updated - deposit_count set to 1 (first deposit)', [
+                    'user_id' => $deposit->user_id,
+                    'new_deposit_count' => 1
+                ]);
+            } else {
+                Log::info('Not first deposit - deposit_count not incremented', [
+                    'user_id' => $deposit->user_id,
+                    'current_deposit_count' => $referralUsage->deposit_count
+                ]);
+            }
 
             // PROSES KOMISI UNTUK SETIAP DEPOSIT
             $commissionRate = DB::table('configs')
@@ -157,7 +163,7 @@ class DepositController extends Controller
                         'initial_deposit_amount' => $deposit->amount,
                         'commission_rate' => $commissionRate,
                         'depositor_user_id' => $currentUserId,
-                        'deposit_count' => $newDepositCount
+                        'first_deposit' => true
                     ]);
 
                     // Loop untuk distribusi komisi ke upline hierarchy
