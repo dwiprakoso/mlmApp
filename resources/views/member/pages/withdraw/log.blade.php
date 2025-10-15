@@ -195,8 +195,45 @@
 
     <!-- Pagination -->
     @if ($withdrawals->hasPages())
-        <div class="d-flex justify-content-center mb-4">
-            {{ $withdrawals->links() }}
+        <div class="pagination-wrapper">
+            <div class="pagination-container">
+                {{-- Previous Button --}}
+                @if ($withdrawals->onFirstPage())
+                    <span class="pagination-btn disabled">
+                        <i class="bi bi-chevron-left"></i>
+                    </span>
+                @else
+                    <a href="{{ $withdrawals->previousPageUrl() }}" class="pagination-btn">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                @endif
+
+                {{-- Page Numbers --}}
+                <div class="pagination-info">
+                    <span class="text-white">{{ $withdrawals->currentPage() }}</span>
+                    <span class="text-muted mx-2">dari</span>
+                    <span class="text-white">{{ $withdrawals->lastPage() }}</span>
+                </div>
+
+                {{-- Next Button --}}
+                @if ($withdrawals->hasMorePages())
+                    <a href="{{ $withdrawals->nextPageUrl() }}" class="pagination-btn">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                @else
+                    <span class="pagination-btn disabled">
+                        <i class="bi bi-chevron-right"></i>
+                    </span>
+                @endif
+            </div>
+
+            {{-- Results Info --}}
+            <div class="text-center mt-2">
+                <small class="text-muted">
+                    Menampilkan {{ $withdrawals->firstItem() ?? 0 }} - {{ $withdrawals->lastItem() ?? 0 }}
+                    dari {{ $withdrawals->total() }} hasil
+                </small>
+            </div>
         </div>
     @endif
 
@@ -254,6 +291,72 @@
 
         .badge {
             font-size: 0.75rem;
+        }
+
+        /* Pagination Wrapper */
+        .pagination-wrapper {
+            position: fixed;
+            bottom: 80px;
+            /* Sesuaikan dengan tinggi bottom navigation */
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(18, 18, 18, 1) 70%, rgba(18, 18, 18, 0));
+            padding: 20px 15px 15px;
+            z-index: 100;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .pagination-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: #d4af37;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+            background: #d4af37;
+            color: #121212;
+            transform: scale(1.05);
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .pagination-info {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 10px;
+        }
+
+        .pagination-info .text-white {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Adjust container padding for pagination */
+        .withdrawal-log-container {
+            padding-bottom: 180px !important;
+            /* Tambah space untuk pagination */
         }
 
         /* Modal customizations for mobile */
