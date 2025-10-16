@@ -63,8 +63,12 @@ class AboutController extends Controller
             // Handle app logo upload
             if ($request->hasFile('avatar')) {
                 $oldLogo = Config::get('app_logo');
-                if ($oldLogo && Storage::disk('public')->exists(str_replace('/storage/', '', $oldLogo))) {
-                    Storage::disk('public')->delete(str_replace('/storage/', '', $oldLogo));
+                if ($oldLogo) {
+                    // Extract filename from URL (works with both /storage/... and full path)
+                    $filePath = str_replace(['/storage/', env('APP_URL') . '/storage/'], '', $oldLogo);
+                    if (Storage::disk('public')->exists($filePath)) {
+                        Storage::disk('public')->delete($filePath);
+                    }
                 }
 
                 $logoPath = $request->file('avatar')->store('logos', 'public');
@@ -79,8 +83,12 @@ class AboutController extends Controller
             // Handle payment QR code upload
             if ($request->hasFile('payment_qr_code')) {
                 $oldQrCode = Config::get('payment_qr_code');
-                if ($oldQrCode && Storage::disk('public')->exists(str_replace('/storage/', '', $oldQrCode))) {
-                    Storage::disk('public')->delete(str_replace('/storage/', '', $oldQrCode));
+                if ($oldQrCode) {
+                    // Extract filename from URL (works with both /storage/... and full path)
+                    $filePath = str_replace(['/storage/', env('APP_URL') . '/storage/'], '', $oldQrCode);
+                    if (Storage::disk('public')->exists($filePath)) {
+                        Storage::disk('public')->delete($filePath);
+                    }
                 }
 
                 $qrCodePath = $request->file('payment_qr_code')->store('qr-codes', 'public');
