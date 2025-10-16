@@ -92,8 +92,9 @@ class InvestController extends Controller
             // Generate unique reference number
             $reference = $this->generateReference();
 
-            // ✅ NEW: Calculate expired_at based on product duration
-            $expiredAt = now()->addDays($product->duration);
+            // ✅ FIX: Cast duration to integer before using with Carbon
+            $durationDays = (int) $product->duration;
+            $expiredAt = now()->addDays($durationDays);
 
             // ✅ NEW: Create pending transaction with source_balance_type and expired_at
             $transaction = Transaction::create([
@@ -122,7 +123,7 @@ class InvestController extends Controller
                 'source_balance_type' => 'deposit',
                 'status' => 'pending',
                 'expired_at' => $expiredAt,
-                'duration_days' => $product->duration,
+                'duration_days' => $durationDays,
                 'purchasable_balance' => $purchaseValidation['available'],
                 'existing_purchases' => $existingPurchases,
                 'remaining_purchases' => 3 - $existingPurchases
@@ -130,7 +131,7 @@ class InvestController extends Controller
 
             $successMessage = 'Transaksi pembelian berhasil dibuat untuk produk ' . $product->name .
                 '. Transaksi Anda sedang menunggu persetujuan admin. ' .
-                'Masa aktif: ' . $product->duration . ' hari (hingga ' . $expiredAt->format('d/m/Y') . ')';
+                'Masa aktif: ' . $durationDays . ' hari (hingga ' . $expiredAt->format('d/m/Y') . ')';
 
             return redirect()->route('member.invest.log')
                 ->with('success', $successMessage);
