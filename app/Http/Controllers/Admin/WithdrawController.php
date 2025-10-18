@@ -15,13 +15,11 @@ class WithdrawController extends Controller
 {
     public function index()
     {
-        // ✅ Get all withdraw transactions with grouping
         $withdrawTransactions = Transaction::where('type', 'withdraw')
             ->with(['user', 'wallet'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->groupBy(function ($transaction) {
-                // Group by main reference (WD-1727699143)
                 if (preg_match('/^(WD-\d+)/', $transaction->reference, $matches)) {
                     return $matches[1];
                 }
@@ -30,17 +28,14 @@ class WithdrawController extends Controller
             ->map(function ($group) {
                 $mainTransaction = $group->first();
 
-                // ✅ Override amount dengan total dari semua transaction dalam group
                 $mainTransaction->amount = $group->sum('amount');
                 $mainTransaction->withdrawal_fee = $group->sum('withdrawal_fee');
                 $mainTransaction->net_amount = $mainTransaction->amount - $mainTransaction->withdrawal_fee;
 
-                // Simpan main reference
                 if (preg_match('/^(WD-\d+)/', $mainTransaction->reference, $matches)) {
                     $mainTransaction->main_reference = $matches[1];
                 }
 
-                // ✅ Allocation details untuk ditampilkan
                 $mainTransaction->allocation_details = $group->map(function ($t) {
                     return [
                         'source' => $t->source_balance_type,
@@ -49,7 +44,6 @@ class WithdrawController extends Controller
                     ];
                 })->filter(fn($a) => $a['amount'] > 0);
 
-                // ✅ Simpan semua transaction IDs dalam group
                 $mainTransaction->grouped_transaction_ids = $group->pluck('id')->toArray();
 
                 return $mainTransaction;
@@ -62,12 +56,10 @@ class WithdrawController extends Controller
 
     public function show($id)
     {
-        // ✅ Find the main transaction
         $withdraw = Transaction::where('type', 'withdraw')
             ->with(['user', 'wallet', 'approvedBy'])
             ->findOrFail($id);
 
-        // ✅ Get all related transactions in the same group
         if (preg_match('/^(WD-\d+)/', $withdraw->reference, $matches)) {
             $mainReference = $matches[1];
 
@@ -76,13 +68,11 @@ class WithdrawController extends Controller
                 ->with(['user', 'wallet'])
                 ->get();
 
-            // Calculate totals
             $withdraw->amount = $groupedTransactions->sum('amount');
             $withdraw->withdrawal_fee = $groupedTransactions->sum('withdrawal_fee');
             $withdraw->net_amount = $withdraw->amount - $withdraw->withdrawal_fee;
             $withdraw->main_reference = $mainReference;
 
-            // Allocation details
             $withdraw->allocation_details = $groupedTransactions->map(function ($t) {
                 return [
                     'source' => $t->source_balance_type,
@@ -91,7 +81,6 @@ class WithdrawController extends Controller
                 ];
             })->filter(fn($a) => $a['amount'] > 0);
 
-            // Store grouped IDs for confirm/reject
             $withdraw->grouped_transaction_ids = $groupedTransactions->pluck('id')->toArray();
         }
 
@@ -100,10 +89,8 @@ class WithdrawController extends Controller
 
     public function confirm($id)
     {
-        $withdraw = Transaction::where('type', 'withdraw')
-            ->findOrFail($id);
+        $withdraw = Transaction::where('type', 'withdraw')->findOrFail($id);
 
-        // Validasi status
         if (!in_array($withdraw->status, ['pending', 'waiting_confirmation'])) {
             return redirect()->back()->with('error', 'Withdraw cannot be confirmed. Invalid status.');
         }
@@ -111,13 +98,11 @@ class WithdrawController extends Controller
         try {
             DB::beginTransaction();
 
-            // ✅ Get all transactions in the same group
             $mainReference = null;
             if (preg_match('/^(WD-\d+)/', $withdraw->reference, $matches)) {
                 $mainReference = $matches[1];
             }
 
-            // Get all related transactions
             $relatedTransactions = collect([$withdraw]);
             if ($mainReference) {
                 $relatedTransactions = Transaction::where('type', 'withdraw')
@@ -125,7 +110,6 @@ class WithdrawController extends Controller
                     ->get();
             }
 
-            // ✅ Update ALL transactions in the group
             foreach ($relatedTransactions as $transaction) {
                 $transaction->update([
                     'status' => 'success',
@@ -137,14 +121,8 @@ class WithdrawController extends Controller
 
             DB::commit();
 
-            // Send confirmation email (only once to user)
             try {
                 Mail::to($withdraw->user->email)->send(new WithdrawConfirmed($withdraw));
-                Log::info('Withdraw confirmation email sent', [
-                    'main_reference' => $mainReference,
-                    'user_email' => $withdraw->user->email,
-                    'transactions_updated' => $relatedTransactions->count()
-                ]);
             } catch (\Exception $e) {
                 Log::error('Failed to send withdraw confirmation email', [
                     'main_reference' => $mainReference,
@@ -166,8 +144,7 @@ class WithdrawController extends Controller
 
     public function reject($id)
     {
-        $withdraw = Transaction::where('type', 'withdraw')
-            ->findOrFail($id);
+        $withdraw = Transaction::where('type', 'withdraw')->findOrFail($id);
 
         if (!in_array($withdraw->status, ['pending', 'waiting_confirmation'])) {
             return redirect()->back()->with('error', 'Withdraw cannot be rejected. Invalid status.');
@@ -176,13 +153,11 @@ class WithdrawController extends Controller
         try {
             DB::beginTransaction();
 
-            // ✅ Get all transactions in the same group
             $mainReference = null;
             if (preg_match('/^(WD-\d+)/', $withdraw->reference, $matches)) {
                 $mainReference = $matches[1];
             }
 
-            // Get all related transactions
             $relatedTransactions = collect([$withdraw]);
             if ($mainReference) {
                 $relatedTransactions = Transaction::where('type', 'withdraw')
@@ -190,7 +165,6 @@ class WithdrawController extends Controller
                     ->get();
             }
 
-            // ✅ Update ALL transactions in the group to failed
             foreach ($relatedTransactions as $transaction) {
                 $transaction->update([
                     'status' => 'failed',
@@ -202,14 +176,8 @@ class WithdrawController extends Controller
 
             DB::commit();
 
-            // Send rejection email (only once to user)
             try {
                 Mail::to($withdraw->user->email)->send(new WithdrawRejected($withdraw));
-                Log::info('Withdraw rejection email sent', [
-                    'main_reference' => $mainReference,
-                    'user_email' => $withdraw->user->email,
-                    'transactions_updated' => $relatedTransactions->count()
-                ]);
             } catch (\Exception $e) {
                 Log::error('Failed to send withdraw rejection email', [
                     'main_reference' => $mainReference,
@@ -228,22 +196,19 @@ class WithdrawController extends Controller
             return redirect()->back()->with('error', 'Gagal menolak withdraw: ' . $e->getMessage());
         }
     }
+
     public function destroy($id)
     {
         try {
             DB::beginTransaction();
 
-            // Find the transaction
-            $withdraw = Transaction::where('type', 'withdraw')
-                ->findOrFail($id);
+            $withdraw = Transaction::where('type', 'withdraw')->findOrFail($id);
 
-            // ✅ Get all transactions in the same group
             $mainReference = null;
             if (preg_match('/^(WD-\d+)/', $withdraw->reference, $matches)) {
                 $mainReference = $matches[1];
             }
 
-            // Get all related transactions
             $relatedTransactions = collect([$withdraw]);
             if ($mainReference) {
                 $relatedTransactions = Transaction::where('type', 'withdraw')
@@ -251,11 +216,9 @@ class WithdrawController extends Controller
                     ->get();
             }
 
-            // Store info for logging before deletion
             $transactionCount = $relatedTransactions->count();
             $userEmail = $withdraw->user->email ?? 'N/A';
 
-            // ✅ Delete ALL transactions in the group
             foreach ($relatedTransactions as $transaction) {
                 $transaction->delete();
             }

@@ -27,7 +27,6 @@ class ProductController extends Controller
                 'is_active' => 'required|boolean',
             ]);
 
-            // Calculate total_profit and profit
             $price = $request->price;
             $presentase = $request->presentase;
             $duration = $request->duration;
@@ -66,7 +65,6 @@ class ProductController extends Controller
                 'is_active' => 'required|boolean',
             ]);
 
-            // Calculate total_profit and profit
             $price = $request->price;
             $presentase = $request->presentase;
             $duration = $request->duration;

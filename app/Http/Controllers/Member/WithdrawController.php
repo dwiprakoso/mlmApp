@@ -20,10 +20,7 @@ class WithdrawController extends Controller
     {
         $wallets = Auth::user()->wallets()->orderByDesc('is_primary')->orderBy('created_at')->get();
 
-        // ✅ NEW: Get withdrawable balance (revenue + commission + deposit)
         $withdrawableBalance = Transaction::getWithdrawableBalance(Auth::id());
-
-        // ✅ NEW: Get balance breakdown for display (optional)
         $balanceBreakdown = Transaction::getBalanceBreakdown(Auth::id());
 
         $withdrawalFeeConfig = Config::where('key', 'withdrawal_fee')->first();
@@ -39,8 +36,6 @@ class WithdrawController extends Controller
 
     public function store(Request $request)
     {
-        Log::info('Withdrawal request:', $request->all());
-
         $validator = Validator::make($request->all(), [
             'wallet_id' => 'required|exists:wallets,id',
             'amount' => 'required|numeric|min:50000|max:50000000',
@@ -68,12 +63,10 @@ class WithdrawController extends Controller
         $withdrawalFeeConfig = Config::where('key', 'withdrawal_fee')->first();
         $withdrawalFeePercent = $withdrawalFeeConfig ? (float) $withdrawalFeeConfig->value : 0;
 
-        // Calculate withdrawal fee
         $withdrawalFee = ($amount * $withdrawalFeePercent) / 100;
         $withdrawalFee = round($withdrawalFee);
         $netAmount = $amount - $withdrawalFee;
 
-        // ✅ NEW: Check withdrawable balance
         $withdrawValidation = Transaction::canWithdraw(Auth::id(), $amount);
 
         if (!$withdrawValidation['can_withdraw']) {
@@ -89,7 +82,6 @@ class WithdrawController extends Controller
             return back()->with('error', $errorMessage)->withInput();
         }
 
-        // ✅ NEW: Calculate withdrawal allocation (priority: revenue → commission → deposit)
         $allocation = Transaction::calculateWithdrawalAllocation(Auth::id(), $amount);
 
         if (!$allocation['is_sufficient']) {
@@ -99,27 +91,23 @@ class WithdrawController extends Controller
         try {
             DB::beginTransaction();
 
-            // ✅ FIX: Generate main reference untuk grouping
             $mainReference = $this->generateWithdrawalReference();
             $createdTransactions = [];
 
-            // ✅ FIX: Create separate transactions dengan UNIQUE reference per transaction
             foreach ($allocation['allocation'] as $sourceType => $sourceAmount) {
                 if ($sourceAmount > 0) {
-                    // ✅ Generate unique reference untuk setiap transaction
                     $uniqueReference = $mainReference . '-' . strtoupper(substr($sourceType, 0, 3));
-                    // Hasil: WD-1727699143-REV, WD-1727699143-COM, WD-1727699143-DEP
 
                     $transaction = Transaction::create([
                         'user_id' => Auth::id(),
                         'product_id' => null,
-                        'reference' => $uniqueReference, // ✅ FIX: Unique per transaction
+                        'reference' => $uniqueReference,
                         'amount' => $sourceAmount,
                         'withdrawal_fee' => $sourceType === array_key_first(array_filter($allocation['allocation']))
-                            ? $withdrawalFee  // Apply fee to first source only
+                            ? $withdrawalFee
                             : 0,
                         'type' => 'withdraw',
-                        'source_balance_type' => $sourceType, // ✅ Track source
+                        'source_balance_type' => $sourceType,
                         'wallet_id' => $wallet->id,
                         'status' => 'pending',
                         'payment_method' => null,
@@ -129,29 +117,25 @@ class WithdrawController extends Controller
 
                     $createdTransactions[] = $transaction;
 
-                    Log::info('Withdrawal transaction part created', [
+                    Log::info('Withdrawal transaction created', [
                         'transaction_id' => $transaction->id,
-                        'reference' => $uniqueReference, // ✅ Log unique reference
+                        'reference' => $uniqueReference,
                         'source_type' => $sourceType,
-                        'amount' => $sourceAmount,
-                        'withdrawal_fee' => $transaction->withdrawal_fee
+                        'amount' => $sourceAmount
                     ]);
                 }
             }
 
             if ($request->notes) {
-                Log::info('Withdrawal notes:', [
-                    'main_reference' => $mainReference, // ✅ Log main reference
+                Log::info('Withdrawal notes', [
+                    'main_reference' => $mainReference,
                     'notes' => $request->notes
                 ]);
             }
 
-            // Send email notification
             try {
-                // Get the main transaction (first one) for email
                 $mainTransaction = $createdTransactions[0];
 
-                // Create allocation summary for email
                 $allocationSummary = [];
                 foreach ($allocation['allocation'] as $sourceType => $sourceAmount) {
                     if ($sourceAmount > 0) {
@@ -164,27 +148,25 @@ class WithdrawController extends Controller
                         $mainTransaction,
                         $withdrawalFee,
                         $netAmount,
-                        $allocationSummary // Optional: pass allocation info
+                        $allocationSummary
                     )
                 );
-                Log::info('Withdrawal notification email sent successfully');
             } catch (\Exception $e) {
-                Log::error('Failed to send withdrawal notification email: ' . $e->getMessage());
-                // Don't fail the transaction if email fails
+                Log::error('Failed to send withdrawal notification email', [
+                    'error' => $e->getMessage()
+                ]);
             }
 
             DB::commit();
 
-            Log::info('Withdrawal transactions created successfully:', [
-                'main_reference' => $mainReference, // ✅ Log main reference
+            Log::info('Withdrawal transactions created', [
+                'main_reference' => $mainReference,
                 'total_amount' => $amount,
-                'allocation' => $allocation['allocation'],
                 'withdrawal_fee' => $withdrawalFee,
                 'net_amount' => $netAmount,
                 'transactions_count' => count($createdTransactions)
             ]);
 
-            // Create success message with allocation details
             $allocationDetails = [];
             foreach ($allocation['allocation'] as $sourceType => $sourceAmount) {
                 if ($sourceAmount > 0) {
@@ -193,7 +175,7 @@ class WithdrawController extends Controller
             }
 
             $successMessage = "Permintaan penarikan berhasil dibuat. " .
-                "ID Transaksi: {$mainReference}. " . // ✅ Show main reference
+                "ID Transaksi: {$mainReference}. " .
                 "Total: IDR " . number_format($amount, 0, ',', '.') . ". " .
                 "Alokasi: " . implode(', ', $allocationDetails) . ". " .
                 "Biaya admin: IDR " . number_format($withdrawalFee, 0, ',', '.') . ". " .
@@ -203,9 +185,8 @@ class WithdrawController extends Controller
                 ->with('success', $successMessage);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error creating withdrawal transaction:', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+            Log::error('Error creating withdrawal transaction', [
+                'error' => $e->getMessage()
             ]);
 
             return back()
@@ -214,7 +195,6 @@ class WithdrawController extends Controller
         }
     }
 
-    // ✅ Method generateWithdrawalReference tetap sama
     private function generateWithdrawalReference()
     {
         return 'WD-' . time();
@@ -236,17 +216,14 @@ class WithdrawController extends Controller
             ->map(function ($group) {
                 $mainTransaction = $group->first();
 
-                // ✅ Override amount langsung biar view gak perlu ubah
                 $mainTransaction->amount = $group->sum('amount');
                 $mainTransaction->withdrawal_fee = $group->sum('withdrawal_fee');
                 $mainTransaction->net_amount = $mainTransaction->amount - $mainTransaction->withdrawal_fee;
 
-                // Simpan main reference
                 if (preg_match('/^(WD-\d+)/', $mainTransaction->reference, $matches)) {
                     $mainTransaction->main_reference = $matches[1];
                 }
 
-                // Allocation details (opsional)
                 $mainTransaction->allocation_details = $group->map(function ($t) {
                     return [
                         'source' => $t->source_balance_type,
@@ -259,7 +236,6 @@ class WithdrawController extends Controller
             ->sortByDesc('created_at')
             ->values();
 
-        // Manual pagination
         $perPage = 15;
         $currentPage = request()->get('page', 1);
         $pagedData = $withdrawals->slice(($currentPage - 1) * $perPage, $perPage)->all();

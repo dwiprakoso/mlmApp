@@ -29,7 +29,6 @@ class Wallet extends Model
         'is_active' => 'boolean',
     ];
 
-    // Constants untuk wallet types
     const TYPE_BANK = 'bank';
     const TYPE_EWALLET = 'ewallet';
 
@@ -38,7 +37,6 @@ class Wallet extends Model
         self::TYPE_EWALLET => 'E-Wallet',
     ];
 
-    // Bank providers
     const BANK_PROVIDERS = [
         'BCA' => 'Bank Central Asia',
         'BNI' => 'Bank Negara Indonesia',
@@ -49,7 +47,6 @@ class Wallet extends Model
         'Permata' => 'Bank Permata',
         'BTN' => 'Bank Tabungan Negara',
         'BSI' => 'Bank Syariah Indonesia',
-        // Bank Digital
         'SeaBank' => 'SeaBank Indonesia',
         'Jago' => 'Bank Jago',
         'BNC' => 'Bank Neo Commerce',
@@ -74,10 +71,6 @@ class Wallet extends Model
         'OVONabung' => 'OVO Nabung (Rek-Wallet)',
     ];
 
-
-    /**
-     * Relationship dengan User
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

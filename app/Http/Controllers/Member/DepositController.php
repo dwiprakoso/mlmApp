@@ -16,7 +16,6 @@ class DepositController extends Controller
 {
     public function index()
     {
-        // Generate form token untuk prevent duplicate submission
         $formToken = bin2hex(random_bytes(16));
         session(['deposit_form_token' => $formToken]);
 
@@ -25,7 +24,6 @@ class DepositController extends Controller
 
     public function store(Request $request)
     {
-        // Validate form token
         if ($request->form_token !== session('deposit_form_token')) {
             return redirect()->back()
                 ->with('error', 'Form submission tidak valid. Silakan coba lagi.')
@@ -37,7 +35,6 @@ class DepositController extends Controller
             'payment_method' => 'required|string'
         ]);
 
-        // Check if user has recent pending deposit (last 2 minutes)
         $recentDeposit = Transaction::where('user_id', Auth::id())
             ->where('type', 'deposit')
             ->where('status', 'pending')
@@ -47,20 +44,16 @@ class DepositController extends Controller
             ->first();
 
         if ($recentDeposit) {
-            // Remove token to prevent reuse
             session()->forget('deposit_form_token');
 
             return redirect()->route('member.deposit.payment', $recentDeposit->id)
                 ->with('info', 'Deposit ini sudah dibuat sebelumnya dengan kode: ' . $recentDeposit->reference);
         }
 
-        // Use database transaction untuk ensure atomicity
         DB::beginTransaction();
         try {
-            // Generate reference dengan format DEP-6 digit random
             $reference = 'DEP-' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT);
 
-            // Pastikan reference unik dengan lock
             $maxAttempts = 5;
             $attempts = 0;
             while (Transaction::where('reference', $reference)->exists() && $attempts < $maxAttempts) {
@@ -72,7 +65,6 @@ class DepositController extends Controller
                 throw new \Exception('Gagal generate reference number yang unik');
             }
 
-            // Buat transaksi deposit
             $transaction = Transaction::create([
                 'user_id' => Auth::id(),
                 'product_id' => null,
@@ -87,25 +79,24 @@ class DepositController extends Controller
 
             DB::commit();
 
-            // Remove token setelah berhasil
             session()->forget('deposit_form_token');
 
-            // Send email notification (async, jangan block transaction)
             try {
                 Mail::to('richkingdomltd@gmail.com')->send(new DepositNotification($transaction));
-                Log::info('Deposit notification email sent successfully', ['transaction_id' => $transaction->id]);
             } catch (\Exception $e) {
-                Log::error('Failed to send deposit notification email: ' . $e->getMessage(), [
-                    'transaction_id' => $transaction->id
+                Log::error('Failed to send deposit notification email', [
+                    'transaction_id' => $transaction->id,
+                    'error' => $e->getMessage()
                 ]);
-                // Don't fail the transaction if email fails
             }
 
             return redirect()->route('member.deposit.payment', $transaction->id)
                 ->with('success', 'Deposit berhasil dibuat dengan kode: ' . $reference);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to create deposit transaction: ' . $e->getMessage());
+            Log::error('Failed to create deposit transaction', [
+                'error' => $e->getMessage()
+            ]);
 
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan saat membuat deposit. Silakan coba lagi.')
@@ -120,7 +111,6 @@ class DepositController extends Controller
             ->where('type', 'deposit')
             ->firstOrFail();
 
-        // Get dynamic payment methods from configs table
         $configs = Config::whereIn('key', [
             'app_name',
             'app_logo',

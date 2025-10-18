@@ -21,17 +21,14 @@ class TeamController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Hitung total deposit dari ReferralUsage (logic lama)
         $totalDepositFromReferral = ReferralUsage::where('user_referral', $currentUser->id)
             ->sum('deposit_count');
 
-        // Hitung total deposit sukses dari Transaction user sendiri (logic baru)
         $totalDepositFromTransaction = Transaction::where('user_id', $currentUser->id)
             ->where('type', 'deposit')
             ->where('status', 'success')
             ->count();
 
-        // Total gabungan
         $totalDepositCount = $totalDepositFromReferral + $totalDepositFromTransaction;
 
         $commissionRate = Config::where('key', 'team_invite_presentation')

@@ -34,7 +34,6 @@ class User extends Authenticatable
         ];
     }
 
-    // Auto generate referral code saat user dibuat
     protected static function boot()
     {
         parent::boot();
@@ -49,7 +48,6 @@ class User extends Authenticatable
     public static function generateUniqueReferralCode($length = 6)
     {
         do {
-            // Generate random string dengan huruf dan angka
             $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             $code = '';
             for ($i = 0; $i < $length; $i++) {
@@ -79,17 +77,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Wallet::class)->where('is_primary', true);
     }
-    /**
-     * Referral yang dimiliki user ini (orang yang pakai kode referral dia)
-     */
     public function referrals()
     {
         return $this->hasMany(ReferralUsage::class, 'user_referral');
     }
-
-    /**
-     * Referral yang dipakai user ini saat daftar
-     */
     public function usedReferral()
     {
         return $this->hasOne(ReferralUsage::class, 'used_by');

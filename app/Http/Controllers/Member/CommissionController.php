@@ -10,7 +10,6 @@ class CommissionController extends Controller
 {
     public function index()
     {
-        // Ambil semua transaksi komisi untuk user yang sedang login
         $commissions = Transaction::with(['relatedTransaction', 'sourceUser'])
             ->where('type', 'commission')
             ->where('user_id', auth()->id())

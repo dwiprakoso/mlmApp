@@ -101,7 +101,6 @@ class AuthController extends Controller
 
         $user->assignRole('member');
 
-        // Handle referral jika ada
         $referralCode = $request->get('ref');
         if ($referralCode) {
             $referrer = User::where('refferal_code', $referralCode)->first();

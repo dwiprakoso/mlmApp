@@ -12,27 +12,18 @@ use Carbon\Carbon;
 
 class ResetPasswordController extends Controller
 {
-    /**
-     * Normalize nomor HP ke format 62xxx
-     * @param string $phone
-     * @return string
-     */
     private function normalizePhone(string $phone): string
     {
-        // Hapus semua karakter non-digit
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
-        // Jika diawali 0, ganti dengan 62
         if (substr($phone, 0, 1) === '0') {
             $phone = '62' . substr($phone, 1);
         }
 
-        // Jika diawali +62, hapus +
         if (substr($phone, 0, 3) === '+62') {
             $phone = substr($phone, 1);
         }
 
-        // Jika belum diawali 62, tambahkan 62
         if (substr($phone, 0, 2) !== '62') {
             $phone = '62' . $phone;
         }
@@ -40,13 +31,11 @@ class ResetPasswordController extends Controller
         return $phone;
     }
 
-    // 1. Tampilkan form request reset password
     public function showRequestForm()
     {
         return view('guest.pages.forgot-password.index');
     }
 
-    // 2. Process request reset - kirim OTP
     public function sendOtp(Request $request)
     {
         $request->validate([
@@ -55,14 +44,12 @@ class ResetPasswordController extends Controller
             'phone.required' => 'No HP wajib diisi',
         ]);
 
-        // Normalize nomor HP untuk pencarian dan pengiriman
         $normalizedPhone = $this->normalizePhone($request->phone);
 
-        // Cari user dengan berbagai format nomor
         $user = User::where(function ($query) use ($request, $normalizedPhone) {
-            $query->where('phone', $request->phone) // Format asli input
-                ->orWhere('phone', $normalizedPhone) // Format 62xxx
-                ->orWhere('phone', '0' . substr($normalizedPhone, 2)); // Format 08xxx
+            $query->where('phone', $request->phone)
+                ->orWhere('phone', $normalizedPhone)
+                ->orWhere('phone', '0' . substr($normalizedPhone, 2));
         })->first();
 
         if (!$user) {
@@ -77,20 +64,17 @@ class ResetPasswordController extends Controller
             ])->withInput();
         }
 
-        // Generate OTP 6 digit
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        // Simpan dengan nomor normalized untuk konsistensi
         OtpPassword::updateOrCreate(
             ['phone' => $normalizedPhone],
             [
                 'otp' => $otp,
                 'is_used' => false,
-                'expires_at' => Carbon::now()->addMinutes(5), // Expire 5 menit
+                'expires_at' => Carbon::now()->addMinutes(5),
             ]
         );
 
-        // Kirim OTP ke WhatsApp (wajib format 62xxx)
         $whatsappService = new WhatsAppOtpService();
         $result = $whatsappService->sendOtp($normalizedPhone, $otp);
 
@@ -105,7 +89,6 @@ class ResetPasswordController extends Controller
             ->with('success', 'Kode OTP telah dikirim ke nomor WhatsApp Anda');
     }
 
-    // 3. Tampilkan form verifikasi OTP
     public function showVerifyOtpForm(Request $request)
     {
         $phone = $request->get('phone');
@@ -117,7 +100,6 @@ class ResetPasswordController extends Controller
         return view('guest.pages.verify-otp.index', compact('phone'));
     }
 
-    // 4. Process verifikasi OTP
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -141,7 +123,6 @@ class ResetPasswordController extends Controller
             ])->withInput();
         }
 
-        // OTP valid, redirect ke form reset password
         return redirect()
             ->route('reset-password.reset', [
                 'phone' => $request->phone,
@@ -149,7 +130,6 @@ class ResetPasswordController extends Controller
             ]);
     }
 
-    // 5. Tampilkan form reset password
     public function showResetForm(Request $request)
     {
         $phone = $request->get('phone');
@@ -159,7 +139,6 @@ class ResetPasswordController extends Controller
             return redirect()->route('reset-password.request');
         }
 
-        // Cek apakah token masih valid
         $otpRecord = OtpPassword::where('id', $token)
             ->where('phone', $phone)
             ->where('is_used', false)
@@ -175,7 +154,6 @@ class ResetPasswordController extends Controller
         return view('guest.pages.reset-password.index', compact('phone', 'token'));
     }
 
-    // 6. Process reset password
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -190,7 +168,6 @@ class ResetPasswordController extends Controller
 
         $normalizedPhone = $this->normalizePhone($request->phone);
 
-        // Validasi token
         $otpRecord = OtpPassword::where('id', $request->token)
             ->where('phone', $normalizedPhone)
             ->where('is_used', false)
@@ -203,7 +180,6 @@ class ResetPasswordController extends Controller
             ]);
         }
 
-        // Cari user dengan berbagai format
         $user = User::where(function ($query) use ($request, $normalizedPhone) {
             $query->where('phone', $request->phone)
                 ->orWhere('phone', $normalizedPhone)
@@ -220,7 +196,6 @@ class ResetPasswordController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        // Tandai OTP sebagai sudah digunakan
         $otpRecord->update([
             'is_used' => true
         ]);
@@ -230,17 +205,14 @@ class ResetPasswordController extends Controller
             ->with('success', 'Password berhasil direset. Silakan login dengan password baru Anda.');
     }
 
-    // Optional: Resend OTP
     public function resendOtp(Request $request)
     {
         $request->validate([
             'phone' => 'required|string',
         ]);
 
-        // Normalize nomor HP
         $normalizedPhone = $this->normalizePhone($request->phone);
 
-        // Cari user dengan berbagai format
         $user = User::where(function ($query) use ($request, $normalizedPhone) {
             $query->where('phone', $request->phone)
                 ->orWhere('phone', $normalizedPhone)
@@ -253,10 +225,8 @@ class ResetPasswordController extends Controller
             ]);
         }
 
-        // Generate OTP baru
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        // Update atau Create OTP baru dengan nomor normalized
         OtpPassword::updateOrCreate(
             ['phone' => $normalizedPhone],
             [
@@ -266,7 +236,6 @@ class ResetPasswordController extends Controller
             ]
         );
 
-        // Kirim OTP ke WhatsApp (format 62xxx)
         $whatsappService = new WhatsAppOtpService();
         $result = $whatsappService->sendOtp($normalizedPhone, $otp);
 

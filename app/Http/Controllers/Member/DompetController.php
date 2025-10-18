@@ -19,12 +19,10 @@ class DompetController extends Controller
         $wallets = Auth::user()->wallets()->orderByDesc('is_primary')->orderBy('created_at')->get();
 
         $balance = Transaction::calculateUserBalance(Auth::id());
-
-        // Ambil data real menggunakan method yang sudah ada di model
         $totalDeposit = Transaction::getTotalDeposit(Auth::id());
         $totalWithdraw = Transaction::getTotalWithdraw(Auth::id());
-        $totalRevenue = Transaction::getTotalRevenue(Auth::id()); // Total hadiah
-        $totalCommission = Transaction::getTotalCommission(Auth::id()); // Total komisi
+        $totalRevenue = Transaction::getTotalRevenue(Auth::id());
+        $totalCommission = Transaction::getTotalCommission(Auth::id());
 
         return view('member.pages.dompet.index', compact(
             'wallets',
@@ -38,7 +36,6 @@ class DompetController extends Controller
 
     public function detail()
     {
-        // Ambil wallet user yang login
         $wallets = Auth::user()->wallets()->orderByDesc('is_primary')->orderBy('created_at')->get();
         return view('member.pages.dompet.detail', compact('wallets'));
     }
@@ -50,50 +47,37 @@ class DompetController extends Controller
 
     public function store(Request $request)
     {
-        // Debug: lihat data yang masuk
-        Log::info('Store wallet request:', $request->all());
-
         $validator = Validator::make($request->all(), [
             'wallet_type' => 'required|in:bank,ewallet',
             'is_primary' => 'boolean',
-
-            // Bank validation
             'bank_name' => 'required_if:wallet_type,bank|nullable|string|max:100',
             'bank_account' => 'required_if:wallet_type,bank|nullable|string|max:50',
             'account_name' => 'required_if:wallet_type,bank|nullable|string|max:100',
-
-            // E-wallet validation
             'ewallet_provider' => 'required_if:wallet_type,ewallet|nullable|string|max:50',
             'ewallet_number' => 'required_if:wallet_type,ewallet|nullable|string|max:20',
             'ewallet_name' => 'required_if:wallet_type,ewallet|nullable|string|max:100',
-
             'notes' => 'nullable|string|max:255'
         ], [
             'wallet_type.required' => 'Tipe wallet harus dipilih',
             'wallet_type.in' => 'Tipe wallet tidak valid',
-
             'bank_name.required_if' => 'Nama bank harus diisi',
             'bank_account.required_if' => 'Nomor rekening harus diisi',
             'account_name.required_if' => 'Nama pemegang rekening harus diisi',
-
             'ewallet_provider.required_if' => 'Provider e-wallet harus diisi',
             'ewallet_number.required_if' => 'Nomor e-wallet harus diisi',
             'ewallet_name.required_if' => 'Nama akun e-wallet harus diisi',
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed:', $validator->errors()->toArray());
             return back()->withErrors($validator)->withInput();
         }
 
-        // Cek apakah ini wallet pertama user
         $isFirstWallet = Auth::user()->wallets()->count() === 0;
         $setPrimary = $request->boolean('is_primary') || $isFirstWallet;
 
         try {
             DB::beginTransaction();
 
-            // Jika akan di-set sebagai primary, ubah wallet primary lama
             if ($setPrimary) {
                 Auth::user()->wallets()->update(['is_primary' => false]);
             }
@@ -105,7 +89,6 @@ class DompetController extends Controller
                 'notes' => $request->notes,
             ];
 
-            // Add type-specific data
             if ($request->wallet_type === 'bank') {
                 $walletData = array_merge($walletData, [
                     'bank_name' => $request->bank_name,
@@ -129,15 +112,14 @@ class DompetController extends Controller
             $wallet = Wallet::create($walletData);
 
             DB::commit();
-            Log::info('Wallet created successfully:', $wallet->toArray());
+            Log::info('Wallet created', ['wallet_id' => $wallet->id, 'user_id' => Auth::id()]);
 
             return redirect()->route('member.dompet.index')
                 ->with('success', 'Wallet berhasil ditambahkan!');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error creating wallet:', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+            Log::error('Error creating wallet', [
+                'error' => $e->getMessage()
             ]);
 
             return back()
@@ -148,7 +130,6 @@ class DompetController extends Controller
 
     public function edit(Wallet $wallet)
     {
-        // Pastikan wallet milik user yang login
         if ($wallet->user_id !== Auth::id()) {
             abort(403);
         }
@@ -158,7 +139,6 @@ class DompetController extends Controller
 
     public function update(Request $request, Wallet $wallet)
     {
-        // Pastikan wallet milik user yang login
         if ($wallet->user_id !== Auth::id()) {
             abort(403);
         }
@@ -166,33 +146,25 @@ class DompetController extends Controller
         $validator = Validator::make($request->all(), [
             'wallet_type' => 'required|in:bank,ewallet',
             'is_primary' => 'boolean',
-
-            // Bank validation
             'bank_name' => 'required_if:wallet_type,bank|nullable|string|max:100',
             'bank_account' => 'required_if:wallet_type,bank|nullable|string|max:50',
             'account_name' => 'required_if:wallet_type,bank|nullable|string|max:100',
-
-            // E-wallet validation
             'ewallet_provider' => 'required_if:wallet_type,ewallet|nullable|string|max:50',
             'ewallet_number' => 'required_if:wallet_type,ewallet|nullable|string|max:20',
             'ewallet_name' => 'required_if:wallet_type,ewallet|nullable|string|max:100',
-
             'notes' => 'nullable|string|max:255'
         ], [
             'wallet_type.required' => 'Tipe wallet harus dipilih',
             'wallet_type.in' => 'Tipe wallet tidak valid',
-
             'bank_name.required_if' => 'Nama bank harus diisi',
             'bank_account.required_if' => 'Nomor rekening harus diisi',
             'account_name.required_if' => 'Nama pemegang rekening harus diisi',
-
             'ewallet_provider.required_if' => 'Provider e-wallet harus diisi',
             'ewallet_number.required_if' => 'Nomor e-wallet harus diisi',
             'ewallet_name.required_if' => 'Nama akun e-wallet harus diisi',
         ]);
 
         if ($validator->fails()) {
-            Log::error('Update validation failed:', $validator->errors()->toArray());
             return back()->withErrors($validator)->withInput();
         }
 
@@ -201,7 +173,6 @@ class DompetController extends Controller
         try {
             DB::beginTransaction();
 
-            // Jika akan di-set sebagai primary, ubah wallet primary lama
             if ($setPrimary && !$wallet->is_primary) {
                 Auth::user()->wallets()->where('id', '!=', $wallet->id)->update(['is_primary' => false]);
             }
@@ -212,7 +183,6 @@ class DompetController extends Controller
                 'notes' => $request->notes,
             ];
 
-            // Add type-specific data
             if ($request->wallet_type === 'bank') {
                 $walletData = array_merge($walletData, [
                     'bank_name' => $request->bank_name,
@@ -236,15 +206,14 @@ class DompetController extends Controller
             $wallet->update($walletData);
 
             DB::commit();
-            Log::info('Wallet updated successfully:', $wallet->fresh()->toArray());
+            Log::info('Wallet updated', ['wallet_id' => $wallet->id, 'user_id' => Auth::id()]);
 
             return redirect()->route('member.dompet.index')
                 ->with('success', 'Wallet berhasil diperbarui!');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error updating wallet:', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+            Log::error('Error updating wallet', [
+                'error' => $e->getMessage()
             ]);
 
             return back()
@@ -255,19 +224,16 @@ class DompetController extends Controller
 
     public function destroy(Wallet $wallet)
     {
-        // Pastikan wallet milik user yang login
         if ($wallet->user_id !== Auth::id()) {
             abort(403);
         }
 
-        // Jangan hapus jika ini wallet primary dan satu-satunya
         if ($wallet->is_primary && Auth::user()->wallets()->count() === 1) {
             return back()->with('error', 'Tidak dapat menghapus wallet utama terakhir!');
         }
 
         $wallet->delete();
 
-        // Jika wallet yang dihapus adalah primary, set wallet lain sebagai primary
         if ($wallet->is_primary) {
             $nextWallet = Auth::user()->wallets()->first();
             if ($nextWallet) {
@@ -280,7 +246,6 @@ class DompetController extends Controller
 
     public function setPrimary(Wallet $wallet)
     {
-        // Pastikan wallet milik user yang login
         if ($wallet->user_id !== Auth::id()) {
             abort(403);
         }

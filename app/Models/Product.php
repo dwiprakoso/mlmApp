@@ -21,13 +21,11 @@ class Product extends Model
         'total_profit'
     ];
 
-    // Cast attributes to appropriate types
     protected $casts = [
         'is_active' => 'boolean',
         'price' => 'decimal:2',
     ];
 
-    // Default values
     protected $attributes = [
         'is_active' => true,
     ];

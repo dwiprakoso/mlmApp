@@ -56,15 +56,12 @@ class AboutController extends Controller
         }
 
         try {
-            // Update app settings
             Config::set('app_name', $request->name);
             Config::set('app_description', $request->description);
 
-            // Handle app logo upload
             if ($request->hasFile('avatar')) {
                 $oldLogo = Config::get('app_logo');
                 if ($oldLogo) {
-                    // Extract filename from URL (works with both /storage/... and full path)
                     $filePath = str_replace(['/storage/', env('APP_URL') . '/storage/'], '', $oldLogo);
                     if (Storage::disk('public')->exists($filePath)) {
                         Storage::disk('public')->delete($filePath);
@@ -75,16 +72,13 @@ class AboutController extends Controller
                 Config::set('app_logo', '/storage/' . $logoPath);
             }
 
-            // Update bank settings
             Config::set('bank_name', $request->bank_name);
             Config::set('bank_account_number', $request->bank_account_number);
             Config::set('account_name', $request->account_name);
 
-            // Handle payment QR code upload
             if ($request->hasFile('payment_qr_code')) {
                 $oldQrCode = Config::get('payment_qr_code');
                 if ($oldQrCode) {
-                    // Extract filename from URL (works with both /storage/... and full path)
                     $filePath = str_replace(['/storage/', env('APP_URL') . '/storage/'], '', $oldQrCode);
                     if (Storage::disk('public')->exists($filePath)) {
                         Storage::disk('public')->delete($filePath);
@@ -95,15 +89,10 @@ class AboutController extends Controller
                 Config::set('payment_qr_code', '/storage/' . $qrCodePath);
             }
 
-            // Update team settings
             Config::set('team_invite_presentation', $request->team_invite_presentation);
-
-            // Update general settings
             Config::set('header_text', $request->header_text);
             Config::set('legal_name', $request->legal_name);
             Config::set('withdrawal_fee', $request->withdrawal_fee);
-
-            // Update contact settings
             Config::set('whatsapp_channel', $request->whatsapp_channel);
             Config::set('whatsapp_number', $request->whatsapp_number);
 

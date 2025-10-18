@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 
 class RevenueController extends Controller
 {
-
     public function index()
     {
         $userId = auth()->id();
@@ -17,12 +16,11 @@ class RevenueController extends Controller
             ->where('user_id', $userId)
             ->where('type', 'revenue')
             ->where('status', 'success')
-            ->orderBy('created_at', 'desc') // Urutkan dari yang terbaru
+            ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($transaction, $index) {
                 $transaction->revenue_count = $index + 1;
 
-                // Hitung day in cycle berdasarkan duration
                 if ($transaction->product && $transaction->product->duration > 0) {
                     $transaction->day_in_cycle = (($transaction->revenue_count - 1) % $transaction->product->duration) + 1;
                     $transaction->cycle = ceil($transaction->revenue_count / $transaction->product->duration);
@@ -31,7 +29,6 @@ class RevenueController extends Controller
                 return $transaction;
             });
 
-        // Hitung total revenue untuk summary
         $totalRevenue = $revenues->sum('amount');
 
         return view('member.pages.revenue.index', compact('revenues', 'totalRevenue'));

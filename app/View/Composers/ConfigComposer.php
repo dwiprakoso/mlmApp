@@ -17,7 +17,6 @@ class ConfigComposer
             'legalName' => Config::get('legal_name', 'Legal Name'),
             'appDescription' => Config::get('app_description', 'Description'),
 
-            // ✅ Tambahan data user
             'currentUser' => $user,
             'userName' => $user ? $user->name : 'Guest',
             'userEmail' => $user ? $user->email : null,

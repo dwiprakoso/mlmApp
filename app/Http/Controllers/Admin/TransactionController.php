@@ -13,7 +13,6 @@ class TransactionController extends Controller
 {
     public function index()
     {
-        // Get transactions with type 'purchase' using Eloquent
         $transactions = Transaction::with(['user', 'product'])
             ->where('type', 'purchase')
             ->orderBy('created_at', 'desc')
@@ -29,13 +28,11 @@ class TransactionController extends Controller
 
             $transaction = Transaction::with(['user', 'product'])->findOrFail($id);
 
-            // Check if transaction is pending
             if ($transaction->status !== 'pending') {
                 DB::rollBack();
                 return back()->with('error', 'Transaksi ini tidak dapat disetujui. Status saat ini: ' . $transaction->status);
             }
 
-            // Check user balance
             $currentBalance = Transaction::calculateUserBalance($transaction->user_id);
 
             if ($currentBalance < $transaction->amount) {
@@ -43,7 +40,6 @@ class TransactionController extends Controller
                 return back()->with('error', 'Saldo user tidak mencukupi. Saldo: Rp ' . number_format($currentBalance, 0, ',', '.') . ', Dibutuhkan: Rp ' . number_format($transaction->amount, 0, ',', '.'));
             }
 
-            // Update transaction status to success
             $transaction->update([
                 'status' => 'success',
                 'approved_by' => Auth::id(),
@@ -82,13 +78,11 @@ class TransactionController extends Controller
 
             $transaction = Transaction::with(['user', 'product'])->findOrFail($id);
 
-            // Check if transaction is pending
             if ($transaction->status !== 'pending') {
                 DB::rollBack();
                 return back()->with('error', 'Transaksi ini tidak dapat ditolak. Status saat ini: ' . $transaction->status);
             }
 
-            // Update transaction status to failed
             $transaction->update([
                 'status' => 'failed',
                 'approved_by' => Auth::id(),

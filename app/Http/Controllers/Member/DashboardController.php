@@ -6,7 +6,7 @@ use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\Transaction; // Import model Transaction
+use App\Models\Transaction;
 
 class DashboardController extends Controller
 {
@@ -16,11 +16,9 @@ class DashboardController extends Controller
         $referralCode = $user->refferal_code;
         $referralLink = route('guest.sign-up', ['ref' => $referralCode]);
 
-        // ✅ Balance breakdown untuk debug
         $balanceData = Transaction::getBalanceBreakdown($user->id);
-        $balance = $balanceData['total']; // Total withdrawable balance
+        $balance = $balanceData['total'];
 
-        // ✅ Validasi (opsional, untuk development/debug)
         if (config('app.debug')) {
             $validation = Transaction::validateBalanceCalculation($user->id);
             Log::info('Balance Validation', [
@@ -36,8 +34,6 @@ class DashboardController extends Controller
             ->value('value') ?? '10';
         $headerText = Config::where('key', 'header_text')
             ->value('value') ?? 'Investasi pertambangan';
-
-        // Ambil config WhatsApp
         $whatsappNumber = Config::where('key', 'whatsapp_number')
             ->value('value') ?? '6281266818738';
         $whatsappChannel = Config::where('key', 'whatsapp_channel')
@@ -48,7 +44,7 @@ class DashboardController extends Controller
             'referralCode',
             'referralLink',
             'balance',
-            'balanceData', // ← Kirim breakdown ke view
+            'balanceData',
             'commissionRate',
             'headerText',
             'whatsappNumber',
