@@ -13,6 +13,7 @@ class OtpPassword extends Model
 
     protected $fillable = [
         'phone',
+        'email',  
         'otp',
         'is_used',
         'expires_at',

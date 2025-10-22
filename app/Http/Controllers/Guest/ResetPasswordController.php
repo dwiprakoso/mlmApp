@@ -5,32 +5,14 @@ namespace App\Http\Controllers\Guest;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\OtpPassword;
-use App\Services\WhatsAppOtpService;
+use App\Mail\ResetPasswordOtp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class ResetPasswordController extends Controller
 {
-    private function normalizePhone(string $phone): string
-    {
-        $phone = preg_replace('/[^0-9]/', '', $phone);
-
-        if (substr($phone, 0, 1) === '0') {
-            $phone = '62' . substr($phone, 1);
-        }
-
-        if (substr($phone, 0, 3) === '+62') {
-            $phone = substr($phone, 1);
-        }
-
-        if (substr($phone, 0, 2) !== '62') {
-            $phone = '62' . $phone;
-        }
-
-        return $phone;
-    }
-
     public function showRequestForm()
     {
         return view('guest.pages.forgot-password.index');
@@ -39,35 +21,32 @@ class ResetPasswordController extends Controller
     public function sendOtp(Request $request)
     {
         $request->validate([
-            'phone' => 'required|string',
+            'email' => 'required|email',
         ], [
-            'phone.required' => 'No HP wajib diisi',
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email tidak valid',
         ]);
 
-        $normalizedPhone = $this->normalizePhone($request->phone);
-
-        $user = User::where(function ($query) use ($request, $normalizedPhone) {
-            $query->where('phone', $request->phone)
-                ->orWhere('phone', $normalizedPhone)
-                ->orWhere('phone', '0' . substr($normalizedPhone, 2));
-        })->first();
+        $user = User::where('email', $request->email)->first();
 
         if (!$user) {
             return back()->withErrors([
-                'phone' => 'No HP tidak terdaftar'
+                'email' => 'Email tidak terdaftar'
             ])->withInput();
         }
 
         if ($user->status !== 'active') {
             return back()->withErrors([
-                'phone' => 'Akun tidak aktif'
+                'email' => 'Akun tidak aktif'
             ])->withInput();
         }
 
+        // Generate OTP
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
+        // Simpan OTP
         OtpPassword::updateOrCreate(
-            ['phone' => $normalizedPhone],
+            ['email' => $request->email],
             [
                 'otp' => $otp,
                 'is_used' => false,
@@ -75,43 +54,43 @@ class ResetPasswordController extends Controller
             ]
         );
 
-        $whatsappService = new WhatsAppOtpService();
-        $result = $whatsappService->sendOtp($normalizedPhone, $otp);
+        // Kirim email
+        try {
+            Mail::to($request->email)->send(new ResetPasswordOtp($otp, $user->name));
 
-        if (!$result['success']) {
+            return redirect()
+                ->route('reset-password.verify-otp', ['email' => $request->email])
+                ->with('success', 'Kode OTP telah dikirim ke email Anda');
+        } catch (\Exception $e) {
             return back()->withErrors([
-                'phone' => 'Gagal mengirim OTP: ' . $result['message']
+                'email' => 'Gagal mengirim OTP: ' . $e->getMessage()
             ])->withInput();
         }
-
-        return redirect()
-            ->route('reset-password.verify-otp', ['phone' => $normalizedPhone])
-            ->with('success', 'Kode OTP telah dikirim ke nomor WhatsApp Anda');
     }
 
     public function showVerifyOtpForm(Request $request)
     {
-        $phone = $request->get('phone');
+        $email = $request->get('email');
 
-        if (!$phone) {
+        if (!$email) {
             return redirect()->route('reset-password.request');
         }
 
-        return view('guest.pages.verify-otp.index', compact('phone'));
+        return view('guest.pages.verify-otp.index', compact('email'));
     }
 
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'phone' => 'required|string',
+            'email' => 'required|email',
             'otp' => 'required|string|size:6',
         ], [
-            'phone.required' => 'No HP wajib diisi',
+            'email.required' => 'Email wajib diisi',
             'otp.required' => 'Kode OTP wajib diisi',
             'otp.size' => 'Kode OTP harus 6 digit',
         ]);
 
-        $otpRecord = OtpPassword::where('phone', $request->phone)
+        $otpRecord = OtpPassword::where('email', $request->email)
             ->where('otp', $request->otp)
             ->where('is_used', false)
             ->where('expires_at', '>', Carbon::now())
@@ -125,22 +104,22 @@ class ResetPasswordController extends Controller
 
         return redirect()
             ->route('reset-password.reset', [
-                'phone' => $request->phone,
+                'email' => $request->email,
                 'token' => $otpRecord->id
             ]);
     }
 
     public function showResetForm(Request $request)
     {
-        $phone = $request->get('phone');
+        $email = $request->get('email');
         $token = $request->get('token');
 
-        if (!$phone || !$token) {
+        if (!$email || !$token) {
             return redirect()->route('reset-password.request');
         }
 
         $otpRecord = OtpPassword::where('id', $token)
-            ->where('phone', $phone)
+            ->where('email', $email)
             ->where('is_used', false)
             ->where('expires_at', '>', Carbon::now())
             ->first();
@@ -151,13 +130,13 @@ class ResetPasswordController extends Controller
                 ->withErrors(['error' => 'Sesi reset password sudah kadaluarsa']);
         }
 
-        return view('guest.pages.reset-password.index', compact('phone', 'token'));
+        return view('guest.pages.reset-password.index', compact('email', 'token'));
     }
 
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'phone' => 'required|string',
+            'email' => 'required|email',
             'token' => 'required',
             'password' => 'required|string|min:8|confirmed',
         ], [
@@ -166,10 +145,8 @@ class ResetPasswordController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok',
         ]);
 
-        $normalizedPhone = $this->normalizePhone($request->phone);
-
         $otpRecord = OtpPassword::where('id', $request->token)
-            ->where('phone', $normalizedPhone)
+            ->where('email', $request->email)
             ->where('is_used', false)
             ->where('expires_at', '>', Carbon::now())
             ->first();
@@ -180,11 +157,7 @@ class ResetPasswordController extends Controller
             ]);
         }
 
-        $user = User::where(function ($query) use ($request, $normalizedPhone) {
-            $query->where('phone', $request->phone)
-                ->orWhere('phone', $normalizedPhone)
-                ->orWhere('phone', '0' . substr($normalizedPhone, 2));
-        })->first();
+        $user = User::where('email', $request->email)->first();
 
         if (!$user) {
             return back()->withErrors([
@@ -208,27 +181,21 @@ class ResetPasswordController extends Controller
     public function resendOtp(Request $request)
     {
         $request->validate([
-            'phone' => 'required|string',
+            'email' => 'required|email',
         ]);
 
-        $normalizedPhone = $this->normalizePhone($request->phone);
-
-        $user = User::where(function ($query) use ($request, $normalizedPhone) {
-            $query->where('phone', $request->phone)
-                ->orWhere('phone', $normalizedPhone)
-                ->orWhere('phone', '0' . substr($normalizedPhone, 2));
-        })->first();
+        $user = User::where('email', $request->email)->first();
 
         if (!$user) {
             return back()->withErrors([
-                'phone' => 'No HP tidak terdaftar'
+                'email' => 'Email tidak terdaftar'
             ]);
         }
 
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         OtpPassword::updateOrCreate(
-            ['phone' => $normalizedPhone],
+            ['email' => $request->email],
             [
                 'otp' => $otp,
                 'is_used' => false,
@@ -236,15 +203,14 @@ class ResetPasswordController extends Controller
             ]
         );
 
-        $whatsappService = new WhatsAppOtpService();
-        $result = $whatsappService->sendOtp($normalizedPhone, $otp);
+        try {
+            Mail::to($request->email)->send(new ResetPasswordOtp($otp, $user->name));
 
-        if (!$result['success']) {
+            return back()->with('success', 'Kode OTP baru telah dikirim');
+        } catch (\Exception $e) {
             return back()->withErrors([
-                'error' => 'Gagal mengirim OTP: ' . $result['message']
+                'error' => 'Gagal mengirim OTP: ' . $e->getMessage()
             ]);
         }
-
-        return back()->with('success', 'Kode OTP baru telah dikirim');
     }
 }

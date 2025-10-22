@@ -33,7 +33,7 @@
                             <!--end::Title-->
                             <!--begin::Description-->
                             <div class="text-gray-500 fw-semibold fs-6">
-                                Masukkan nomor HP yang terdaftar untuk menerima kode OTP
+                                Masukkan email yang terdaftar untuk menerima kode OTP
                             </div>
                             <!--end::Description-->
                         </div>
@@ -42,13 +42,13 @@
                         <!--begin::Input group-->
                         <div class="fv-row mb-10">
                             <!--begin::Label-->
-                            <label class="form-label fs-6 fw-semibold text-gray-900 mb-3">No HP</label>
+                            <label class="form-label fs-6 fw-semibold text-gray-900 mb-3">Email</label>
                             <!--end::Label-->
-                            <!--begin::Phone-->
-                            <input type="text" placeholder="Contoh: 08123456789" name="phone"
-                                value="{{ old('phone') }}" autocomplete="off"
-                                class="form-control form-control-lg bg-transparent @error('phone') is-invalid @enderror" />
-                            <!--end::Phone-->
+                            <!--begin::Email-->
+                            <input type="email" placeholder="Contoh: nama@email.com" name="email"
+                                value="{{ old('email') }}" autocomplete="email"
+                                class="form-control form-control-lg bg-transparent @error('email') is-invalid @enderror" />
+                            <!--end::Email-->
                         </div>
                         <!--end::Input group-->
 

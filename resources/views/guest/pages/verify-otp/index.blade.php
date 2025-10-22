@@ -26,7 +26,7 @@
                     <!--begin::Form-->
                     <form class="form w-100" method="POST" action="{{ route('reset-password.verify-otp.process') }}">
                         @csrf
-                        <input type="hidden" name="phone" value="{{ $phone }}">
+                        <input type="hidden" name="email" value="{{ $email }}">
 
                         <!--begin::Heading-->
                         <div class="text-center mb-10">
@@ -35,10 +35,10 @@
                             <!--end::Title-->
                             <!--begin::Description-->
                             <div class="text-gray-500 fw-semibold fs-6 mb-2">
-                                Kode OTP telah dikirim ke nomor
+                                Kode OTP telah dikirim ke email
                             </div>
                             <div class="text-gray-900 fw-bold fs-5 mb-5">
-                                {{ $phone }}
+                                {{ $email }}
                             </div>
                             <div class="text-gray-500 fw-semibold fs-7">
                                 Masukkan 6 digit kode OTP yang Anda terima
@@ -76,7 +76,7 @@
                             <form action="{{ route('reset-password.resend-otp') }}" method="POST" class="d-inline"
                                 id="resend-form">
                                 @csrf
-                                <input type="hidden" name="phone" value="{{ $phone }}">
+                                <input type="hidden" name="email" value="{{ $email }}">
                                 <button type="submit" class="btn btn-link link-primary fw-bold p-0" id="resend-btn">
                                     Kirim Ulang
                                 </button>
