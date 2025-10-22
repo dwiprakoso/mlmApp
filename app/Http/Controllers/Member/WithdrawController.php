@@ -58,6 +58,15 @@ class WithdrawController extends Controller
             return back()->with('error', 'Wallet tidak valid')->withInput();
         }
 
+        $hasSuccessfulDeposit = Transaction::where('user_id', Auth::id())
+            ->where('type', 'deposit')
+            ->where('status', 'success')
+            ->exists();
+
+        if (!$hasSuccessfulDeposit) {
+            return back()->with('error', 'Anda harus melakukan deposit terlebih dahulu sebelum dapat melakukan penarikan')->withInput();
+        }
+
         $amount = $request->amount;
 
         $withdrawalFeeConfig = Config::where('key', 'withdrawal_fee')->first();
