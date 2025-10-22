@@ -21,7 +21,12 @@ use App\Http\Controllers\Member\WithdrawController as MemberWithdrawController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 
 Route::get('/', function () {
-    return redirect('https://richkingdomasia.com/');
+    if (auth()->check()) {
+        return auth()->user()->hasRole('admin')
+            ? redirect()->route('admin.dashboard.index')
+            : redirect()->route('member.dashboard.index');
+    }
+    return redirect()->route('login');
 });
 
 Route::middleware('guest')->group(function () {

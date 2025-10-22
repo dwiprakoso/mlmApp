@@ -26,7 +26,7 @@
                     <!--begin::Form-->
                     <form class="form w-100" method="POST" action="{{ route('reset-password.reset.process') }}">
                         @csrf
-                        <input type="hidden" name="phone" value="{{ $phone }}">
+                        <input type="hidden" name="email" value="{{ $email }}">
                         <input type="hidden" name="token" value="{{ $token }}">
 
                         <!--begin::Heading-->
