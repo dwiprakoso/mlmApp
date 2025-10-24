@@ -173,6 +173,42 @@ class DepositController extends Controller
 
         return redirect()->back()->with('success', 'Deposit berhasil dikonfirmasi.');
     }
+    public function reject(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'nullable|string|max:500'
+        ]);
+
+        $deposit = Transaction::where('type', 'deposit')->findOrFail($id);
+
+        if (!in_array($deposit->status, ['pending', 'waiting_confirmation'])) {
+            return redirect()->back()->with('error', 'Deposit tidak dapat ditolak.');
+        }
+
+        $deposit->update([
+            'status' => 'failed',
+            'approved_by' => auth()->id(),
+        ]);
+
+        Log::info('Deposit rejected', [
+            'deposit_id' => $deposit->id,
+            'user_id' => $deposit->user_id,
+            'amount' => $deposit->amount,
+            'reason' => $request->reason,
+            'rejected_by' => auth()->id()
+        ]);
+
+        try {
+            Mail::to($deposit->user->email)->send(new DepositRejected($deposit, $request->reason));
+        } catch (\Exception $e) {
+            Log::error('Failed to send deposit rejection email', [
+                'deposit_id' => $deposit->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Deposit berhasil ditolak.');
+    }
 
     public function destroy($id)
     {
