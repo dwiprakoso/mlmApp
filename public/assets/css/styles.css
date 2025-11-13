@@ -1,12 +1,12 @@
-/* Mobile-First Design with Metronic Dark Theme */
+/* Mobile-First Design with Metronic Light Theme */
 :root {
-    --primary-dark: #1e1e2e;
-    --secondary-dark: #2a2d3a;
-    --card-dark: #181c32;
+    --primary-dark: #f5f8fa;
+    --secondary-dark: #ffffff;
+    --card-dark: #ffffff;
     --gold-color: #DAA520;
     --gold-hover: #b8941c;
     --text-muted: #7e8299;
-    --border-color: #323248;
+    --border-color: #e4e6ef;
 }
 
 * {
@@ -22,7 +22,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    color: #fff;
+    color: #181c32;
 }
 
 /* Mobile Container - Fixed Width for Consistency */
@@ -31,20 +31,20 @@ body {
     min-height: 100vh;
     background-color: var(--primary-dark);
     position: relative;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     padding-top: 20px;
 }
 
 /* Hero Section */
 .hero-card {
-    background: linear-gradient(135deg, var(--card-dark) 0%, var(--secondary-dark) 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f5f8fa 100%);
     padding: 20px;
     border-radius: 0 0 20px 20px;
     border-bottom: 2px solid var(--border-color);
 }
 
 .balance-card {
-    background: linear-gradient(135deg, var(--secondary-dark), var(--card-dark));
+    background: linear-gradient(135deg, var(--secondary-dark), #f9fafb);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 20px;
@@ -135,7 +135,7 @@ body {
 }
 
 .text-white {
-    color: #fff !important;
+    color: #181c32 !important;
 }
 
 /* Bottom Navigation */
@@ -145,7 +145,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     width: 425px;
-    background: linear-gradient(135deg, var(--card-dark), var(--secondary-dark));
+    background: linear-gradient(135deg, #ffffff, #f5f8fa);
     border-top: 1px solid var(--border-color);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
@@ -189,7 +189,7 @@ body {
 /* Responsive Adjustments for Larger Screens */
 @media (min-width: 768px) {
     body {
-        background: linear-gradient(135deg, #0f0f23 0%, var(--primary-dark) 100%);
+        background: linear-gradient(135deg, #e8edf2 0%, var(--primary-dark) 100%);
         padding: 20px 0;
     }
     
@@ -224,7 +224,7 @@ body {
 
 /* Invitation Box Styling */
 .invitation-box {
-    background-color: var(--secondary-dark);
+    background-color: #f9fafb;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px 8px;
@@ -238,7 +238,7 @@ body {
 
 /* Order Cards */
 .order-card {
-    background-color: var(--secondary-dark);
+    background-color: #f9fafb;
     border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 12px;
@@ -283,17 +283,17 @@ body {
 
 /* Deposit Page Styles */
 .form-control-dark {
-    background-color: var(--secondary-dark);
+    background-color: #f9fafb;
     border: 1px solid var(--border-color);
-    color: #fff;
+    color: #181c32;
     border-radius: 8px;
     padding: 12px 15px;
 }
 
 .form-control-dark:focus {
-    background-color: var(--secondary-dark);
+    background-color: #ffffff;
     border-color: var(--gold-color);
-    color: #fff;
+    color: #181c32;
     box-shadow: 0 0 0 0.2rem rgba(218, 165, 32, 0.25);
 }
 
@@ -314,7 +314,7 @@ body {
 }
 
 .payment-method {
-    background-color: var(--secondary-dark);
+    background-color: #f9fafb;
     border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 15px;
@@ -406,7 +406,7 @@ body {
 
 .log-item .text-white {
     font-size: 13px;
-    color: #fff;
+    color: #181c32;
 }
 
 .log-item .fw-bold {
@@ -427,7 +427,7 @@ body {
 }
 
 .bg-success {
-    background-color: #28a745 !important;
+    background-color: #4e73df !important;
     color: #fff !important;
 }
 
@@ -473,7 +473,7 @@ body {
 }
 
 .form-control:disabled {
-    background-color: var(--secondary-dark);
+    background-color: #f9fafb;
     opacity: 0.6;
     cursor: not-allowed;
 }
@@ -512,14 +512,14 @@ hr {
     padding: 6px 12px;
 }
 .balance-card {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #4e73df, #36b9cc);
     border-radius: 15px;
     padding: 20px;
     margin-top: 15px;
 }
 
 .hero-card {
-    background: linear-gradient(135deg, var(--card-dark) 0%, var(--secondary-dark) 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f5f8fa 100%);
     padding: 20px;
     border-radius: 0 0 20px 20px;
     border-bottom: 2px solid var(--border-color);
@@ -534,11 +534,11 @@ hr {
 
 .card-dark:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(218, 165, 32, 0.1);
+    box-shadow: 0 4px 12px rgba(218, 165, 32, 0.15);
 }
 
 .btn-success {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #4e73df, #36b9cc);
     border: none;
     border-radius: 10px;
     padding: 12px;
@@ -546,7 +546,7 @@ hr {
 }
 
 .btn-success:hover {
-    background: linear-gradient(135deg, #20c997, #28a745);
+    background: linear-gradient(135deg, #36b9cc, #4e73df);
     transform: translateY(-1px);
 }
 
@@ -659,8 +659,8 @@ small {
 }
 
 .progress-dot.completed {
-    background-color: #28a745;
-    box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+    background-color: #4e73df;
+    box-shadow: 0 0 8px rgba(78, 115, 223, 0.3);
 }
 
 .investment-details small {
@@ -681,7 +681,7 @@ small {
 }
 
 .text-white {
-    color: #fff !important;
+    color: #181c32 !important;
 }
 
 h6 {
